@@ -4,49 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { proxy } from "../factory/proxy";
 import { baseballCache } from "../factory/cache";
 
-export interface BaseballProps {
-  query: string;
-}
-
-type BaseballSavantPosition =
-  | "RHP"
-  | "LHP"
-  | "TWP"
-  | "C"
-  | "1B"
-  | "2B"
-  | "SS"
-  | "3B"
-  | "RF"
-  | "CF"
-  | "LF"
-  | "";
-
-export type BaseballSavantResult = {
-  name: string;
-  id: string;
-  is_player: number;
-  mlb: number;
-  league: string;
-  first: string;
-  is_prospect: number;
-  parent_team: string;
-  pos: BaseballSavantPosition;
-  rank: string;
-  last_year: string;
-  name_display_club: string;
-  url: string;
-};
-
-type BaseballSavantFilter = {
-  position: BaseballSavantPosition;
-  team: string;
-};
-
 const searchBaseballSavant = async (query: string) => {
   const q = query.trim();
   const cached = baseballCache.get(q);
-  if (cached.length > 0) return cached;
+  if (cached !== null) return cached;
 
   const res = await proxy(
     `https://baseballsavant.mlb.com/player/search-all?search=${q}`

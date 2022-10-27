@@ -1,6 +1,3 @@
-import { BaseballSavantResult } from "../component/Baseball";
-import { EliteProspectsResult } from "../component/Hockey";
-
 const baseballRequest = {
   query: "",
   results: [] as BaseballSavantResult[],
@@ -15,7 +12,7 @@ export const getBaseballCache = (query: string) => {
   if (query === baseballRequest.query) {
     return baseballRequest.results;
   } else {
-    return [];
+    return null;
   }
 };
 
@@ -38,7 +35,7 @@ export const getHockeyCache = (query: string) => {
   if (query === hockeyRequest.query) {
     return hockeyRequest.results;
   } else {
-    return [];
+    return null;
   }
 };
 

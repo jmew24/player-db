@@ -5,38 +5,10 @@ import Image from "next/image";
 import { proxy } from "../factory/proxy";
 import { hockeyCache } from "../factory/cache";
 
-export interface HockeyProps {
-  query: string;
-}
-
-type EliteProspectPosition = "F" | "D" | "G" | "Staff" | "";
-
-type EliteProspectTypes = "team" | "player" | "staff" | "";
-
-export type EliteProspectsResult = {
-  age: string;
-  country: string;
-  fullname: string;
-  id: string;
-  matches: [number, number][];
-  position: EliteProspectPosition;
-  season: string;
-  team: string;
-  verified: string;
-  verifiedHidden: string;
-  league: string;
-  _type: EliteProspectTypes;
-  url: string;
-};
-
-type EliteProspectsFilter = {
-  position: EliteProspectPosition;
-  team: string;
-};
 const searchEliteProspects = async (query: string) => {
   const q = query.trim();
   const cached = hockeyCache.get(q);
-  if (cached.length > 0) return cached;
+  if (cached !== null) return cached;
 
   const res = await proxy(`https://autocomplete.eliteprospects.com/all?q=${q}`);
   const json = await res.json();
