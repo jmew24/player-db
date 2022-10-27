@@ -2,6 +2,7 @@ import { FC, useState, useEffect, useRef, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { proxy } from "../factory/proxy";
+import { baseballCache } from "../factory/cache";
 
 export interface BaseballProps {
   query: string;
@@ -21,7 +22,7 @@ type BaseballSavantPosition =
   | "LF"
   | "";
 
-type BaseballSavantResult = {
+export type BaseballSavantResult = {
   name: string;
   id: string;
   is_player: number;
@@ -42,13 +43,10 @@ type BaseballSavantFilter = {
   team: string;
 };
 
-let lastRequest = {
-  query: "",
-  results: [] as BaseballSavantResult[],
-};
 const searchBaseballSavant = async (query: string) => {
   const q = query.trim();
-  if (q == lastRequest.query) return lastRequest.results;
+  const cached = baseballCache.get(q);
+  if (cached.length > 0) return cached;
 
   const res = await proxy(
     `https://baseballsavant.mlb.com/player/search-all?search=${q}`
@@ -59,12 +57,8 @@ const searchBaseballSavant = async (query: string) => {
       item.id
     }`.toLowerCase();
   }
-  lastRequest = {
-    query: q,
-    results: json as BaseballSavantResult[],
-  };
 
-  return lastRequest.results;
+  return baseballCache.set(q, json as BaseballSavantResult[]);
 };
 
 const useSearchBaseballSavant = (query: string) => {

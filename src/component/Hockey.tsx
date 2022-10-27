@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 
 import { proxy } from "../factory/proxy";
+import { hockeyCache } from "../factory/cache";
 
 export interface HockeyProps {
   query: string;
@@ -12,7 +13,7 @@ type EliteProspectPosition = "F" | "D" | "G" | "Staff" | "";
 
 type EliteProspectTypes = "team" | "player" | "staff" | "";
 
-type EliteProspectsResult = {
+export type EliteProspectsResult = {
   age: string;
   country: string;
   fullname: string;
@@ -32,14 +33,10 @@ type EliteProspectsFilter = {
   position: EliteProspectPosition;
   team: string;
 };
-
-let lastRequest = {
-  query: "",
-  results: [] as EliteProspectsResult[],
-};
 const searchEliteProspects = async (query: string) => {
   const q = query.trim();
-  if (q == lastRequest.query) return lastRequest.results;
+  const cached = hockeyCache.get(q);
+  if (cached.length > 0) return cached;
 
   const res = await proxy(`https://autocomplete.eliteprospects.com/all?q=${q}`);
   const json = await res.json();
@@ -78,12 +75,8 @@ const searchEliteProspects = async (query: string) => {
 
     results.push(newItem);
   }
-  lastRequest = {
-    query: q,
-    results: results,
-  };
 
-  return lastRequest.results;
+  return hockeyCache.set(q, results);
 };
 
 const useSearchEliteProspects = (query: string) => {
