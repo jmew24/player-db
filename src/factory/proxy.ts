@@ -8,7 +8,7 @@ export const proxy = async (url: string, options: RequestInit = {}) => {
       ...headers,
       "Content-Type": "application/json",
       Accept: "application/json",
-      origin: window.location.origin,
     },
+    credentials: "include",
   });
 };
