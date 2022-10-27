@@ -38,7 +38,7 @@ export const Search = () => {
         </div>
 
         {query && (
-          <div className="grid h-56 grid-cols-3 content-start gap-4">
+          <div className="grid h-56 grid-cols-2 content-start gap-8">
             <Hockey query={query} />
             <Baseball query={query} />
           </div>

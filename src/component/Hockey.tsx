@@ -87,7 +87,7 @@ export const Hockey: FC<HockeyProps> = ({ query }) => {
         <h1 className="text-3xl font-bold">Filters</h1>
         <div className="mt-4 flex w-full">
           <select
-            className="w-1/4 rounded border border-gray-300 p-2"
+            className="mx-2 w-1/2 rounded border border-gray-300 p-2"
             value={filter.position}
             onChange={(e) =>
               setFilter({
@@ -105,11 +105,11 @@ export const Hockey: FC<HockeyProps> = ({ query }) => {
             <option value="Staff">Staff</option>
           </select>
           <input
+            className="mx-2 h-10 w-1/2 flex-grow rounded-l px-5 outline-double outline-1 focus:outline-none focus:ring"
             type="text"
             value={filter.team}
             onChange={(e) => setFilter({ ...filter, team: e.target.value })}
             placeholder="Team"
-            className="h-10 flex-grow rounded-l px-5 outline-double outline-1 focus:outline-none focus:ring"
           />
         </div>
       </div>
