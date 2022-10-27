@@ -20,8 +20,8 @@ const searchNHL = async (query: string) => {
     const data = item.toString().split("|");
     const newPlayer: NHLPlayer = {
       id: parseInt(data[0]?.toString() || "-1"),
-      first_name: data[1]?.toString() || "",
-      last_name: data[2]?.toString() || "",
+      last_name: data[1]?.toString() || "",
+      first_name: data[2]?.toString() || "",
       birthplace: data[7]?.toString() || "",
       birth_state: data[8]?.toString() || "",
       birth_country: data[9]?.toString() || "",
