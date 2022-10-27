@@ -1,11 +1,15 @@
-const baseballRequest = {
+const baseballRequest: MLBRequest = {
   query: "",
-  results: [] as BaseballSavantResult[],
+  results: [] as MLBPlayer[],
 };
 
-const hockeyRequest = {
+const baseballTeamRequest: MLBTeamsRequest = {
+  results: null,
+};
+
+const hockeyRequest: NHLRequest = {
   query: "",
-  results: [] as EliteProspectsResult[],
+  results: [] as NHLPlayer[],
 };
 
 export const getBaseballCache = (query: string) => {
@@ -16,10 +20,7 @@ export const getBaseballCache = (query: string) => {
   }
 };
 
-export const setBaseballCache = (
-  query: string,
-  results: BaseballSavantResult[]
-) => {
+export const setBaseballCache = (query: string, results: MLBPlayer[]) => {
   baseballRequest.query = query;
   baseballRequest.results = results;
 
@@ -31,6 +32,21 @@ export const baseballCache = {
   set: setBaseballCache,
 };
 
+export const getBaseballTeamCache = () => {
+  return baseballTeamRequest.results;
+};
+
+export const setBaseballTeamCache = (results: MLBTeam[]) => {
+  baseballTeamRequest.results = results;
+
+  return baseballTeamRequest.results;
+};
+
+export const baseballTeamCache = {
+  get: getBaseballTeamCache,
+  set: setBaseballTeamCache,
+};
+
 export const getHockeyCache = (query: string) => {
   if (query === hockeyRequest.query) {
     return hockeyRequest.results;
@@ -39,10 +55,7 @@ export const getHockeyCache = (query: string) => {
   }
 };
 
-export const setHockeyCache = (
-  query: string,
-  results: EliteProspectsResult[]
-) => {
+export const setHockeyCache = (query: string, results: NHLPlayer[]) => {
   hockeyRequest.query = query;
   hockeyRequest.results = results;
 

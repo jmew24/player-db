@@ -27,6 +27,10 @@ export default defineNextConfig({
     defaultLocale: "en",
   },
   images: {
-    domains: ["files.eliteprospects.com"],
+    domains: [
+      "files.eliteprospects.com",
+      "cms.nhl.bamgrid.com",
+      "img.mlbstatic.com",
+    ],
   },
 });

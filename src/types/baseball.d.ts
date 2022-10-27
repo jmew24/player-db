@@ -2,10 +2,8 @@ declare interface BaseballProps {
   query: string;
 }
 
-declare type BaseballSavantPosition =
-  | "RHP"
-  | "LHP"
-  | "TWP"
+declare type MLBPosition =
+  | "P"
   | "C"
   | "1B"
   | "2B"
@@ -16,23 +14,79 @@ declare type BaseballSavantPosition =
   | "LF"
   | "";
 
-declare type BaseballSavantResult = {
+declare type MLBTeam = {
+  allStarStatus: string;
+  id: number;
   name: string;
-  id: string;
-  is_player: number;
-  mlb: number;
-  league: string;
-  first: string;
-  is_prospect: number;
-  parent_team: string;
-  pos: BaseballSavantPosition;
-  rank: string;
-  last_year: string;
-  name_display_club: string;
-  url: string;
+  teamCode: string;
+  fileCode: string;
+  abbreviation: string;
+  teamName: string;
+  locationName: string;
+  shortName: string;
+  franchiseName: string;
+  clubName: string;
+  active: boolean;
 };
 
-declare type BaseballSavantFilter = {
-  position: BaseballSavantPosition;
+declare type MLBTeamRequest = {
+  copyright: string;
+  teams: MLBTeam[];
+};
+
+declare type MLBTeamsRequest = {
+  results: MLBTeam[] | null;
+};
+
+declare type MLBTeamResult = MLBTeam[];
+
+declare interface MLBTeamProps {
+  query: string;
+}
+
+declare type MLBTeamFilter = {
   team: string;
+};
+
+declare type MLBPlayer = {
+  id: number;
+  fullName: string;
+  link: string;
+  firstName: string;
+  lastName: string;
+  primaryNumber: string;
+  currentAge: number;
+  birthCity: string;
+  birthStateProvince: string;
+  birthCountry: string;
+  active: boolean;
+  currentTeam: {
+    id: number;
+    link: string;
+    name: string;
+  };
+  primaryPosition: {
+    name: string;
+    abbreviation: MLBPosition;
+  };
+  isPlayer: boolean;
+  url: string;
+  image: string;
+};
+
+declare type MLBPlayerRequest = {
+  copyright: string;
+  people: MLBPlayer[];
+};
+
+declare type MLBRequest = {
+  query: string;
+  results: MLBPlayer[];
+};
+
+declare type MLBPlayerResult = MLBPlayer[];
+
+declare type MLBPlayerFilter = {
+  team: string;
+  position: string;
 };

@@ -2,27 +2,35 @@ declare interface HockeyProps {
   query: string;
 }
 
-declare type EliteProspectPosition = "F" | "D" | "G" | "Staff" | "";
+declare type NHLPosition = "C" | "R" | "L" | "D" | "G" | "";
 
-declare type EliteProspectTypes = "team" | "player" | "staff" | "";
-
-declare type EliteProspectsResult = {
-  age: string;
-  country: string;
-  fullname: string;
-  id: string;
-  matches: [number, number][];
-  position: EliteProspectPosition;
-  season: string;
+declare type NHLPlayer = {
+  id: number;
+  first_name: string;
+  last_name: string;
+  birthplace: string;
+  birth_state: string;
+  birth_country: string;
+  birth_date: string;
   team: string;
-  verified: string;
-  verifiedHidden: string;
-  league: string;
-  _type: EliteProspectTypes;
+  position: NHLPosition;
+  number: number;
   url: string;
+  image: string;
 };
 
-declare type EliteProspectsFilter = {
-  position: EliteProspectPosition;
+declare type NHLFilter = {
+  position: NHLPosition;
   team: string;
 };
+
+declare type NHLRequest = {
+  query: string;
+  results: NHLPlayer[];
+};
+
+declare type NHLResult = NHLPlayer[];
+
+declare interface NHLProps {
+  query: string;
+}
