@@ -42,9 +42,16 @@ type BaseballSavantFilter = {
   team: string;
 };
 
+let lastRequest = {
+  query: "",
+  results: [] as BaseballSavantResult[],
+};
 const searchBaseballSavant = async (query: string) => {
+  const q = query.trim();
+  if (q == lastRequest.query) return lastRequest.results;
+
   const res = await proxy(
-    `https://baseballsavant.mlb.com/player/search-all?search=${query.trim()}`
+    `https://baseballsavant.mlb.com/player/search-all?search=${q}`
   );
   const json = await res.json();
   for (const item of json) {
@@ -52,7 +59,12 @@ const searchBaseballSavant = async (query: string) => {
       item.id
     }`.toLowerCase();
   }
-  return json as BaseballSavantResult[];
+  lastRequest = {
+    query: q,
+    results: json as BaseballSavantResult[],
+  };
+
+  return lastRequest.results;
 };
 
 const useSearchBaseballSavant = (query: string) => {

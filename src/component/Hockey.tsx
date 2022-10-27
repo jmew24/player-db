@@ -33,10 +33,15 @@ type EliteProspectsFilter = {
   team: string;
 };
 
+let lastRequest = {
+  query: "",
+  results: [] as EliteProspectsResult[],
+};
 const searchEliteProspects = async (query: string) => {
-  const res = await proxy(
-    `https://autocomplete.eliteprospects.com/all?q=${query.trim()}`
-  );
+  const q = query.trim();
+  if (q == lastRequest.query) return lastRequest.results;
+
+  const res = await proxy(`https://autocomplete.eliteprospects.com/all?q=${q}`);
   const json = await res.json();
   const results: EliteProspectsResult[] = [];
   for (const item of json) {
@@ -73,7 +78,12 @@ const searchEliteProspects = async (query: string) => {
 
     results.push(newItem);
   }
-  return results;
+  lastRequest = {
+    query: q,
+    results: results,
+  };
+
+  return lastRequest.results;
 };
 
 const useSearchEliteProspects = (query: string) => {
