@@ -2,6 +2,8 @@ import { FC, useState, useEffect, useRef, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 
+import { proxy } from "../factory/proxy";
+
 export interface HockeyProps {
   query: string;
 }
@@ -32,7 +34,7 @@ type EliteProspectsFilter = {
 };
 
 const searchEliteProspects = async (query: string) => {
-  const res = await fetch(
+  const res = await proxy(
     `https://autocomplete.eliteprospects.com/all?q=${query.trim()}`
   );
   const json = await res.json();
@@ -123,7 +125,6 @@ export const Hockey: FC<HockeyProps> = ({ query }) => {
   useEffect(() => {
     if (eliteProspectsData && eliteProspectsData !== resultsRef.current) {
       resultsRef.current = eliteProspectsData;
-      console.log("eliteProspectsData", eliteProspectsData);
       setResults(eliteProspectsData);
     }
   }, [eliteProspectsData]);

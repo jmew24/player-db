@@ -1,6 +1,8 @@
 import { FC, useState, useEffect, useRef, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 
+import { proxy } from "../factory/proxy";
+
 export interface BaseballProps {
   query: string;
 }
@@ -41,7 +43,7 @@ type BaseballSavantFilter = {
 };
 
 const searchBaseballSavant = async (query: string) => {
-  const res = await fetch(
+  const res = await proxy(
     `https://baseballsavant.mlb.com/player/search-all?search=${query.trim()}`
   );
   const json = await res.json();
@@ -92,7 +94,6 @@ export const Baseball: FC<BaseballProps> = ({ query }) => {
   useEffect(() => {
     if (baseballSavantData && baseballSavantData !== resultsRef.current) {
       resultsRef.current = baseballSavantData;
-      console.log("baseballSavant", baseballSavantData);
       setResults(baseballSavantData);
     }
   }, [baseballSavantData]);
