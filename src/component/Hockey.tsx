@@ -5,13 +5,21 @@ import { proxy } from "../factory/proxy";
 import { hockeyCache, hockeyTeamCache } from "../factory/cache";
 import ImageWithFallback from "./ImageWithFallback";
 
+const blankTeam: NHLTeam = {
+  id: -1,
+  name: "Unknown",
+  abbreviation: "",
+  teamName: "Unknown",
+  shortName: "",
+};
+
 const getTeams = async () => {
   const cached = hockeyTeamCache.get();
   if (cached !== null) return cached;
 
   const response = await proxy(`https://statsapi.web.nhl.com/api/v1/teams`);
 
-  const teams: NHLTeam[] = [];
+  const teams: NHLTeam[] = [blankTeam];
   for (const item of response.teams) {
     teams.push({
       id: item.id,
@@ -45,13 +53,15 @@ const searchNHL = async (query: string, t: NHLTeam[] | undefined) => {
     const data = item.toString().split("|");
     const postion = data[12]?.toString() || "";
     const teamAbbreviation = data[11]?.toString() || "";
+    const team = teams.find(
+      (team) => team.abbreviation === teamAbbreviation
+    ) || { ...blankTeam };
+
     players.push({
       id: parseInt(data[0]?.toString() || "-1"),
       lastName: data[1]?.toString() || "",
       firstName: data[2]?.toString() || "",
-      team:
-        teams.find((team) => team.abbreviation === teamAbbreviation) ||
-        ({} as NHLTeam),
+      team: team,
       position: postion == "R" ? "RW" : postion == "L" ? "LW" : postion,
       number: parseInt(data[13]?.toString() || "-1"),
       experience: "NHL",
@@ -72,21 +82,14 @@ const searchNHL = async (query: string, t: NHLTeam[] | undefined) => {
 
     const firstName = item.fullname?.split(" ")[0] || "";
     const lastName = item.fullname.split(" ")[1] || "";
-    const team =
-      teams.find(
-        (team) =>
-          team.name === item.team ||
-          team.abbreviation === item.team ||
-          team.teamName === item.team ||
-          team.shortName === item.team
-      ) ||
-      ({
-        id: -1,
-        name: item.team,
-        abbreviation: item.team,
-        teamName: item.team,
-        shortName: item.team,
-      } as NHLTeam);
+    const teamName = item.team;
+    const team = teams.find(
+      (team) =>
+        team.name === teamName ||
+        team.abbreviation === teamName ||
+        team.teamName === teamName ||
+        team.shortName === teamName
+    ) || { ...blankTeam };
 
     if (
       players.find(
@@ -195,10 +198,10 @@ export const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
       <div className="mt-4 w-full">
         <h1 className="text-6xl font-bold">Hockey</h1>
 
-        <h1 className="text-3xl font-bold">Filters</h1>
+        <h1 className="text-lg font-bold">Filters</h1>
         <div className="mt-4 flex w-full">
           <select
-            className="mx-2 w-1/2 rounded border border-gray-300 p-2"
+            className="mx-2 w-1/2 rounded border border-gray-300 p-2 text-gray-600"
             value={filter.position}
             onChange={(e) =>
               setFilter({
@@ -217,7 +220,7 @@ export const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
             <option value="Staff">Staff</option>
           </select>
           <input
-            className="mx-2 h-10 w-1/2 flex-grow rounded-l px-5 outline-double outline-1 focus:outline-none focus:ring"
+            className="mx-2 h-10 w-1/2 flex-grow rounded-l px-5 text-gray-600 outline-double outline-1 focus:outline-none focus:ring"
             type="text"
             value={filter.team}
             onChange={(e) => setFilter({ ...filter, team: e.target.value })}
@@ -247,7 +250,9 @@ export const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
                 <a href={player.url} target="_blank" rel="noreferrer">
                   <p className="w-fill m-1 flex items-center justify-center py-2 px-1">
                     <label className="px-1 font-bold">Name: </label>
-                    {player.firstName} {player.lastName}
+                    <span className="capitalize">
+                      {player.firstName} {player.lastName}
+                    </span>
                   </p>
                   <p className="w-fill m-1 flex items-center justify-center py-2 px-1">
                     <label className="px-1 font-bold">Team: </label>

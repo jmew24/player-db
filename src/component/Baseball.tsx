@@ -5,13 +5,26 @@ import { proxy } from "../factory/proxy";
 import { baseballCache, baseballTeamCache } from "../factory/cache";
 import ImageWithFallback from "./ImageWithFallback";
 
+const blankTeam: MLBTeam = {
+  id: -1,
+  name: "Unknown",
+  teamCode: "",
+  fileCode: "",
+  abbreviation: "",
+  teamName: "Unknown",
+  locationName: "",
+  shortName: "",
+  franchiseName: "",
+  clubName: "",
+};
+
 const getTeams = async () => {
   const cached = baseballTeamCache.get();
   if (cached !== null) return cached;
 
   const response = await proxy(`https://statsapi.mlb.com/api/v1/teams/`);
 
-  const teams: MLBTeam[] = [];
+  const teams: MLBTeam[] = [blankTeam];
   for (const item of response.teams) {
     teams.push({
       id: item.id,
@@ -49,18 +62,9 @@ const searchMLB = async (query: string, t: MLBTeam[] | undefined) => {
 
   const players: MLBPlayer[] = [];
   for (const item of response.people) {
-    const team =
-      teams.find((team) => team.id === item.currentTeam.id) ||
-      ({
-        id: -1,
-        teamCode: item.currentTeam.name,
-        name: item.currentTeam.name,
-        abbreviation: item.currentTeam.name,
-        teamName: item.currentTeam.name,
-        shortName: item.currentTeam.name,
-        franchiseName: item.currentTeam.name,
-        clubName: item.currentTeam.name,
-      } as MLBTeam);
+    const team = teams.find((team) => team.id === item.currentTeam.id) || {
+      ...blankTeam,
+    };
 
     players.push({
       id: item.id,
@@ -95,27 +99,16 @@ const searchMLB = async (query: string, t: MLBTeam[] | undefined) => {
         : item.pos == "TWP"
         ? "P"
         : item.pos;
-    const team =
-      teams.find(
-        (team) =>
-          team.teamCode === item.name_display_club ||
-          team.name === item.name_display_club ||
-          team.abbreviation === item.name_display_club ||
-          team.teamName === item.name_display_club ||
-          team.shortName === item.name_display_club ||
-          team.franchiseName === item.name_display_club ||
-          team.clubName === item.name_display_club
-      ) ||
-      ({
-        id: -1,
-        teamCode: item.name_display_club,
-        name: item.name_display_club,
-        abbreviation: item.name_display_club,
-        teamName: item.name_display_club,
-        shortName: item.name_display_club,
-        franchiseName: item.name_display_club,
-        clubName: item.name_display_club,
-      } as MLBTeam);
+    const team = teams.find(
+      (team) =>
+        team.teamCode === item.name_display_club ||
+        team.name === item.name_display_club ||
+        team.abbreviation === item.name_display_club ||
+        team.teamName === item.name_display_club ||
+        team.shortName === item.name_display_club ||
+        team.franchiseName === item.name_display_club ||
+        team.clubName === item.name_display_club
+    ) || { ...blankTeam };
 
     if (
       players.find(
@@ -217,10 +210,10 @@ export const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
       <div className="mt-4 w-full">
         <h1 className="text-6xl font-bold">Baseball</h1>
 
-        <h1 className="text-3xl font-bold">Filters</h1>
+        <h1 className="text-lg font-bold">Filters</h1>
         <div className="mt-4 flex w-full">
           <select
-            className="mx-2 w-1/2 rounded border border-gray-300 p-2"
+            className="mx-2 w-1/2 rounded border border-gray-300 p-2 text-gray-600"
             value={filter.position}
             onChange={(e) =>
               setFilter({
@@ -241,7 +234,7 @@ export const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
             <option value="LF">LF</option>
           </select>
           <input
-            className="mx-2 h-10 w-1/2 flex-grow rounded-l px-5 outline-double outline-1 focus:outline-none focus:ring"
+            className="mx-2 h-10 w-1/2 flex-grow rounded-l px-5 text-gray-600 outline-double outline-1 focus:outline-none focus:ring"
             type="text"
             value={filter.team}
             onChange={(e) => setFilter({ ...filter, team: e.target.value })}
@@ -253,7 +246,7 @@ export const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
       {mlbIsFetching ?? mlbIsLoading ? (
         <h1 className="mt-4 text-2xl">Loading...</h1>
       ) : filteredResults.length > 0 ? (
-        <ul className="mt-4 flex w-full flex-col items-center justify-center">
+        <ul className="mt-4 flex w-full flex-col items-center justify-center ">
           {filteredResults.map((player: MLBPlayer, index: number) => (
             <li
               key={`${player.id}-${player.fullName.replaceAll(
@@ -273,7 +266,7 @@ export const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
               <a href={player.url} target="_blank" rel="noreferrer">
                 <p className="w-fill m-1 flex items-center justify-center py-2 px-1">
                   <label className="px-1 font-bold">Name: </label>
-                  {player.fullName}
+                  <span className="capitalize">{player.fullName}</span>
                 </p>
                 <p className="w-fill m-1 flex items-center justify-center py-2 px-1">
                   <label className="px-1 font-bold">Team: </label>

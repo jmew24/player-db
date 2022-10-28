@@ -98,10 +98,10 @@ export const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
       <div className="mt-4 w-full">
         <h1 className="text-6xl font-bold">Basketball</h1>
 
-        <h1 className="text-3xl font-bold">Filters</h1>
+        <h1 className="text-lg font-bold">Filters</h1>
         <div className="mt-4 flex w-full">
           <select
-            className="mx-2 w-1/2 rounded border border-gray-300 p-2"
+            className="mx-2 w-1/2 rounded border border-gray-300 p-2 text-gray-600"
             value={filter.position}
             onChange={(e) =>
               setFilter({
@@ -119,7 +119,7 @@ export const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
             <option value="F-G">Forward-Guard</option>
           </select>
           <input
-            className="mx-2 h-10 w-1/2 flex-grow rounded-l px-5 outline-double outline-1 focus:outline-none focus:ring"
+            className="mx-2 h-10 w-1/2 flex-grow rounded-l px-5 text-gray-600 outline-double outline-1 focus:outline-none focus:ring"
             type="text"
             value={filter.team}
             onChange={(e) => setFilter({ ...filter, team: e.target.value })}
@@ -148,7 +148,7 @@ export const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
               <a href={player.url} target="_blank" rel="noreferrer">
                 <p className="w-fill m-1 flex items-center justify-center py-2 px-1">
                   <label className="px-1 font-bold">Name: </label>
-                  {player.displayName}
+                  <span className="capitalize">{player.displayName}</span>
                 </p>
                 <p className="w-fill m-1 flex items-center justify-center py-2 px-1">
                   <label className="px-1 font-bold">Team: </label>

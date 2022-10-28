@@ -106,7 +106,7 @@ export const Search = () => {
         <h1 className="text-6xl font-bold">Search For Athlete/Coach</h1>
         <div className="mt-4 flex w-full">
           <select
-            className="mx-2 w-1/6 rounded border border-gray-300 p-2"
+            className="mx-2 w-1/6 rounded border border-gray-300 p-2 text-gray-600"
             value={filter}
             onChange={(e) => setFilter(e.target.value as SearchFilter)}
           >
@@ -120,7 +120,7 @@ export const Search = () => {
             value={search}
             placeholder="Enter a name here..."
             onChange={(e) => setSearch(e.target.value)}
-            className="mx-2 h-10 flex-grow rounded-l px-5 outline-double outline-1 focus:outline-none focus:ring"
+            className="mx-2 h-10 flex-grow rounded-l px-5 text-gray-600 outline-double outline-1 focus:outline-none focus:ring"
           />
           <button
             onClick={() => searchQuery()}
