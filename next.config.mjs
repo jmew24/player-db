@@ -28,9 +28,11 @@ export default defineNextConfig({
   },
   images: {
     domains: [
-      "files.eliteprospects.com",
       "cms.nhl.bamgrid.com",
+      "files.eliteprospects.com",
       "img.mlbstatic.com",
+      "securea.mlb.com",
+      "ak-static.cms.nba.com",
     ],
   },
 });

@@ -13,8 +13,7 @@ const getTeams = async () => {
 
   const teams: MLBTeam[] = [];
   for (const item of response.teams) {
-    const newTeam: MLBTeam = {
-      allStarStatus: item.allStarStatus,
+    teams.push({
       id: item.id,
       name: item.name,
       teamCode: item.teamCode,
@@ -25,16 +24,14 @@ const getTeams = async () => {
       shortName: item.shortName,
       franchiseName: item.franchiseName,
       clubName: item.clubName,
-      active: item.active,
-    };
-    teams.push(newTeam);
+    } as MLBTeam);
   }
 
   return baseballTeamCache.set(teams);
 };
 
-const useGetTeams = () => {
-  return useQuery(["useGetTeams"], () => getTeams());
+const useGetMLBTeams = () => {
+  return useQuery(["useGetMLBTeams"], () => getTeams());
 };
 
 const searchMLB = async (query: string, t: MLBTeam[] | undefined) => {
@@ -47,28 +44,31 @@ const searchMLB = async (query: string, t: MLBTeam[] | undefined) => {
     );
 
   const response = await proxy(
-    `https://statsapi.mlb.com/api/v1/sports/1/players`
+    `https://statsapi.mlb.com/api/v1/sports/1/players?fields=people,id,fullName,firstName,lastName,primaryNumber,currentTeam,primaryPosition,name,abbreviation,isPlayer`
   );
 
   const players: MLBPlayer[] = [];
   for (const item of response.people) {
-    const newPlayer: MLBPlayer = {
+    const team =
+      teams.find((team) => team.id === item.currentTeam.id) ||
+      ({
+        id: -1,
+        teamCode: item.currentTeam.name,
+        name: item.currentTeam.name,
+        abbreviation: item.currentTeam.name,
+        teamName: item.currentTeam.name,
+        shortName: item.currentTeam.name,
+        franchiseName: item.currentTeam.name,
+        clubName: item.currentTeam.name,
+      } as MLBTeam);
+
+    players.push({
       id: item.id,
       fullName: item.fullName,
-      link: item.link,
       firstName: item.firstName,
       lastName: item.lastName,
       primaryNumber: item.primaryNumber,
-      currentAge: item.currentAge,
-      birthCity: item.birthCity,
-      birthStateProvince: item.birthStateProvince,
-      birthCountry: item.birthCountry,
-      active: item.active,
-      currentTeam: {
-        id: item.currentTeam.id,
-        link: item.currentTeam.link,
-        name: teams.find((team) => team.id === item.currentTeam.id)?.name || "",
-      },
+      team: team,
       primaryPosition: {
         name: item.primaryPosition.name,
         abbreviation: item.primaryPosition.abbreviation,
@@ -76,8 +76,73 @@ const searchMLB = async (query: string, t: MLBTeam[] | undefined) => {
       isPlayer: item.isPlayer,
       url: `https://www.mlb.com/player/${item.id}`,
       image: `https://securea.mlb.com/mlb/images/players/head_shot/${item.id}.jpg`,
-    };
-    players.push(newPlayer);
+      source: "MLB.com",
+    } as MLBPlayer);
+  }
+
+  const baseballSavantResponse = (await proxy(
+    `https://baseballsavant.mlb.com/player/search-all?search=${q}`
+  )) as BaseballSavantResult[];
+
+  for (const item of baseballSavantResponse) {
+    const firstName = item.name?.split(" ")[0] || "";
+    const lastName = item.name.split(" ")[1] || "";
+    const position =
+      item.pos == "LHP"
+        ? "P"
+        : item.pos == "RHP"
+        ? "P"
+        : item.pos == "TWP"
+        ? "P"
+        : item.pos;
+    const team =
+      teams.find(
+        (team) =>
+          team.teamCode === item.name_display_club ||
+          team.name === item.name_display_club ||
+          team.abbreviation === item.name_display_club ||
+          team.teamName === item.name_display_club ||
+          team.shortName === item.name_display_club ||
+          team.franchiseName === item.name_display_club ||
+          team.clubName === item.name_display_club
+      ) ||
+      ({
+        id: -1,
+        teamCode: item.name_display_club,
+        name: item.name_display_club,
+        abbreviation: item.name_display_club,
+        teamName: item.name_display_club,
+        shortName: item.name_display_club,
+        franchiseName: item.name_display_club,
+        clubName: item.name_display_club,
+      } as MLBTeam);
+
+    if (
+      players.find(
+        (player) =>
+          player.firstName === firstName &&
+          player.lastName === lastName &&
+          player.team.name === team.name
+      )
+    )
+      continue;
+
+    players.push({
+      id: parseInt(item.id),
+      fullName: `${firstName} ${lastName}`,
+      firstName: firstName,
+      lastName: lastName,
+      primaryNumber: "-1",
+      team: team,
+      primaryPosition: {
+        name: item.pos,
+        abbreviation: position,
+      },
+      isPlayer: !!item.is_player,
+      url: `https://baseballsavant.mlb.com/savant-player/${firstName}-${lastName}-${item.id}`,
+      image: `https://img.mlbstatic.com/mlb-photos/image/upload/w_67,q_100/v1/people/${item.id}/headshot/silo/current.jpg`,
+      source: "BaseballSavant.mlb.com",
+    } as MLBPlayer);
   }
 
   return baseballCache
@@ -95,13 +160,13 @@ const useSearchMLB = (query: string, teams: MLBTeam[] | undefined) => {
   );
 };
 
-export const Baseball: FC<BaseballProps> = ({ query }) => {
+export const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
   const [results, setResults] = useState<MLBPlayer[]>([]);
   const [filter, setFilter] = useState<MLBPlayerFilter>({
     position: "",
     team: "",
   });
-  const { data: mlbTeamsData } = useGetTeams();
+  const { data: mlbTeamsData } = useGetMLBTeams();
   const {
     isFetching: mlbIsFetching,
     isLoading: mlbIsLoading,
@@ -112,16 +177,26 @@ export const Baseball: FC<BaseballProps> = ({ query }) => {
     const teamFilter = filter.team?.toLowerCase();
     const positionFilter = filter.position;
 
-    return results.filter((result) => {
-      const teamName = result.currentTeam.name.toLowerCase();
+    return results.filter((player) => {
+      const team = {
+        name: player.team.name?.toLowerCase(),
+        abbreviation: player.team.abbreviation?.toLowerCase(),
+        teamName: player.team.teamName?.toLowerCase(),
+        shortName: player.team.shortName?.toLowerCase(),
+      };
+      const hasTeamName =
+        team.name?.includes(teamFilter) ||
+        team.abbreviation?.includes(teamFilter) ||
+        team.teamName?.includes(teamFilter) ||
+        team.shortName?.includes(teamFilter);
+      const hasPosition =
+        player.primaryPosition.name === positionFilter ||
+        player.primaryPosition.abbreviation === positionFilter;
+
       if (teamFilter !== "" && positionFilter !== "")
-        return (
-          teamName.includes(teamFilter) &&
-          result.primaryPosition.abbreviation === positionFilter
-        );
-      if (teamFilter !== "") return teamName.includes(teamFilter);
-      if (positionFilter !== "")
-        return result.primaryPosition.abbreviation === positionFilter;
+        return hasTeamName && hasPosition;
+      if (teamFilter !== "") return hasTeamName;
+      if (positionFilter !== "") return hasPosition;
       return true;
     });
   }, [filter.position, filter.team, results]);
@@ -130,8 +205,12 @@ export const Baseball: FC<BaseballProps> = ({ query }) => {
     if (mlbData && mlbData !== resultsRef.current) {
       resultsRef.current = mlbData;
       setResults(mlbData);
+      setShow((state: SearchShowSport) => ({
+        ...state,
+        baseball: resultsRef.current.length > 0,
+      }));
     }
-  }, [mlbData]);
+  }, [mlbData, setShow]);
 
   return resultsRef.current.length > 0 ? (
     <div className="items-center justify-center py-2">
@@ -175,9 +254,12 @@ export const Baseball: FC<BaseballProps> = ({ query }) => {
         <h1 className="mt-4 text-2xl">Loading...</h1>
       ) : filteredResults.length > 0 ? (
         <ul className="mt-4 flex w-full flex-col items-center justify-center">
-          {filteredResults.map((player: MLBPlayer) => (
+          {filteredResults.map((player: MLBPlayer, index: number) => (
             <li
-              key={player.id}
+              key={`${player.id}-${player.fullName.replaceAll(
+                " ",
+                "-"
+              )}-${index}`}
               className="my-2 flex w-full items-center justify-between rounded-lg border border-gray-200 p-4 text-lg"
             >
               <ImageWithFallback
@@ -185,7 +267,7 @@ export const Baseball: FC<BaseballProps> = ({ query }) => {
                 alt={`${player.id}`}
                 width={67}
                 height={67}
-                src={`https://img.mlbstatic.com/mlb-photos/image/upload/v1/people/${player.id}/headshot/67/current.jpg`}
+                src={player.image}
                 fallbackSrc="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_426,q_auto:best/v1/people/1/headshot/67/current.jpg"
               />
               <a href={player.url} target="_blank" rel="noreferrer">
@@ -195,7 +277,11 @@ export const Baseball: FC<BaseballProps> = ({ query }) => {
                 </p>
                 <p className="w-fill m-1 flex items-center justify-center py-2 px-1">
                   <label className="px-1 font-bold">Team: </label>
-                  {player.currentTeam.name}
+                  {player.team.name}
+                </p>
+                <p className="w-fill m-1 flex items-center justify-center py-2 px-1 text-sm">
+                  <label className="px-1 font-bold">Source: </label>
+                  {player.source}
                 </p>
               </a>
               <span

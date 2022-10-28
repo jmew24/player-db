@@ -7,11 +7,6 @@ const baseballTeamRequest: MLBTeamsRequest = {
   results: null,
 };
 
-const hockeyRequest: NHLRequest = {
-  query: "",
-  results: [] as NHLPlayer[],
-};
-
 export const getBaseballCache = (query: string) => {
   if (query === baseballRequest.query) {
     return baseballRequest.results;
@@ -47,6 +42,15 @@ export const baseballTeamCache = {
   set: setBaseballTeamCache,
 };
 
+const hockeyRequest: NHLRequest = {
+  query: "",
+  results: [] as NHLPlayer[],
+};
+
+const hockeyTeamRequest: NHLTeamsRequest = {
+  results: null,
+};
+
 export const getHockeyCache = (query: string) => {
   if (query === hockeyRequest.query) {
     return hockeyRequest.results;
@@ -65,4 +69,44 @@ export const setHockeyCache = (query: string, results: NHLPlayer[]) => {
 export const hockeyCache = {
   get: getHockeyCache,
   set: setHockeyCache,
+};
+
+export const getHockeyTeamCache = () => {
+  return hockeyTeamRequest.results;
+};
+
+export const setHockeyTeamCache = (results: NHLTeam[]) => {
+  hockeyTeamRequest.results = results;
+
+  return hockeyTeamRequest.results;
+};
+
+export const hockeyTeamCache = {
+  get: getHockeyTeamCache,
+  set: setHockeyTeamCache,
+};
+
+const basketballRequest: NBARequest = {
+  query: "",
+  results: [] as NBAPlayer[],
+};
+
+export const getBasketballCache = (query: string) => {
+  if (query === basketballRequest.query) {
+    return basketballRequest.results;
+  } else {
+    return null;
+  }
+};
+
+export const setBasketballCache = (query: string, results: NBAPlayer[]) => {
+  basketballRequest.query = query;
+  basketballRequest.results = results;
+
+  return basketballRequest.results;
+};
+
+export const basketballCache = {
+  get: getBasketballCache,
+  set: setBasketballCache,
 };

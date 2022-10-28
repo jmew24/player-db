@@ -1,5 +1,6 @@
 declare interface BaseballProps {
   query: string;
+  setShow: Dispatch<SetStateAction<SearchShowSport>>;
 }
 
 declare type MLBPosition =
@@ -15,7 +16,6 @@ declare type MLBPosition =
   | "";
 
 declare type MLBTeam = {
-  allStarStatus: string;
   id: number;
   name: string;
   teamCode: string;
@@ -26,7 +26,6 @@ declare type MLBTeam = {
   shortName: string;
   franchiseName: string;
   clubName: string;
-  active: boolean;
 };
 
 declare type MLBTeamRequest = {
@@ -51,20 +50,10 @@ declare type MLBTeamFilter = {
 declare type MLBPlayer = {
   id: number;
   fullName: string;
-  link: string;
   firstName: string;
   lastName: string;
   primaryNumber: string;
-  currentAge: number;
-  birthCity: string;
-  birthStateProvince: string;
-  birthCountry: string;
-  active: boolean;
-  currentTeam: {
-    id: number;
-    link: string;
-    name: string;
-  };
+  team: MLBTeam;
   primaryPosition: {
     name: string;
     abbreviation: MLBPosition;
@@ -72,6 +61,23 @@ declare type MLBPlayer = {
   isPlayer: boolean;
   url: string;
   image: string;
+  source: string;
+};
+
+declare type BaseballSavantResult = {
+  name: string;
+  id: string;
+  is_player: number;
+  mlb: number;
+  league: string;
+  first: string;
+  is_prospect: number;
+  parent_team: string;
+  pos: BaseballSavantPosition;
+  rank: string;
+  last_year: string;
+  name_display_club: string;
+  url: string;
 };
 
 declare type MLBPlayerRequest = {
