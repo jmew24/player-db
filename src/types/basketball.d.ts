@@ -1,6 +1,6 @@
 declare interface BasketballProps {
   query: string;
-  setShow: Dispatch<SetStateAction<SSearchShowSport>>;
+  setShow: Dispatch<SetStateAction<SearchShowSport>>;
 }
 
 declare type NBAPosition = "C" | "F" | "C-F" | "F-C" | "G" | "F-G" | "";

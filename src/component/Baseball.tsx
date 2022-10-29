@@ -262,15 +262,24 @@ export const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
                 fallbackSrc="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_426,q_auto:best/v1/people/1/headshot/67/current.jpg"
               />
               <a href={player.url} target="_blank" rel="noreferrer">
-                <p className="w-fill m-1 flex items-center justify-center py-2 px-1">
+                <p
+                  className="w-fill m-1 flex items-center justify-center py-2 px-1"
+                  title={player.fullName}
+                >
                   <label className="px-1 font-bold">Name: </label>
                   <span className="capitalize">{player.fullName}</span>
                 </p>
-                <p className="w-fill m-1 flex items-center justify-center py-2 px-1">
+                <p
+                  className="w-fill m-1 flex items-center justify-center py-2 px-1"
+                  title={player.team.name}
+                >
                   <label className="px-1 font-bold">Team: </label>
                   {player.team.name}
                 </p>
-                <p className="w-fill m-1 flex items-center justify-center py-2 px-1 text-sm">
+                <p
+                  className="w-fill m-1 flex items-center justify-center py-2 px-1 text-sm"
+                  title={player.source}
+                >
                   <label className="px-1 font-bold">Source: </label>
                   {player.source}
                 </p>

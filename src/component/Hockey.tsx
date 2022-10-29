@@ -248,22 +248,34 @@ export const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
                   fallbackSrc="https://cms.nhl.bamgrid.com/images/headshots/current/168x168/skater.jpg"
                 />
                 <a href={player.url} target="_blank" rel="noreferrer">
-                  <p className="w-fill m-1 flex items-center justify-center py-2 px-1">
+                  <p
+                    className="w-fill m-1 flex items-center justify-center py-2 px-1"
+                    title={`${player.firstName} ${player.lastName}`}
+                  >
                     <label className="px-1 font-bold">Name: </label>
                     <span className="capitalize">
                       {player.firstName} {player.lastName}
                     </span>
                   </p>
-                  <p className="w-fill m-1 flex items-center justify-center py-2 px-1">
+                  <p
+                    className="w-fill m-1 flex items-center justify-center py-2 px-1"
+                    title={player.team.name}
+                  >
                     <label className="px-1 font-bold">Team: </label>
                     {player.team.name}
                   </p>
-                  <p className="w-fill m-1 flex items-center justify-center py-2 px-1 text-sm">
+                  <p
+                    className="w-fill m-1 flex items-center justify-center py-2 px-1 text-sm"
+                    title={player.source}
+                  >
                     <label className="px-1 font-bold">Source: </label>
                     {player.source}
                   </p>
                 </a>
-                <span className="flex justify-end rounded bg-gray-500 px-2 py-1 text-sm text-white">
+                <span
+                  className="flex justify-end rounded bg-gray-500 px-2 py-1 text-sm text-white"
+                  title={player.position}
+                >
                   {player.position}
                 </span>
               </li>
