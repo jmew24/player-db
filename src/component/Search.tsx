@@ -98,12 +98,12 @@ export const Search = () => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
       <Head>
-        <title>Athlete/Coach Search</title>
+        <title>Player-DB Search</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className="flex w-full flex-1 flex-col items-center px-5 text-center">
-        <h1 className="text-6xl font-bold">Search For Athlete/Coach</h1>
+        <h1 className="text-6xl font-bold">Search For Person</h1>
         <div className="mt-4 flex w-full">
           <select
             className="mx-2 w-1/6 rounded border border-gray-300 p-2 text-gray-600"
