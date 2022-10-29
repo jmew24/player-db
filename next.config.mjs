@@ -33,6 +33,7 @@ export default defineNextConfig({
       "img.mlbstatic.com",
       "securea.mlb.com",
       "ak-static.cms.nba.com",
+      "madden-assets-cdn.pulse.ea.com",
     ],
   },
 });

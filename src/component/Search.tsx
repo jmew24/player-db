@@ -3,6 +3,7 @@ import Head from "next/head";
 
 import { Baseball } from "./Baseball";
 import { Basketball } from "./Basketball";
+import { Football } from "./Football";
 import { Hockey } from "./Hockey";
 
 export const Search = () => {
@@ -11,11 +12,17 @@ export const Search = () => {
   const [showSport, setShowSport] = useState<SearchShowSport>({
     baseball: true,
     basketball: true,
+    football: true,
     hockey: true,
   });
   const [filter, setFilter] = useState<SearchFilter>("All");
   const searchQuery = useCallback(() => {
-    setShowSport({ baseball: true, basketball: true, hockey: true });
+    setShowSport({
+      baseball: true,
+      basketball: true,
+      football: true,
+      hockey: true,
+    });
     setQuery(search);
   }, [search]);
 
@@ -35,6 +42,12 @@ export const Search = () => {
             <Basketball query={query} setShow={setShowSport} />
           </div>
         );
+      case "Football":
+        return (
+          <div className="grid h-56 grid-cols-1 content-start gap-8">
+            <Football query={query} setShow={setShowSport} />
+          </div>
+        );
       case "Hockey":
         return (
           <div className="grid h-56 grid-cols-1 content-start gap-8">
@@ -42,11 +55,65 @@ export const Search = () => {
           </div>
         );
       default:
-        if (showSport.baseball && showSport.basketball && showSport.hockey) {
+        if (
+          showSport.baseball &&
+          showSport.basketball &&
+          showSport.football &&
+          showSport.hockey
+        ) {
+          return (
+            <div className="grid h-56 grid-cols-4 content-start gap-8">
+              <Baseball query={query} setShow={setShowSport} />
+              <Basketball query={query} setShow={setShowSport} />
+              <Football query={query} setShow={setShowSport} />
+              <Hockey query={query} setShow={setShowSport} />
+            </div>
+          );
+        } else if (
+          showSport.baseball &&
+          showSport.basketball &&
+          showSport.football
+        ) {
           return (
             <div className="grid h-56 grid-cols-3 content-start gap-8">
               <Baseball query={query} setShow={setShowSport} />
               <Basketball query={query} setShow={setShowSport} />
+              <Football query={query} setShow={setShowSport} />
+            </div>
+          );
+        } else if (
+          showSport.baseball &&
+          showSport.basketball &&
+          showSport.hockey
+        ) {
+          return (
+            <div className="grid h-56 grid-cols-3 content-start gap-8">
+              <Baseball query={query} setShow={setShowSport} />
+              <Basketball query={query} setShow={setShowSport} />
+              <Hockey query={query} setShow={setShowSport} />
+            </div>
+          );
+        } else if (
+          showSport.baseball &&
+          showSport.football &&
+          showSport.hockey
+        ) {
+          return (
+            <div className="grid h-56 grid-cols-3 content-start gap-8">
+              <Baseball query={query} setShow={setShowSport} />
+              <Football query={query} setShow={setShowSport} />
+              <Hockey query={query} setShow={setShowSport} />
+            </div>
+          );
+        } else if (
+          showSport.basketball &&
+          showSport.football &&
+          showSport.hockey
+        ) {
+          return (
+            <div className="grid h-56 grid-cols-3 content-start gap-8">
+              <Basketball query={query} setShow={setShowSport} />
+              <Football query={query} setShow={setShowSport} />
               <Hockey query={query} setShow={setShowSport} />
             </div>
           );
@@ -57,6 +124,13 @@ export const Search = () => {
               <Basketball query={query} setShow={setShowSport} />
             </div>
           );
+        } else if (showSport.baseball && showSport.football) {
+          return (
+            <div className="grid h-56 grid-cols-2 content-start gap-8">
+              <Baseball query={query} setShow={setShowSport} />
+              <Football query={query} setShow={setShowSport} />
+            </div>
+          );
         } else if (showSport.baseball && showSport.hockey) {
           return (
             <div className="grid h-56 grid-cols-2 content-start gap-8">
@@ -64,10 +138,24 @@ export const Search = () => {
               <Hockey query={query} setShow={setShowSport} />
             </div>
           );
+        } else if (showSport.basketball && showSport.football) {
+          return (
+            <div className="grid h-56 grid-cols-2 content-start gap-8">
+              <Basketball query={query} setShow={setShowSport} />
+              <Football query={query} setShow={setShowSport} />
+            </div>
+          );
         } else if (showSport.basketball && showSport.hockey) {
           return (
             <div className="grid h-56 grid-cols-2 content-start gap-8">
               <Basketball query={query} setShow={setShowSport} />
+              <Hockey query={query} setShow={setShowSport} />
+            </div>
+          );
+        } else if (showSport.football && showSport.hockey) {
+          return (
+            <div className="grid h-56 grid-cols-2 content-start gap-8">
+              <Football query={query} setShow={setShowSport} />
               <Hockey query={query} setShow={setShowSport} />
             </div>
           );
@@ -81,6 +169,12 @@ export const Search = () => {
           return (
             <div className="grid h-56 grid-cols-1 content-start gap-8">
               <Basketball query={query} setShow={setShowSport} />
+            </div>
+          );
+        } else if (showSport.football) {
+          return (
+            <div className="grid h-56 grid-cols-1 content-start gap-8">
+              <Football query={query} setShow={setShowSport} />
             </div>
           );
         } else if (showSport.hockey) {
@@ -106,13 +200,14 @@ export const Search = () => {
         <h1 className="text-6xl font-bold">Search For Person</h1>
         <div className="mt-4 flex w-full">
           <select
-            className="mx-2 w-1/6 rounded border border-gray-300 p-2 text-gray-600"
+            className="mx-2 w-1/3 rounded border border-gray-300 p-2 text-gray-600"
             value={filter}
             onChange={(e) => setFilter(e.target.value as SearchFilter)}
           >
             <option value="All">All</option>
             <option value="Baseball">Baseball</option>
             <option value="Basketball">Basketball</option>
+            <option value="Football">Football</option>
             <option value="Hockey">Hockey</option>
           </select>
           <input

@@ -110,3 +110,28 @@ export const basketballCache = {
   get: getBasketballCache,
   set: setBasketballCache,
 };
+
+const footballRequest: NFLRequest = {
+  query: "",
+  results: [] as NFLPlayer[],
+};
+
+export const getFootballCache = (query: string) => {
+  if (query === footballRequest.query) {
+    return footballRequest.results;
+  } else {
+    return null;
+  }
+};
+
+export const setFootballCache = (query: string, results: NFLPlayer[]) => {
+  footballRequest.query = query;
+  footballRequest.results = results;
+
+  return footballRequest.results;
+};
+
+export const footballCache = {
+  get: getFootballCache,
+  set: setFootballCache,
+};
