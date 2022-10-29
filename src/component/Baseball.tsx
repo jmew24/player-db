@@ -113,9 +113,7 @@ const searchMLB = async (query: string, t: MLBTeam[] | undefined) => {
     if (
       players.find(
         (player) =>
-          player.firstName === firstName &&
-          player.lastName === lastName &&
-          player.team.name === team.name
+          player.fullName === item.name && player.team.name === team.name
       )
     )
       continue;
