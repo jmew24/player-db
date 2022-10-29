@@ -27,7 +27,7 @@ declare type NFLPosition =
 declare type NFLTeam = {
   name: string;
   abbreviation: string;
-  team: string;
+  teamName: string;
 };
 
 declare type NFLTeamFilter = {
