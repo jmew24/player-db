@@ -40,34 +40,33 @@ const useGetNHLTeams = () => {
 const searchNHL = async (query: string, t: NHLTeam[] | undefined) => {
   const teams = t || ([] as NHLTeam[]);
   const q = query.trim();
-  const cached = hockeyCache.get(q);
+  const cached = hockeyCache.get(q.toLowerCase());
   if (cached.length > 0) return cached;
 
-  const nhlResponse = await proxy(
-    `https://suggest.svc.nhl.com/svc/suggest/v1/minplayers/${q}/99999`
-  );
+  const nhlResponse = (await proxy(
+    `https://suggest.svc.nhl.com/svc/suggest/v1/players/${q}/99999`
+  )) as NHLPlayerResult;
 
   const players: NHLPlayer[] = [];
   for (const item of nhlResponse.suggestions) {
-    // 8479318|Matthews|Auston|1|0|6' 3"|208|San Ramon|CA|USA|1997-09-17|TOR|C|34|auston-matthews-8479318
-    const data = item.toString().split("|");
-    const postion = data[12]?.toString() || "";
-    const teamAbbreviation = data[11]?.toString() || "";
+    const person = item.person;
+    const position = item.position;
+    const teamAbbreviation = item.team.abbreviation;
     const team = teams.find(
       (team) => team.abbreviation === teamAbbreviation
     ) || { ...blankTeam };
 
     players.push({
-      id: parseInt(data[0]?.toString() || "-1"),
-      lastName: data[1]?.toString() || "",
-      firstName: data[2]?.toString() || "",
+      id: parseInt(person.id || "-1"),
+      lastName: person.lastName,
+      firstName: person.firstName,
       team: team,
-      position: postion == "R" ? "RW" : postion == "L" ? "LW" : postion,
-      number: parseInt(data[13]?.toString() || "-1"),
+      position: position.abbreviation,
+      number: parseInt(item.jerseyNumber || "-1"),
       experience: "NHL",
-      _type: "player",
-      url: `https://www.nhl.com/player/${data[14]}`,
-      image: `https://cms.nhl.bamgrid.com/images/headshots/current/168x168/${data[0]}.jpg`,
+      _type: item.type,
+      url: `https://www.nhl.com/player/${person.otherNames.slug}`,
+      image: `https://cms.nhl.bamgrid.com/images/headshots/current/168x168/${person.id}.jpg`,
       source: "NHL.com",
     } as NHLPlayer);
   }
@@ -123,7 +122,7 @@ const searchNHL = async (query: string, t: NHLTeam[] | undefined) => {
     } as NHLPlayer);
   }
 
-  return hockeyCache.set(q, players);
+  return hockeyCache.set(q.toLowerCase(), players);
 };
 
 const useSearchNHL = (query: string, teams: NHLTeam[] | undefined) => {

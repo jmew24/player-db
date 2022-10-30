@@ -43,6 +43,37 @@ declare type NHLPlayer = {
   source: string;
 };
 
+declare type NHLPlayerResult = {
+  suggestions: [
+    {
+      person: {
+        id: string;
+        otherNames: {
+          firstLastNameRoman: string;
+          slug: string;
+        };
+        fullName: string;
+        firstName: string;
+        lastName: lastName;
+      };
+      team: {
+        abbreviation: string;
+        locationName: string;
+        name: string;
+        teamName: string;
+      };
+      position: {
+        abbreviation: string;
+        code: string;
+        type: string;
+        name: string;
+      };
+      type: string;
+      jerseyNumber: string;
+    }
+  ];
+};
+
 declare type NHLFilter = {
   position: NHLPosition;
   team: string;
