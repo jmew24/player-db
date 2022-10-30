@@ -22,7 +22,9 @@ const getTeams = async () => {
   const cached = baseballTeamCache.get();
   if (cached.length > 0) return cached;
 
-  const response = await proxy(`https://statsapi.mlb.com/api/v1/teams/`);
+  const response = (await proxy(
+    `https://statsapi.mlb.com/api/v1/teams/`
+  )) as MLBTeamRequest;
 
   const teams: MLBTeam[] = [blankTeam];
   for (const item of response.teams) {
@@ -43,10 +45,6 @@ const getTeams = async () => {
   return baseballTeamCache.set(teams);
 };
 
-const useGetMLBTeams = () => {
-  return useQuery(["useGetMLBTeams"], () => getTeams());
-};
-
 const searchMLB = async (query: string, t: MLBTeam[] | undefined) => {
   const teams = t || ([] as MLBTeam[]);
   const q = query.trim();
@@ -55,9 +53,9 @@ const searchMLB = async (query: string, t: MLBTeam[] | undefined) => {
   );
 
   if (mlbResults.length === 0 && lastQuery !== q.toLowerCase().trim()) {
-    const response = await proxy(
+    const response = (await proxy(
       `https://statsapi.mlb.com/api/v1/sports/1/players?fields=people,id,fullName,firstName,lastName,primaryNumber,currentTeam,primaryPosition,name,abbreviation,isPlayer`
-    );
+    )) as MLBPlayerRequest;
 
     for (const item of response.people) {
       const team = teams.find((team) => team.id === item.currentTeam.id) || {
@@ -71,10 +69,7 @@ const searchMLB = async (query: string, t: MLBTeam[] | undefined) => {
         lastName: item.lastName,
         primaryNumber: item.primaryNumber,
         team: team,
-        primaryPosition: {
-          name: item.primaryPosition.name,
-          abbreviation: item.primaryPosition.abbreviation,
-        },
+        primaryPosition: item.primaryPosition,
         isPlayer: item.isPlayer,
         url: `https://www.mlb.com/player/${item.id}`,
         image: `https://securea.mlb.com/mlb/images/players/head_shot/${item.id}.jpg`,
@@ -89,7 +84,7 @@ const searchMLB = async (query: string, t: MLBTeam[] | undefined) => {
   ) {
     const baseballSavantResponse = (await proxy(
       `https://baseballsavant.mlb.com/player/search-all?search=${q}`
-    )) as BaseballSavantResult[];
+    )) as BaseballSavantRequest;
 
     for (const item of baseballSavantResponse) {
       const firstName = item.name?.split(" ")[0] || "";
@@ -145,16 +140,6 @@ const searchMLB = async (query: string, t: MLBTeam[] | undefined) => {
     .filter((player) => player.fullName.toLowerCase().includes(query));
 };
 
-const useSearchMLB = (query: string, teams: MLBTeam[] | undefined) => {
-  return useQuery(
-    ["searchMLB", query, teams],
-    () => searchMLB(query.toLowerCase(), teams),
-    {
-      enabled: !!query && teams !== undefined,
-    }
-  );
-};
-
 export const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
   const [results, setResults] = useState<MLBPlayer[]>([]);
   const [filter, setFilter] = useState<MLBPlayerFilter>({
@@ -165,12 +150,18 @@ export const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
     isFetching: mlbTeamIsFetching,
     isLoading: mlbTeamIsLoading,
     data: mlbTeamsData,
-  } = useGetMLBTeams();
+  } = useQuery(["useGetMLBTeams"], async () => await getTeams());
   const {
     isFetching: mlbIsFetching,
     isLoading: mlbIsLoading,
     data: mlbData,
-  } = useSearchMLB(query, mlbTeamsData);
+  } = useQuery(
+    ["searchMLB", query, mlbTeamsData],
+    async () => await searchMLB(query.toLowerCase(), mlbTeamsData),
+    {
+      enabled: !!query && mlbTeamsData !== undefined,
+    }
+  );
   const resultsRef = useRef<MLBPlayer[]>([]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();

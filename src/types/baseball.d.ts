@@ -64,6 +64,22 @@ declare type MLBPlayer = {
   source: string;
 };
 
+declare type MLBResult = {
+  id: number;
+  currentTeam: {
+    id: number;
+  };
+  fullName: string;
+  firstName: string;
+  lastName: string;
+  isPlayer: boolean;
+  primaryNumber: string;
+  primaryPosition: {
+    name: string;
+    abbreviation: string;
+  };
+};
+
 declare type BaseballSavantResult = {
   name: string;
   id: string;
@@ -80,9 +96,11 @@ declare type BaseballSavantResult = {
   url: string;
 };
 
+declare type BaseballSavantRequest = BaseballSavantResult[];
+
 declare type MLBPlayerRequest = {
   copyright: string;
-  people: MLBPlayer[];
+  people: MLBResult[];
 };
 
 declare type MLBRequest = {

@@ -81,12 +81,6 @@ const searchNFL = async (query: string) => {
     .filter((player) => player.fullNameForSearch.toLowerCase().includes(q));
 };
 
-const useSearchNFL = (query: string) => {
-  return useQuery(["searchNFL", query], () => searchNFL(query.toLowerCase()), {
-    enabled: !!query,
-  });
-};
-
 export const Football: FC<FootballProps> = ({ query, setShow }) => {
   const [results, setResults] = useState<NFLPlayer[]>([]);
   const [filter, setFilter] = useState<NFLPlayerFilter>({
@@ -97,7 +91,13 @@ export const Football: FC<FootballProps> = ({ query, setShow }) => {
     isFetching: nflIsFetching,
     isLoading: nflIsLoading,
     data: nflData,
-  } = useSearchNFL(query);
+  } = useQuery(
+    ["searchNFL", query],
+    async () => await searchNFL(query.toLowerCase()),
+    {
+      enabled: !!query,
+    }
+  );
   const resultsRef = useRef<NFLPlayer[]>([]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();

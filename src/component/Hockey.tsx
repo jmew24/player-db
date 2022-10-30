@@ -17,7 +17,9 @@ const getTeams = async () => {
   const cached = hockeyTeamCache.get();
   if (cached.length > 0) return cached;
 
-  const response = await proxy(`https://statsapi.web.nhl.com/api/v1/teams`);
+  const response = (await proxy(
+    `https://statsapi.web.nhl.com/api/v1/teams`
+  )) as NHLTeamRequest;
 
   const teams: NHLTeam[] = [blankTeam];
   for (const item of response.teams) {
@@ -31,10 +33,6 @@ const getTeams = async () => {
   }
 
   return hockeyTeamCache.set(teams);
-};
-
-const useGetNHLTeams = () => {
-  return useQuery(["useGetNHLTeams"], () => getTeams());
 };
 
 const searchNHL = async (query: string, t: NHLTeam[] | undefined) => {
@@ -125,16 +123,6 @@ const searchNHL = async (query: string, t: NHLTeam[] | undefined) => {
   return hockeyCache.set(q.toLowerCase(), players);
 };
 
-const useSearchNHL = (query: string, teams: NHLTeam[] | undefined) => {
-  return useQuery(
-    ["searchNHL", query, teams],
-    () => searchNHL(query.toLowerCase(), teams),
-    {
-      enabled: !!query && teams !== undefined,
-    }
-  );
-};
-
 export const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
   const [results, setResults] = useState<NHLPlayer[]>([]);
   const [filter, setFilter] = useState<NHLFilter>({
@@ -145,12 +133,18 @@ export const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
     isFetching: nhlTeamIsFetching,
     isLoading: nhlTeamIsLoading,
     data: nhlTeamsData,
-  } = useGetNHLTeams();
+  } = useQuery(["useGetNHLTeams"], async () => await getTeams());
   const {
     isFetching: nhlIsFetching,
     isLoading: nhlIsLoading,
     data: nhlData,
-  } = useSearchNHL(query, nhlTeamsData);
+  } = useQuery(
+    ["searchNHL", query, nhlTeamsData],
+    async () => await searchNHL(query.toLowerCase(), nhlTeamsData),
+    {
+      enabled: !!query && nhlTeamsData !== undefined,
+    }
+  );
   const resultsRef = useRef<NHLPlayer[]>([]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();

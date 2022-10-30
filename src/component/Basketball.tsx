@@ -40,12 +40,6 @@ const searchNBA = async (query: string) => {
     .filter((player) => player.displayName.toLowerCase().includes(q));
 };
 
-const useSearchNBA = (query: string) => {
-  return useQuery(["searchNBA", query], () => searchNBA(query.toLowerCase()), {
-    enabled: !!query,
-  });
-};
-
 export const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
   const [results, setResults] = useState<NBAPlayer[]>([]);
   const [filter, setFilter] = useState<NBAPlayerFilter>({
@@ -56,7 +50,13 @@ export const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
     isFetching: nbaIsFetching,
     isLoading: nbaIsLoading,
     data: nbaData,
-  } = useSearchNBA(query);
+  } = useQuery(
+    ["searchNBA", query],
+    async () => await searchNBA(query.toLowerCase()),
+    {
+      enabled: !!query,
+    }
+  );
   const resultsRef = useRef<NBAPlayer[]>([]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();

@@ -1,3 +1,14 @@
+const proxyCache = new Map<string, unknown>();
+
+export function getProxyCache(query: string) {
+  return proxyCache.get(query);
+}
+
+export function setProxyCache(query: string, value: unknown) {
+  proxyCache.set(query, value);
+  return value;
+}
+
 const baseballRequest: MLBRequest = {
   query: "",
   mlbResults: [] as MLBPlayer[],
