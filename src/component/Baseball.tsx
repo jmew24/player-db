@@ -50,9 +50,11 @@ const useGetMLBTeams = () => {
 const searchMLB = async (query: string, t: MLBTeam[] | undefined) => {
   const teams = t || ([] as MLBTeam[]);
   const q = query.trim();
-  const { mlbResults, baseballSavantResults } = baseballCache.get(q);
+  const { lastQuery, mlbResults, baseballSavantResults } = baseballCache.get(
+    q.toLowerCase()
+  );
 
-  if (mlbResults.length <= 0) {
+  if (mlbResults.length === 0 && lastQuery !== q.toLowerCase().trim()) {
     const response = await proxy(
       `https://statsapi.mlb.com/api/v1/sports/1/players?fields=people,id,fullName,firstName,lastName,primaryNumber,currentTeam,primaryPosition,name,abbreviation,isPlayer`
     );
@@ -81,7 +83,10 @@ const searchMLB = async (query: string, t: MLBTeam[] | undefined) => {
     }
   }
 
-  if (baseballSavantResults.length <= 0) {
+  if (
+    baseballSavantResults.length === 0 &&
+    lastQuery !== q.toLowerCase().trim()
+  ) {
     const baseballSavantResponse = (await proxy(
       `https://baseballsavant.mlb.com/player/search-all?search=${q}`
     )) as BaseballSavantResult[];
@@ -136,7 +141,7 @@ const searchMLB = async (query: string, t: MLBTeam[] | undefined) => {
   }
 
   return baseballCache
-    .set(q, mlbResults, baseballSavantResults)
+    .set(q.toLowerCase(), mlbResults, baseballSavantResults)
     .filter((player) => player.fullName.toLowerCase().includes(query));
 };
 

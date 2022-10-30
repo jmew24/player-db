@@ -46,8 +46,11 @@ const teams: NFLTeam[] = [
 
 const searchNFL = async (query: string) => {
   const q = query.trim();
-  const cached = footballCache.get(q);
-  if (cached.length > 0) return cached;
+  const cached = footballCache.get(q.toLowerCase());
+  if (cached.length > 0)
+    return cached.filter((player) =>
+      player.fullNameForSearch.toLowerCase().includes(q)
+    );
 
   const response = (await proxy(
     `https://ratings-api.ea.com/v2/entities/m23-ratings?filter=((fullNameForSearch%3A*${q}*))&sort=firstName%3AASC`
@@ -73,7 +76,9 @@ const searchNFL = async (query: string) => {
     } as NFLPlayer);
   }
 
-  return footballCache.set(q, players);
+  return footballCache
+    .set(q.toLowerCase(), players)
+    .filter((player) => player.fullNameForSearch.toLowerCase().includes(q));
 };
 
 const useSearchNFL = (query: string) => {

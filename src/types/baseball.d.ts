@@ -92,6 +92,7 @@ declare type MLBRequest = {
 };
 
 declare type MLBCache = {
+  lastQuery: string;
   mlbResults: MLBPlayer[];
   baseballSavantResults: MLBPlayer[];
 };

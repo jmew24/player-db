@@ -9,22 +9,18 @@ const baseballTeamRequest: MLBTeamsRequest = {
 };
 
 export const getBaseballCache = (query: string) => {
-  console.log(
-    "getBaseballCache",
-    query.toLowerCase().trim() === baseballRequest.query.toLowerCase().trim(),
-    query,
-    baseballRequest.query.toLowerCase().trim()
-  );
   if (
     query.toLowerCase().trim() === baseballRequest.query.toLowerCase().trim()
   ) {
     return {
+      lastQuery: baseballRequest.query,
       mlbResults: baseballRequest.mlbResults,
       baseballSavantResults: baseballRequest.baseballSavantResults,
     } as MLBCache;
   }
 
   return {
+    lastQuery: baseballRequest.query,
     mlbResults: baseballRequest.mlbResults,
     baseballSavantResults: [],
   } as MLBCache;
