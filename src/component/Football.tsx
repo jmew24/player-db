@@ -176,7 +176,9 @@ export const Football: FC<FootballProps> = ({ query, setShow }) => {
             <option value="DE">Defensive End</option>
             <option value="DT">Defensive Tackle</option>
             <option value="MLB">Middle Linebacker</option>
+            <option value="ROLB">Right Outside Linebacker</option>
             <option value="OLB">Outside Linebacker</option>
+            <option value="LOLB">Left Outside Linebacker</option>
             <option value="CB">Cornerback</option>
             <option value="FS">Free Safety</option>
             <option value="SS">Strong Safety</option>
