@@ -198,32 +198,39 @@ export const Search = () => {
 
       <main className="flex w-full flex-1 flex-col items-center px-5 text-center">
         <h1 className="text-6xl font-bold">Search For Person</h1>
-        <div className="mt-4 flex w-full">
-          <select
-            className="mx-2 w-1/3 rounded border border-gray-300 p-2 text-gray-600"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value as SearchFilter)}
-          >
-            <option value="All">All</option>
-            <option value="Baseball">Baseball</option>
-            <option value="Basketball">Basketball</option>
-            <option value="Football">Football</option>
-            <option value="Hockey">Hockey</option>
-          </select>
-          <input
-            type="text"
-            value={search}
-            placeholder="Enter a name here..."
-            onChange={(e) => setSearch(e.target.value)}
-            className="mx-2 h-10 flex-grow rounded-l px-5 text-gray-600 outline-double outline-1 focus:outline-none focus:ring"
-          />
-          <button
-            onClick={() => searchQuery()}
-            className="mx-2 rounded-r bg-blue-500 px-8 py-2 text-white hover:bg-blue-600"
-          >
-            Search
-          </button>
-        </div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            searchQuery();
+          }}
+        >
+          <div className="mt-4 flex w-full">
+            <select
+              className="mx-2 w-1/3 rounded border border-gray-300 p-2 text-gray-600"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value as SearchFilter)}
+            >
+              <option value="All">All</option>
+              <option value="Baseball">Baseball</option>
+              <option value="Basketball">Basketball</option>
+              <option value="Football">Football</option>
+              <option value="Hockey">Hockey</option>
+            </select>
+            <input
+              type="text"
+              value={search}
+              placeholder="Enter a name here..."
+              onChange={(e) => setSearch(e.target.value)}
+              className="mx-2 h-10 flex-grow rounded-l px-5 text-gray-600 outline-double outline-1 focus:outline-none focus:ring"
+            />
+            <button
+              onClick={() => searchQuery()}
+              className="mx-2 rounded-r bg-blue-500 px-8 py-2 text-white hover:bg-blue-600"
+            >
+              Search
+            </button>
+          </div>
+        </form>
 
         {leagueDisplay()}
       </main>
