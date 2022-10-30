@@ -20,7 +20,7 @@ const blankTeam: MLBTeam = {
 
 const getTeams = async () => {
   const cached = baseballTeamCache.get();
-  if (cached !== null) return cached;
+  if (cached.length > 0) return cached;
 
   const response = await proxy(`https://statsapi.mlb.com/api/v1/teams/`);
 
@@ -50,94 +50,93 @@ const useGetMLBTeams = () => {
 const searchMLB = async (query: string, t: MLBTeam[] | undefined) => {
   const teams = t || ([] as MLBTeam[]);
   const q = query.trim();
-  const cached = baseballCache.get(q);
-  if (cached !== null)
-    return cached.filter((player) =>
-      player.fullName.toLowerCase().includes(query)
+  const { mlbResults, baseballSavantResults } = baseballCache.get(q);
+
+  if (mlbResults.length <= 0) {
+    const response = await proxy(
+      `https://statsapi.mlb.com/api/v1/sports/1/players?fields=people,id,fullName,firstName,lastName,primaryNumber,currentTeam,primaryPosition,name,abbreviation,isPlayer`
     );
 
-  const response = await proxy(
-    `https://statsapi.mlb.com/api/v1/sports/1/players?fields=people,id,fullName,firstName,lastName,primaryNumber,currentTeam,primaryPosition,name,abbreviation,isPlayer`
-  );
+    for (const item of response.people) {
+      const team = teams.find((team) => team.id === item.currentTeam.id) || {
+        ...blankTeam,
+      };
 
-  const players: MLBPlayer[] = [];
-  for (const item of response.people) {
-    const team = teams.find((team) => team.id === item.currentTeam.id) || {
-      ...blankTeam,
-    };
-
-    players.push({
-      id: item.id,
-      fullName: item.fullName,
-      firstName: item.firstName,
-      lastName: item.lastName,
-      primaryNumber: item.primaryNumber,
-      team: team,
-      primaryPosition: {
-        name: item.primaryPosition.name,
-        abbreviation: item.primaryPosition.abbreviation,
-      },
-      isPlayer: item.isPlayer,
-      url: `https://www.mlb.com/player/${item.id}`,
-      image: `https://securea.mlb.com/mlb/images/players/head_shot/${item.id}.jpg`,
-      source: "MLB.com",
-    } as MLBPlayer);
+      mlbResults.push({
+        id: item.id,
+        fullName: item.fullName,
+        firstName: item.firstName,
+        lastName: item.lastName,
+        primaryNumber: item.primaryNumber,
+        team: team,
+        primaryPosition: {
+          name: item.primaryPosition.name,
+          abbreviation: item.primaryPosition.abbreviation,
+        },
+        isPlayer: item.isPlayer,
+        url: `https://www.mlb.com/player/${item.id}`,
+        image: `https://securea.mlb.com/mlb/images/players/head_shot/${item.id}.jpg`,
+        source: "MLB.com",
+      } as MLBPlayer);
+    }
   }
 
-  const baseballSavantResponse = (await proxy(
-    `https://baseballsavant.mlb.com/player/search-all?search=${q}`
-  )) as BaseballSavantResult[];
+  if (baseballSavantResults.length <= 0) {
+    const baseballSavantResponse = (await proxy(
+      `https://baseballsavant.mlb.com/player/search-all?search=${q}`
+    )) as BaseballSavantResult[];
 
-  for (const item of baseballSavantResponse) {
-    const firstName = item.name?.split(" ")[0] || "";
-    const lastName = item.name.split(" ")[1] || "";
-    const position =
-      item.pos == "LHP"
-        ? "P"
-        : item.pos == "RHP"
-        ? "P"
-        : item.pos == "TWP"
-        ? "P"
-        : item.pos;
-    const team = teams.find(
-      (team) =>
-        team.teamCode === item.name_display_club ||
-        team.name === item.name_display_club ||
-        team.abbreviation === item.name_display_club ||
-        team.teamName === item.name_display_club ||
-        team.shortName === item.name_display_club ||
-        team.franchiseName === item.name_display_club ||
-        team.clubName === item.name_display_club
-    ) || { ...blankTeam };
+    for (const item of baseballSavantResponse) {
+      const firstName = item.name?.split(" ")[0] || "";
+      const lastName = item.name.split(" ")[1] || "";
+      const position =
+        item.pos == "LHP"
+          ? "P"
+          : item.pos == "RHP"
+          ? "P"
+          : item.pos == "TWP"
+          ? "P"
+          : item.pos;
+      const team = teams.find(
+        (team) =>
+          team.teamCode === item.name_display_club ||
+          team.name === item.name_display_club ||
+          team.abbreviation === item.name_display_club ||
+          team.teamName === item.name_display_club ||
+          team.shortName === item.name_display_club ||
+          team.franchiseName === item.name_display_club ||
+          team.clubName === item.name_display_club
+      ) || { ...blankTeam };
 
-    if (
-      players.find(
-        (player) =>
-          player.fullName === item.name && player.team.name === team.name
+      if (
+        mlbResults.find(
+          (player) =>
+            player.fullName === item.name && player.team.name === team.name
+        )
       )
-    )
-      continue;
+        continue;
 
-    players.push({
-      id: parseInt(item.id),
-      fullName: `${firstName} ${lastName}`,
-      firstName: firstName,
-      lastName: lastName,
-      primaryNumber: "-1",
-      team: team,
-      primaryPosition: {
-        name: item.pos,
-        abbreviation: position,
-      },
-      isPlayer: !!item.is_player,
-      url: `https://baseballsavant.mlb.com/savant-player/${firstName}-${lastName}-${item.id}`,
-      image: `https://img.mlbstatic.com/mlb-photos/image/upload/w_67,q_100/v1/people/${item.id}/headshot/silo/current.jpg`,
-      source: "BaseballSavant.mlb.com",
-    } as MLBPlayer);
+      baseballSavantResults.push({
+        id: parseInt(item.id),
+        fullName: `${firstName} ${lastName}`,
+        firstName: firstName,
+        lastName: lastName,
+        primaryNumber: "-1",
+        team: team,
+        primaryPosition: {
+          name: item.pos,
+          abbreviation: position,
+        },
+        isPlayer: !!item.is_player,
+        url: `https://baseballsavant.mlb.com/savant-player/${firstName}-${lastName}-${item.id}`,
+        image: `https://img.mlbstatic.com/mlb-photos/image/upload/w_67,q_100/v1/people/${item.id}/headshot/silo/current.jpg`,
+        source: "BaseballSavant.mlb.com",
+      } as MLBPlayer);
+    }
   }
 
   return baseballCache
-    .set(q, players)
+    .set(q, mlbResults, baseballSavantResults)
     .filter((player) => player.fullName.toLowerCase().includes(query));
 };
 
@@ -157,7 +156,11 @@ export const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
     position: "",
     team: "",
   });
-  const { data: mlbTeamsData } = useGetMLBTeams();
+  const {
+    isFetching: mlbTeamIsFetching,
+    isLoading: mlbTeamIsLoading,
+    data: mlbTeamsData,
+  } = useGetMLBTeams();
   const {
     isFetching: mlbIsFetching,
     isLoading: mlbIsLoading,
@@ -202,6 +205,18 @@ export const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
       }));
     }
   }, [mlbData, setShow]);
+
+  if (mlbTeamIsFetching || mlbIsFetching || mlbTeamIsLoading || mlbIsLoading)
+    return (
+      <div className="items-center justify-center py-2">
+        <div className="mt-4 w-full">
+          <h1 className="text-6xl font-bold">Baseball</h1>
+        </div>
+        <div className="mt-4 w-full">
+          <h1 className="mt-4 text-2xl">Loading...</h1>
+        </div>
+      </div>
+    );
 
   return resultsRef.current.length > 0 ? (
     <div className="items-center justify-center py-2">

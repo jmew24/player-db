@@ -6,11 +6,11 @@ import { basketballCache } from "../factory/cache";
 import ImageWithFallback from "./ImageWithFallback";
 
 const searchNBA = async (query: string) => {
-  const q = query.trim();
-  const cached = basketballCache.get(q);
-  if (cached !== null)
+  const q = query.trim().toLowerCase();
+  const cached = basketballCache.get("NBA");
+  if (cached.length > 0)
     return cached.filter((player) =>
-      player.displayName.toLowerCase().includes(query)
+      player.displayName.toLowerCase().includes(q)
     );
 
   const response = (await proxy(
@@ -36,8 +36,8 @@ const searchNBA = async (query: string) => {
   }
 
   return basketballCache
-    .set(q, players)
-    .filter((player) => player.displayName.toLowerCase().includes(query));
+    .set("NBA", players)
+    .filter((player) => player.displayName.toLowerCase().includes(q));
 };
 
 const useSearchNBA = (query: string) => {
@@ -92,6 +92,18 @@ export const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
       }));
     }
   }, [nbaData, setShow]);
+
+  if (nbaIsFetching || nbaIsLoading)
+    return (
+      <div className="items-center justify-center py-2">
+        <div className="mt-4 w-full">
+          <h1 className="text-6xl font-bold">Basketball</h1>
+        </div>
+        <div className="mt-4 w-full">
+          <h1 className="mt-4 text-2xl">Loading...</h1>
+        </div>
+      </div>
+    );
 
   return resultsRef.current.length > 0 ? (
     <div className="items-center justify-center py-2">

@@ -18,7 +18,7 @@ declare type NBATeamRequest = {
 };
 
 declare type NBATeamsRequest = {
-  results: NBATeam[] | null;
+  results: NBATeam[];
 };
 
 declare type NBATeamResult = NBATeam[];

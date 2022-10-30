@@ -15,7 +15,7 @@ const blankTeam: NHLTeam = {
 
 const getTeams = async () => {
   const cached = hockeyTeamCache.get();
-  if (cached !== null) return cached;
+  if (cached.length > 0) return cached;
 
   const response = await proxy(`https://statsapi.web.nhl.com/api/v1/teams`);
 
@@ -41,7 +41,7 @@ const searchNHL = async (query: string, t: NHLTeam[] | undefined) => {
   const teams = t || ([] as NHLTeam[]);
   const q = query.trim();
   const cached = hockeyCache.get(q);
-  if (cached !== null) return cached;
+  if (cached.length > 0) return cached;
 
   const nhlResponse = await proxy(
     `https://suggest.svc.nhl.com/svc/suggest/v1/minplayers/${q}/99999`
@@ -142,7 +142,11 @@ export const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
     position: "",
     team: "",
   });
-  const { data: nhlTeamsData } = useGetNHLTeams();
+  const {
+    isFetching: nhlTeamIsFetching,
+    isLoading: nhlTeamIsLoading,
+    data: nhlTeamsData,
+  } = useGetNHLTeams();
   const {
     isFetching: nhlIsFetching,
     isLoading: nhlIsLoading,
@@ -192,6 +196,18 @@ export const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
       }));
     }
   }, [nhlData, setShow]);
+
+  if (nhlTeamIsFetching || nhlIsFetching || nhlTeamIsLoading || nhlIsLoading)
+    return (
+      <div className="items-center justify-center py-2">
+        <div className="mt-4 w-full">
+          <h1 className="text-6xl font-bold">Hockey</h1>
+        </div>
+        <div className="mt-4 w-full">
+          <h1 className="mt-4 text-2xl">Loading...</h1>
+        </div>
+      </div>
+    );
 
   return resultsRef.current.length > 0 ? (
     <div className="items-center justify-center py-2">

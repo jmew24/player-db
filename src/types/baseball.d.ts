@@ -34,7 +34,7 @@ declare type MLBTeamRequest = {
 };
 
 declare type MLBTeamsRequest = {
-  results: MLBTeam[] | null;
+  results: MLBTeam[];
 };
 
 declare type MLBTeamResult = MLBTeam[];
@@ -87,7 +87,13 @@ declare type MLBPlayerRequest = {
 
 declare type MLBRequest = {
   query: string;
-  results: MLBPlayer[];
+  mlbResults: MLBPlayer[];
+  baseballSavantResults: MLBPlayer[];
+};
+
+declare type MLBCache = {
+  mlbResults: MLBPlayer[];
+  baseballSavantResults: MLBPlayer[];
 };
 
 declare type MLBPlayerResult = MLBPlayer[];

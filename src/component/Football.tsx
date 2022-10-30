@@ -47,7 +47,7 @@ const teams: NFLTeam[] = [
 const searchNFL = async (query: string) => {
   const q = query.trim();
   const cached = footballCache.get(q);
-  if (cached !== null) return cached;
+  if (cached.length > 0) return cached;
 
   const response = (await proxy(
     `https://ratings-api.ea.com/v2/entities/m23-ratings?filter=((fullNameForSearch%3A*${q}*))&sort=firstName%3AASC`
@@ -128,6 +128,18 @@ export const Football: FC<FootballProps> = ({ query, setShow }) => {
       }));
     }
   }, [nflData, setShow]);
+
+  if (nflIsFetching || nflIsLoading)
+    return (
+      <div className="items-center justify-center py-2">
+        <div className="mt-4 w-full">
+          <h1 className="text-6xl font-bold">Football</h1>
+        </div>
+        <div className="mt-4 w-full">
+          <h1 className="mt-4 text-2xl">Loading...</h1>
+        </div>
+      </div>
+    );
 
   return resultsRef.current.length > 0 ? (
     <div className="items-center justify-center py-2">

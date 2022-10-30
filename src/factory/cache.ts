@@ -1,25 +1,48 @@
 const baseballRequest: MLBRequest = {
   query: "",
-  results: [] as MLBPlayer[],
+  mlbResults: [] as MLBPlayer[],
+  baseballSavantResults: [] as MLBPlayer[],
 };
 
 const baseballTeamRequest: MLBTeamsRequest = {
-  results: null,
+  results: [] as MLBTeam[],
 };
 
 export const getBaseballCache = (query: string) => {
-  if (query === baseballRequest.query) {
-    return baseballRequest.results;
-  } else {
-    return null;
+  console.log(
+    "getBaseballCache",
+    query.toLowerCase().trim() === baseballRequest.query.toLowerCase().trim(),
+    query,
+    baseballRequest.query.toLowerCase().trim()
+  );
+  if (
+    query.toLowerCase().trim() === baseballRequest.query.toLowerCase().trim()
+  ) {
+    return {
+      mlbResults: baseballRequest.mlbResults,
+      baseballSavantResults: baseballRequest.baseballSavantResults,
+    } as MLBCache;
   }
+
+  return {
+    mlbResults: baseballRequest.mlbResults,
+    baseballSavantResults: [],
+  } as MLBCache;
 };
 
-export const setBaseballCache = (query: string, results: MLBPlayer[]) => {
-  baseballRequest.query = query;
-  baseballRequest.results = results;
+export const setBaseballCache = (
+  query: string,
+  mlb: MLBPlayer[],
+  baseballSavant: MLBPlayer[]
+) => {
+  baseballRequest.query = query.toLowerCase().trim();
+  baseballRequest.mlbResults = mlb;
+  baseballRequest.baseballSavantResults = baseballSavant;
 
-  return baseballRequest.results;
+  return [
+    ...baseballRequest.mlbResults,
+    ...baseballRequest.baseballSavantResults,
+  ];
 };
 
 export const baseballCache = {
@@ -48,14 +71,14 @@ const hockeyRequest: NHLRequest = {
 };
 
 const hockeyTeamRequest: NHLTeamsRequest = {
-  results: null,
+  results: [] as NHLTeam[],
 };
 
 export const getHockeyCache = (query: string) => {
   if (query === hockeyRequest.query) {
     return hockeyRequest.results;
   } else {
-    return null;
+    return [] as NHLPlayer[];
   }
 };
 
@@ -95,7 +118,7 @@ export const getBasketballCache = (query: string) => {
   if (query === basketballRequest.query) {
     return basketballRequest.results;
   } else {
-    return null;
+    return [] as NBAPlayer[];
   }
 };
 
@@ -120,7 +143,7 @@ export const getFootballCache = (query: string) => {
   if (query === footballRequest.query) {
     return footballRequest.results;
   } else {
-    return null;
+    return [] as NFLPlayer[];
   }
 };
 
