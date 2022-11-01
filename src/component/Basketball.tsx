@@ -1,44 +1,7 @@
 import { FC, useState, useEffect, useRef, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
 
-import { proxy } from "../factory/proxy";
-import { basketballCache } from "../factory/cache";
+import useGetBasketball from "../hooks/useGetBasketball";
 import ImageWithFallback from "./ImageWithFallback";
-
-const searchNBA = async (query: string) => {
-  const q = query.trim().toLowerCase();
-  const cached = basketballCache.get("NBA");
-  if (cached.length > 0)
-    return cached.filter((player) =>
-      player.displayName.toLowerCase().includes(q)
-    );
-
-  const response = (await proxy(
-    `https://ca.global.nba.com/stats2/league/playerlist.json?locale=en`
-  )) as NBAPlayerRequest;
-
-  const players: NBAPlayer[] = [];
-  for (const item of response.payload.players) {
-    const player = item.playerProfile;
-    players.push({
-      id: player.playerId,
-      code: player.code,
-      displayName: player.displayName,
-      firstName: player.firstName,
-      lastName: player.lastName,
-      jerseyNo: player.jerseyNo,
-      position: player.position,
-      team: item.teamProfile,
-      url: `https://ca.global.nba.com/players/#!/${player.code}`,
-      image: `https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/latest/260x190/${player.playerId}.png`,
-      source: "NBA.com",
-    } as NBAPlayer);
-  }
-
-  return basketballCache
-    .set("NBA", players)
-    .filter((player) => player.displayName.toLowerCase().includes(q));
-};
 
 export const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
   const [results, setResults] = useState<NBAPlayer[]>([]);
@@ -46,17 +9,7 @@ export const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
     position: "",
     team: "",
   });
-  const {
-    isFetching: nbaIsFetching,
-    isLoading: nbaIsLoading,
-    data: nbaData,
-  } = useQuery(
-    ["searchNBA", query],
-    async () => await searchNBA(query.toLowerCase()),
-    {
-      enabled: !!query,
-    }
-  );
+  const { isFetching, isLoading, data } = useGetBasketball(query);
   const resultsRef = useRef<NBAPlayer[]>([]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
@@ -83,17 +36,17 @@ export const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
   }, [filter.position, filter.team, results]);
 
   useEffect(() => {
-    if (nbaData && nbaData !== resultsRef.current) {
-      resultsRef.current = nbaData;
-      setResults(nbaData);
+    if (data && data !== resultsRef.current) {
+      resultsRef.current = data;
+      setResults(data);
       setShow((state: SearchShowSport) => ({
         ...state,
         basketball: resultsRef.current.length > 0,
       }));
     }
-  }, [nbaData, setShow]);
+  }, [data, setShow]);
 
-  if (nbaIsFetching || nbaIsLoading)
+  if (isFetching || isLoading)
     return (
       <div className="items-center justify-center py-2">
         <div className="mt-4 w-full">
@@ -140,9 +93,7 @@ export const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
         </div>
       </div>
 
-      {nbaIsFetching ?? nbaIsLoading ? (
-        <h1 className="mt-4 text-2xl">Loading...</h1>
-      ) : filteredResults.length > 0 ? (
+      {filteredResults.length > 0 ? (
         <ul className="mt-4 flex w-full flex-col items-center justify-center">
           {filteredResults.map((player: NBAPlayer, index: number) => (
             <li

@@ -1,127 +1,7 @@
 import { FC, useState, useEffect, useRef, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
 
-import { proxy } from "../factory/proxy";
-import { hockeyCache, hockeyTeamCache } from "../factory/cache";
+import useGetHockey from "../hooks/useGetHockey";
 import ImageWithFallback from "./ImageWithFallback";
-
-const blankTeam: NHLTeam = {
-  id: -1,
-  name: "Unknown",
-  abbreviation: "",
-  teamName: "Unknown",
-  shortName: "",
-};
-
-const getTeams = async () => {
-  const cached = hockeyTeamCache.get();
-  if (cached.length > 0) return cached;
-
-  const response = (await proxy(
-    `https://statsapi.web.nhl.com/api/v1/teams`
-  )) as NHLTeamRequest;
-
-  const teams: NHLTeam[] = [blankTeam];
-  for (const item of response.teams) {
-    teams.push({
-      id: item.id,
-      name: item.name,
-      abbreviation: item.abbreviation,
-      teamName: item.teamName,
-      shortName: item.shortName,
-    } as NHLTeam);
-  }
-
-  return hockeyTeamCache.set(teams);
-};
-
-const searchNHL = async (query: string, t: NHLTeam[] | undefined) => {
-  const teams = t || ([] as NHLTeam[]);
-  const q = query.trim();
-  const cached = hockeyCache.get(q.toLowerCase());
-  if (cached.length > 0) return cached;
-
-  const nhlResponse = (await proxy(
-    `https://suggest.svc.nhl.com/svc/suggest/v1/players/${q}/99999`
-  )) as NHLPlayerResult;
-
-  const players: NHLPlayer[] = [];
-  for (const item of nhlResponse.suggestions) {
-    const person = item.person;
-    const position = item.position;
-    const teamAbbreviation = item.team.abbreviation;
-    const team = teams.find(
-      (team) => team.abbreviation === teamAbbreviation
-    ) || { ...blankTeam };
-
-    players.push({
-      id: parseInt(person.id || "-1"),
-      lastName: person.lastName,
-      firstName: person.firstName,
-      team: team,
-      position: position.abbreviation,
-      number: parseInt(item.jerseyNumber || "-1"),
-      experience: "NHL",
-      _type: item.type,
-      url: `https://www.nhl.com/player/${person.otherNames.slug}`,
-      image: `https://cms.nhl.bamgrid.com/images/headshots/current/168x168/${person.id}.jpg`,
-      source: "NHL.com",
-    } as NHLPlayer);
-  }
-
-  const eliteProspectsResponse = (await proxy(
-    `https://autocomplete.eliteprospects.com/all?q=${q}`
-  )) as EliteProspectsResult[];
-
-  for (const item of eliteProspectsResponse) {
-    const _type = item._type?.toLowerCase();
-    if (_type !== "player" && _type !== "staff") continue;
-
-    const firstName = item.fullname?.split(" ")[0] || "";
-    const lastName = item.fullname.split(" ")[1] || "";
-    const teamName = item.team;
-    const team = teams.find(
-      (team) =>
-        team.name === teamName ||
-        team.abbreviation === teamName ||
-        team.teamName === teamName ||
-        team.shortName === teamName
-    ) || { ...blankTeam };
-
-    if (
-      players.find(
-        (player) =>
-          player.firstName === firstName &&
-          player.lastName === lastName &&
-          player.team.name === team.name
-      )
-    )
-      continue;
-
-    players.push({
-      id: parseInt(item.id || "-1"),
-      lastName: lastName,
-      firstName: firstName,
-      team: team,
-      position: item.position,
-      number: -1,
-      experience: item.experience,
-      _type: _type,
-      url:
-        _type === "player"
-          ? `https://www.eliteprospects.com/player/${
-              item.id
-            }/${firstName.toLocaleLowerCase()}-${lastName.toLocaleLowerCase()}`
-          : `https://www.eliteprospects.com/staff/${
-              item.id
-            }/${firstName.toLocaleLowerCase()}-${lastName.toLocaleLowerCase()}`,
-      image: `https://cms.nhl.bamgrid.com/images/headshots/current/168x168/skater.jpg`,
-      source: "EliteProspects.com",
-    } as NHLPlayer);
-  }
-
-  return hockeyCache.set(q.toLowerCase(), players);
-};
 
 export const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
   const [results, setResults] = useState<NHLPlayer[]>([]);
@@ -129,22 +9,7 @@ export const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
     position: "",
     team: "",
   });
-  const {
-    isFetching: nhlTeamIsFetching,
-    isLoading: nhlTeamIsLoading,
-    data: nhlTeamsData,
-  } = useQuery(["useGetNHLTeams"], async () => await getTeams());
-  const {
-    isFetching: nhlIsFetching,
-    isLoading: nhlIsLoading,
-    data: nhlData,
-  } = useQuery(
-    ["searchNHL", query, nhlTeamsData],
-    async () => await searchNHL(query.toLowerCase(), nhlTeamsData),
-    {
-      enabled: !!query && nhlTeamsData !== undefined,
-    }
-  );
+  const { isFetching, isLoading, data } = useGetHockey(query.toLowerCase());
   const resultsRef = useRef<NHLPlayer[]>([]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
@@ -180,17 +45,17 @@ export const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
   }, [filter.position, filter.team, results]);
 
   useEffect(() => {
-    if (nhlData && nhlData !== resultsRef.current) {
-      resultsRef.current = nhlData;
-      setResults(nhlData);
+    if (data && data !== resultsRef.current) {
+      resultsRef.current = data;
+      setResults(data);
       setShow((state: SearchShowSport) => ({
         ...state,
         hockey: resultsRef.current.length > 0,
       }));
     }
-  }, [nhlData, setShow]);
+  }, [data, setShow]);
 
-  if (nhlTeamIsFetching || nhlIsFetching || nhlTeamIsLoading || nhlIsLoading)
+  if (isFetching || isLoading)
     return (
       <div className="items-center justify-center py-2">
         <div className="mt-4 w-full">
@@ -238,9 +103,7 @@ export const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
         </div>
       </div>
 
-      {nhlIsFetching ?? nhlIsLoading ? (
-        <h1 className="mt-4 text-2xl">Loading...</h1>
-      ) : filteredResults.length > 0 ? (
+      {filteredResults.length > 0 ? (
         <ul className="mt-4 flex w-full flex-col items-center justify-center">
           {filteredResults.map((player: NHLPlayer, index: number) => {
             return (
