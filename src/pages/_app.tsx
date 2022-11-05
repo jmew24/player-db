@@ -3,7 +3,13 @@ import type { AppType } from "next/dist/shared/lib/utils";
 
 import "../styles/globals.css";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
