@@ -1,6 +1,6 @@
 import { queryClient } from "@factory/queryClient";
 
-const corsAnywhere = process.env.NEXT_PUBLIC_CORS || "http://0.0.0.0:8080";
+const corsAnywhere = process.env.NEXT_PUBLIC_CORS || "";
 
 type requestOptions = RequestInit & {
   timeout?: number;
@@ -24,7 +24,7 @@ export async function proxy<ProxyResult>(
   options: RequestInit = {}
 ): Promise<ProxyResult> {
   return await queryClient(url, async () => {
-    const response = await fetchWithTimeout(`${corsAnywhere}/${url}`, {
+    const response = await fetchWithTimeout(`${corsAnywhere}${url}`, {
       ...options,
     });
     return response.json();
