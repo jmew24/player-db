@@ -16,12 +16,12 @@
     "incremental": true,
     "noUncheckedIndexedAccess": true,
     "paths": {
-      "*": ["types/*.d.ts"],
-      "@component/*": ["src/component/*"],
-      "@factory/*": ["src/factory/*"],
-      "@hook/*": ["src/hooks/*"],
-      "@page/*": ["src/pages/*"],
-      "@style/*": ["src/styles/*"]
+      "*": ["./src/types/*.d.ts"],
+      "@component/*": ["./src/component/*"],
+      "@factory/*": ["./src/factory/*"],
+      "@hook/*": ["./src/hooks/*"],
+      "@page/*": ["./src/pages/*"],
+      "@style/*": ["./src/styles/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.cjs", "**/*.mjs"],
