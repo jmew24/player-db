@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { proxy } from "../factory/proxy";
-import { basketballCache } from "../factory/cache";
+import { proxy } from "@factory/proxy";
+import { basketballCache } from "@factory/cache";
 
 const searchNBA = async (query: string) => {
   const q = query.trim().toLowerCase();

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { proxy } from "../factory/proxy";
-import { footballCache } from "../factory/cache";
+import { proxy } from "@factory/proxy";
+import { footballCache } from "@factory/cache";
 
 const teams: NFLTeam[] = [
   { name: "Arizona Cardinals", abbreviation: "ARI", teamName: "Cardinals" },

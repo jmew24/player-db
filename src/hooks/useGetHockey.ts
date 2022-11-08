@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { proxy } from "../factory/proxy";
-import { hockeyCache, hockeyTeamCache } from "../factory/cache";
+import { proxy } from "@factory/proxy";
+import { hockeyCache, hockeyTeamCache } from "@factory/cache";
 
 const blankTeam: NHLTeam = {
   id: -1,

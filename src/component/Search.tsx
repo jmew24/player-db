@@ -1,11 +1,11 @@
 import { useState, useCallback } from "react";
 import Head from "next/head";
 
-import { Baseball } from "./Baseball";
-import { Basketball } from "./Basketball";
-import { Football } from "./Football";
-import { Hockey } from "./Hockey";
-import useDebounce from "../hooks/useDebounce";
+import { Baseball } from "@component/Baseball";
+import { Basketball } from "@component/Basketball";
+import { Football } from "@component/Football";
+import { Hockey } from "@component/Hockey";
+import useDebounce from "@hook/useDebounce";
 
 export const Search = () => {
   const [search, setSearch] = useState("");

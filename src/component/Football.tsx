@@ -1,7 +1,7 @@
 import { FC, useState, useEffect, useRef, useMemo } from "react";
 
-import useGetFootball from "../hooks/useGetFootball";
-import ImageWithFallback from "./ImageWithFallback";
+import useGetFootball from "@hook/useGetFootball";
+import ImageWithFallback from "@component/ImageWithFallback";
 
 export const Football: FC<FootballProps> = ({ query, setShow }) => {
   const [results, setResults] = useState<NFLPlayer[]>([]);

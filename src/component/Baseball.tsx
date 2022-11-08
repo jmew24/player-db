@@ -1,7 +1,7 @@
 import { FC, useState, useEffect, useRef, useMemo } from "react";
 
-import useGetBaseball from "../hooks/useGetBaseball";
-import ImageWithFallback from "./ImageWithFallback";
+import useGetBaseball from "@hook/useGetBaseball";
+import ImageWithFallback from "@component/ImageWithFallback";
 
 export const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
   const [results, setResults] = useState<MLBPlayer[]>([]);

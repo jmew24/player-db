@@ -14,10 +14,15 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "noUncheckedIndexedAccess": true
-  },
-  "paths": {
-    "*": ["types/*.d.ts"]
+    "noUncheckedIndexedAccess": true,
+    "paths": {
+      "*": ["types/*.d.ts"],
+      "@component/*": ["src/component/*"],
+      "@factory/*": ["src/factory/*"],
+      "@hook/*": ["src/hooks/*"],
+      "@page/*": ["src/pages/*"],
+      "@style/*": ["src/styles/*"]
+    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.cjs", "**/*.mjs"],
   "exclude": ["node_modules"]
