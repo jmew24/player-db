@@ -1,4 +1,4 @@
-import { getProxyCache, setProxyCache } from "../factory/cache";
+import { queryClient } from "../factory/queryClient";
 
 //const corsAnywhere = process.env.cors || "http://0.0.0.0:8080";
 const corsAnywhere = process.env.cors || "https://corsanywhere.up.railway.app";
@@ -20,14 +20,16 @@ async function fetchWithTimeout(url: string, options: requestOptions = {}) {
   return response;
 }
 
-export const proxy = async (url: string, options: RequestInit = {}) => {
-  const cached = getProxyCache(url);
-  if (cached) {
-    return cached;
-  }
-
-  const response = await fetchWithTimeout(`${corsAnywhere}/${url}`, {
-    ...options,
+export async function proxy<ProxyResult>(
+  url: string,
+  options: RequestInit = {}
+): Promise<ProxyResult> {
+  return await queryClient(url, async () => {
+    const response = await fetchWithTimeout(`${corsAnywhere}/${url}`, {
+      ...options,
+    });
+    return response.json();
   });
-  return setProxyCache(url, response.json());
-};
+}
+
+export default proxy;

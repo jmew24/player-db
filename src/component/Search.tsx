@@ -5,6 +5,7 @@ import { Baseball } from "./Baseball";
 import { Basketball } from "./Basketball";
 import { Football } from "./Football";
 import { Hockey } from "./Hockey";
+import useDebounce from "../hooks/useDebounce";
 
 export const Search = () => {
   const [search, setSearch] = useState("");
@@ -16,6 +17,10 @@ export const Search = () => {
     hockey: true,
   });
   const [filter, setFilter] = useState<SearchFilter>("All");
+  const debouncedShow: SearchShowSport = useDebounce<SearchShowSport>(
+    showSport,
+    500
+  );
   const searchQuery = useCallback(() => {
     setShowSport({
       baseball: true,
@@ -56,10 +61,10 @@ export const Search = () => {
         );
       default:
         if (
-          showSport.baseball &&
-          showSport.basketball &&
-          showSport.football &&
-          showSport.hockey
+          debouncedShow.baseball &&
+          debouncedShow.basketball &&
+          debouncedShow.football &&
+          debouncedShow.hockey
         ) {
           return (
             <div className="grid h-56 grid-cols-4 content-start gap-8">
@@ -70,9 +75,9 @@ export const Search = () => {
             </div>
           );
         } else if (
-          showSport.baseball &&
-          showSport.basketball &&
-          showSport.football
+          debouncedShow.baseball &&
+          debouncedShow.basketball &&
+          debouncedShow.football
         ) {
           return (
             <div className="grid h-56 grid-cols-3 content-start gap-8">
@@ -82,9 +87,9 @@ export const Search = () => {
             </div>
           );
         } else if (
-          showSport.baseball &&
-          showSport.basketball &&
-          showSport.hockey
+          debouncedShow.baseball &&
+          debouncedShow.basketball &&
+          debouncedShow.hockey
         ) {
           return (
             <div className="grid h-56 grid-cols-3 content-start gap-8">
@@ -94,9 +99,9 @@ export const Search = () => {
             </div>
           );
         } else if (
-          showSport.baseball &&
-          showSport.football &&
-          showSport.hockey
+          debouncedShow.baseball &&
+          debouncedShow.football &&
+          debouncedShow.hockey
         ) {
           return (
             <div className="grid h-56 grid-cols-3 content-start gap-8">
@@ -106,9 +111,9 @@ export const Search = () => {
             </div>
           );
         } else if (
-          showSport.basketball &&
-          showSport.football &&
-          showSport.hockey
+          debouncedShow.basketball &&
+          debouncedShow.football &&
+          debouncedShow.hockey
         ) {
           return (
             <div className="grid h-56 grid-cols-3 content-start gap-8">
@@ -117,67 +122,67 @@ export const Search = () => {
               <Hockey query={query} setShow={setShowSport} />
             </div>
           );
-        } else if (showSport.baseball && showSport.basketball) {
+        } else if (debouncedShow.baseball && debouncedShow.basketball) {
           return (
             <div className="grid h-56 grid-cols-2 content-start gap-8">
               <Baseball query={query} setShow={setShowSport} />
               <Basketball query={query} setShow={setShowSport} />
             </div>
           );
-        } else if (showSport.baseball && showSport.football) {
+        } else if (debouncedShow.baseball && debouncedShow.football) {
           return (
             <div className="grid h-56 grid-cols-2 content-start gap-8">
               <Baseball query={query} setShow={setShowSport} />
               <Football query={query} setShow={setShowSport} />
             </div>
           );
-        } else if (showSport.baseball && showSport.hockey) {
+        } else if (debouncedShow.baseball && debouncedShow.hockey) {
           return (
             <div className="grid h-56 grid-cols-2 content-start gap-8">
               <Baseball query={query} setShow={setShowSport} />
               <Hockey query={query} setShow={setShowSport} />
             </div>
           );
-        } else if (showSport.basketball && showSport.football) {
+        } else if (debouncedShow.basketball && debouncedShow.football) {
           return (
             <div className="grid h-56 grid-cols-2 content-start gap-8">
               <Basketball query={query} setShow={setShowSport} />
               <Football query={query} setShow={setShowSport} />
             </div>
           );
-        } else if (showSport.basketball && showSport.hockey) {
+        } else if (debouncedShow.basketball && debouncedShow.hockey) {
           return (
             <div className="grid h-56 grid-cols-2 content-start gap-8">
               <Basketball query={query} setShow={setShowSport} />
               <Hockey query={query} setShow={setShowSport} />
             </div>
           );
-        } else if (showSport.football && showSport.hockey) {
+        } else if (debouncedShow.football && debouncedShow.hockey) {
           return (
             <div className="grid h-56 grid-cols-2 content-start gap-8">
               <Football query={query} setShow={setShowSport} />
               <Hockey query={query} setShow={setShowSport} />
             </div>
           );
-        } else if (showSport.baseball) {
+        } else if (debouncedShow.baseball) {
           return (
             <div className="grid h-56 grid-cols-1 content-start gap-8">
               <Baseball query={query} setShow={setShowSport} />
             </div>
           );
-        } else if (showSport.basketball) {
+        } else if (debouncedShow.basketball) {
           return (
             <div className="grid h-56 grid-cols-1 content-start gap-8">
               <Basketball query={query} setShow={setShowSport} />
             </div>
           );
-        } else if (showSport.football) {
+        } else if (debouncedShow.football) {
           return (
             <div className="grid h-56 grid-cols-1 content-start gap-8">
               <Football query={query} setShow={setShowSport} />
             </div>
           );
-        } else if (showSport.hockey) {
+        } else if (debouncedShow.hockey) {
           return (
             <div className="grid h-56 grid-cols-1 content-start gap-8">
               <Hockey query={query} setShow={setShowSport} />
@@ -187,7 +192,7 @@ export const Search = () => {
           return null;
         }
     }
-  }, [filter, query, showSport]);
+  }, [filter, query, debouncedShow]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
