@@ -23,7 +23,6 @@ export async function proxy<ProxyResult>(
   url: string,
   options: RequestInit = {}
 ): Promise<ProxyResult> {
-  console.log(process.env.NEXT_PUBLIC_CORS, corsAnywhere);
   return await queryClient(url, async () => {
     const response = await fetchWithTimeout(`${corsAnywhere}/${url}`, {
       ...options,
