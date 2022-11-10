@@ -3,7 +3,6 @@ declare type SearchFilter = {
   basketball: boolean;
   football: boolean;
   hockey: boolean;
-  soccer: boolean;
 };
 
 declare type SearchFilterProps = {
@@ -16,5 +15,4 @@ declare type SearchShowSport = {
   basketball: boolean;
   football: boolean;
   hockey: boolean;
-  soccer: boolean;
 };

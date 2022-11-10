@@ -6,7 +6,6 @@ import Baseball from "@component/Baseball";
 import Basketball from "@component/Basketball";
 import Football from "@component/Football";
 import Hockey from "@component/Hockey";
-import Soccer from "@component/Soccer";
 import useDebounce from "@hook/useDebounce";
 
 export const Search = () => {
@@ -17,14 +16,12 @@ export const Search = () => {
     basketball: true,
     football: true,
     hockey: true,
-    soccer: true,
   });
   const [filter, setFilter] = useState<SearchFilter>({
     baseball: true,
     basketball: true,
     football: true,
     hockey: true,
-    soccer: true,
   });
   const debouncedShow: SearchShowSport = useDebounce<SearchShowSport>(
     showSport,
@@ -36,7 +33,6 @@ export const Search = () => {
       basketball: true,
       football: true,
       hockey: true,
-      soccer: true,
     });
     setQuery(search);
   }, [search]);
@@ -48,20 +44,20 @@ export const Search = () => {
     const displayBasketball = filter.basketball && debouncedShow.basketball;
     const displayFootball = filter.football && debouncedShow.football;
     const displayHockey = filter.hockey && debouncedShow.hockey;
-    const displaySoccer = filter.soccer && debouncedShow.soccer;
 
     let girdColumns = 0;
     if (displayBaseball) girdColumns++;
     if (displayBasketball) girdColumns++;
     if (displayFootball) girdColumns++;
     if (displayHockey) girdColumns++;
-    if (displaySoccer) girdColumns++;
     if (girdColumns == 0) girdColumns = 1;
     if (girdColumns == 2) girdColumns = 3; // Fix odd display bug on 2 columns
 
     return (
       <div
-        className={`grid h-56 w-full min-w-full grid-cols-${girdColumns} content-start gap-8`}
+        className={`grid h-56 w-full min-w-full grid-cols-${girdColumns
+          .toString()
+          .trim()} content-start gap-8`}
       >
         {displayBaseball && <Baseball query={query} setShow={setShowSport} />}
         {displayBasketball && (
@@ -69,7 +65,6 @@ export const Search = () => {
         )}
         {displayFootball && <Football query={query} setShow={setShowSport} />}
         {displayHockey && <Hockey query={query} setShow={setShowSport} />}
-        {displaySoccer && <Soccer query={query} setShow={setShowSport} />}
       </div>
     );
   }, [query, filter, debouncedShow]);
