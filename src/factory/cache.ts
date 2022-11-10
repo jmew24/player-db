@@ -72,50 +72,6 @@ export const baseballTeamCache = {
   set: setBaseballTeamCache,
 };
 
-const hockeyRequest: NHLRequest = {
-  query: "",
-  results: [] as NHLPlayer[],
-};
-
-const hockeyTeamRequest: NHLTeamsRequest = {
-  results: [] as NHLTeam[],
-};
-
-export const getHockeyCache = (query: string) => {
-  if (query === hockeyRequest.query) {
-    return hockeyRequest.results;
-  } else {
-    return [] as NHLPlayer[];
-  }
-};
-
-export const setHockeyCache = (query: string, results: NHLPlayer[]) => {
-  hockeyRequest.query = query;
-  hockeyRequest.results = results;
-
-  return hockeyRequest.results;
-};
-
-export const hockeyCache = {
-  get: getHockeyCache,
-  set: setHockeyCache,
-};
-
-export const getHockeyTeamCache = () => {
-  return hockeyTeamRequest.results;
-};
-
-export const setHockeyTeamCache = (results: NHLTeam[]) => {
-  hockeyTeamRequest.results = results;
-
-  return hockeyTeamRequest.results;
-};
-
-export const hockeyTeamCache = {
-  get: getHockeyTeamCache,
-  set: setHockeyTeamCache,
-};
-
 const basketballRequest: NBARequest = {
   query: "",
   results: [] as NBAPlayer[],
@@ -164,4 +120,73 @@ export const setFootballCache = (query: string, results: NFLPlayer[]) => {
 export const footballCache = {
   get: getFootballCache,
   set: setFootballCache,
+};
+
+const hockeyRequest: NHLRequest = {
+  query: "",
+  results: [] as NHLPlayer[],
+};
+
+const hockeyTeamRequest: NHLTeamsRequest = {
+  results: [] as NHLTeam[],
+};
+
+export const getHockeyCache = (query: string) => {
+  if (query === hockeyRequest.query) {
+    return hockeyRequest.results;
+  } else {
+    return [] as NHLPlayer[];
+  }
+};
+
+export const setHockeyCache = (query: string, results: NHLPlayer[]) => {
+  hockeyRequest.query = query;
+  hockeyRequest.results = results;
+
+  return hockeyRequest.results;
+};
+
+export const hockeyCache = {
+  get: getHockeyCache,
+  set: setHockeyCache,
+};
+
+export const getHockeyTeamCache = () => {
+  return hockeyTeamRequest.results;
+};
+
+export const setHockeyTeamCache = (results: NHLTeam[]) => {
+  hockeyTeamRequest.results = results;
+
+  return hockeyTeamRequest.results;
+};
+
+export const hockeyTeamCache = {
+  get: getHockeyTeamCache,
+  set: setHockeyTeamCache,
+};
+
+const soccerRequest: SoccerRequest = {
+  query: "",
+  results: [] as SoccerPlayer[],
+};
+
+export const getSoccerCache = (query: string) => {
+  if (query === soccerRequest.query) {
+    return soccerRequest.results;
+  } else {
+    return [] as SoccerPlayer[];
+  }
+};
+
+export const setSoccerCache = (query: string, results: SoccerPlayer[]) => {
+  soccerRequest.query = query;
+  soccerRequest.results = results;
+
+  return soccerRequest.results;
+};
+
+export const soccerCache = {
+  get: getSoccerCache,
+  set: setSoccerCache,
 };
