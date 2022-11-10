@@ -1,9 +1,9 @@
-import { FC, useState, useEffect, useRef, useMemo } from "react";
+import { FC, memo, useState, useEffect, useRef, useMemo } from "react";
 
 import useGetHockey from "@hook/useGetHockey";
 import ImageWithFallback from "@component/ImageWithFallback";
 
-export const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
+const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
   const [results, setResults] = useState<NHLPlayer[]>([]);
   const [filter, setFilter] = useState<NHLFilter>({
     position: "",
@@ -158,3 +158,5 @@ export const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
     </div>
   ) : null;
 };
+
+export default memo(Hockey);

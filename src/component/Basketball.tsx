@@ -1,9 +1,9 @@
-import { FC, useState, useEffect, useRef, useMemo } from "react";
+import { FC, memo, useState, useEffect, useRef, useMemo } from "react";
 
 import useGetBasketball from "@hook/useGetBasketball";
 import ImageWithFallback from "@component/ImageWithFallback";
 
-export const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
+const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
   const [results, setResults] = useState<NBAPlayer[]>([]);
   const [filter, setFilter] = useState<NBAPlayerFilter>({
     position: "",
@@ -144,3 +144,5 @@ export const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
     </div>
   ) : null;
 };
+
+export default memo(Basketball);

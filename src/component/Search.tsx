@@ -1,10 +1,11 @@
 import { useState, useCallback } from "react";
 import Head from "next/head";
 
-import { Baseball } from "@component/Baseball";
-import { Basketball } from "@component/Basketball";
-import { Football } from "@component/Football";
-import { Hockey } from "@component/Hockey";
+import SearchFilter from "@component/SearchFilter";
+import Baseball from "@component/Baseball";
+import Basketball from "@component/Basketball";
+import Football from "@component/Football";
+import Hockey from "@component/Hockey";
 import useDebounce from "@hook/useDebounce";
 
 export const Search = () => {
@@ -16,7 +17,12 @@ export const Search = () => {
     football: true,
     hockey: true,
   });
-  const [filter, setFilter] = useState<SearchFilter>("All");
+  const [filter, setFilter] = useState<SearchFilter>({
+    baseball: true,
+    basketball: true,
+    football: true,
+    hockey: true,
+  });
   const debouncedShow: SearchShowSport = useDebounce<SearchShowSport>(
     showSport,
     500
@@ -34,193 +40,50 @@ export const Search = () => {
   const leagueDisplay = useCallback(() => {
     if (!query) return null;
 
-    switch (filter) {
-      case "Baseball":
-        return (
-          <div className="grid h-56 grid-cols-1 content-start gap-8">
-            <Baseball query={query} setShow={setShowSport} />
-          </div>
-        );
-      case "Basketball":
-        return (
-          <div className="grid h-56 grid-cols-1 content-start gap-8">
-            <Basketball query={query} setShow={setShowSport} />
-          </div>
-        );
-      case "Football":
-        return (
-          <div className="grid h-56 grid-cols-1 content-start gap-8">
-            <Football query={query} setShow={setShowSport} />
-          </div>
-        );
-      case "Hockey":
-        return (
-          <div className="grid h-56 grid-cols-1 content-start gap-8">
-            <Hockey query={query} setShow={setShowSport} />
-          </div>
-        );
-      default:
-        if (
-          debouncedShow.baseball &&
-          debouncedShow.basketball &&
-          debouncedShow.football &&
-          debouncedShow.hockey
-        ) {
-          return (
-            <div className="grid h-56 grid-cols-4 content-start gap-8">
-              <Baseball query={query} setShow={setShowSport} />
-              <Basketball query={query} setShow={setShowSport} />
-              <Football query={query} setShow={setShowSport} />
-              <Hockey query={query} setShow={setShowSport} />
-            </div>
-          );
-        } else if (
-          debouncedShow.baseball &&
-          debouncedShow.basketball &&
-          debouncedShow.football
-        ) {
-          return (
-            <div className="grid h-56 grid-cols-3 content-start gap-8">
-              <Baseball query={query} setShow={setShowSport} />
-              <Basketball query={query} setShow={setShowSport} />
-              <Football query={query} setShow={setShowSport} />
-            </div>
-          );
-        } else if (
-          debouncedShow.baseball &&
-          debouncedShow.basketball &&
-          debouncedShow.hockey
-        ) {
-          return (
-            <div className="grid h-56 grid-cols-3 content-start gap-8">
-              <Baseball query={query} setShow={setShowSport} />
-              <Basketball query={query} setShow={setShowSport} />
-              <Hockey query={query} setShow={setShowSport} />
-            </div>
-          );
-        } else if (
-          debouncedShow.baseball &&
-          debouncedShow.football &&
-          debouncedShow.hockey
-        ) {
-          return (
-            <div className="grid h-56 grid-cols-3 content-start gap-8">
-              <Baseball query={query} setShow={setShowSport} />
-              <Football query={query} setShow={setShowSport} />
-              <Hockey query={query} setShow={setShowSport} />
-            </div>
-          );
-        } else if (
-          debouncedShow.basketball &&
-          debouncedShow.football &&
-          debouncedShow.hockey
-        ) {
-          return (
-            <div className="grid h-56 grid-cols-3 content-start gap-8">
-              <Basketball query={query} setShow={setShowSport} />
-              <Football query={query} setShow={setShowSport} />
-              <Hockey query={query} setShow={setShowSport} />
-            </div>
-          );
-        } else if (debouncedShow.baseball && debouncedShow.basketball) {
-          return (
-            <div className="grid h-56 grid-cols-2 content-start gap-8">
-              <Baseball query={query} setShow={setShowSport} />
-              <Basketball query={query} setShow={setShowSport} />
-            </div>
-          );
-        } else if (debouncedShow.baseball && debouncedShow.football) {
-          return (
-            <div className="grid h-56 grid-cols-2 content-start gap-8">
-              <Baseball query={query} setShow={setShowSport} />
-              <Football query={query} setShow={setShowSport} />
-            </div>
-          );
-        } else if (debouncedShow.baseball && debouncedShow.hockey) {
-          return (
-            <div className="grid h-56 grid-cols-2 content-start gap-8">
-              <Baseball query={query} setShow={setShowSport} />
-              <Hockey query={query} setShow={setShowSport} />
-            </div>
-          );
-        } else if (debouncedShow.basketball && debouncedShow.football) {
-          return (
-            <div className="grid h-56 grid-cols-2 content-start gap-8">
-              <Basketball query={query} setShow={setShowSport} />
-              <Football query={query} setShow={setShowSport} />
-            </div>
-          );
-        } else if (debouncedShow.basketball && debouncedShow.hockey) {
-          return (
-            <div className="grid h-56 grid-cols-2 content-start gap-8">
-              <Basketball query={query} setShow={setShowSport} />
-              <Hockey query={query} setShow={setShowSport} />
-            </div>
-          );
-        } else if (debouncedShow.football && debouncedShow.hockey) {
-          return (
-            <div className="grid h-56 grid-cols-2 content-start gap-8">
-              <Football query={query} setShow={setShowSport} />
-              <Hockey query={query} setShow={setShowSport} />
-            </div>
-          );
-        } else if (debouncedShow.baseball) {
-          return (
-            <div className="grid h-56 grid-cols-1 content-start gap-8">
-              <Baseball query={query} setShow={setShowSport} />
-            </div>
-          );
-        } else if (debouncedShow.basketball) {
-          return (
-            <div className="grid h-56 grid-cols-1 content-start gap-8">
-              <Basketball query={query} setShow={setShowSport} />
-            </div>
-          );
-        } else if (debouncedShow.football) {
-          return (
-            <div className="grid h-56 grid-cols-1 content-start gap-8">
-              <Football query={query} setShow={setShowSport} />
-            </div>
-          );
-        } else if (debouncedShow.hockey) {
-          return (
-            <div className="grid h-56 grid-cols-1 content-start gap-8">
-              <Hockey query={query} setShow={setShowSport} />
-            </div>
-          );
-        } else {
-          return null;
-        }
-    }
-  }, [filter, query, debouncedShow]);
+    const displayBaseball = filter.baseball && debouncedShow.baseball;
+    const displayBasketball = filter.basketball && debouncedShow.basketball;
+    const displayFootball = filter.football && debouncedShow.football;
+    const displayHockey = filter.hockey && debouncedShow.hockey;
+
+    let girdColumns = 0;
+    if (displayBaseball) girdColumns++;
+    if (displayBasketball) girdColumns++;
+    if (displayFootball) girdColumns++;
+    if (displayHockey) girdColumns++;
+    if (girdColumns == 0) girdColumns = 1;
+    if (girdColumns == 2) girdColumns = 3; // Fix odd display bug on 2 columns
+
+    return (
+      <div
+        className={`grid h-56 w-full min-w-full grid-cols-${girdColumns} content-start gap-8`}
+      >
+        {displayBaseball && <Baseball query={query} setShow={setShowSport} />}
+        {displayBasketball && (
+          <Basketball query={query} setShow={setShowSport} />
+        )}
+        {displayFootball && <Football query={query} setShow={setShowSport} />}
+        {displayHockey && <Hockey query={query} setShow={setShowSport} />}
+      </div>
+    );
+  }, [query, filter, debouncedShow]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center py-2">
+    <div className="flex min-h-screen w-full min-w-full flex-col items-center justify-center py-2">
       <Head>
         <title>Player-DB Search</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex w-full flex-1 flex-col items-center px-5 text-center">
+      <main className="flex w-full min-w-full flex-1 flex-col items-center px-5 text-center">
         <h1 className="text-6xl font-bold">Search For Person</h1>
         <form
           onSubmit={(e) => {
             e.preventDefault();
             searchQuery();
           }}
+          className="flex w-full flex-col items-center justify-center"
         >
-          <div className="mt-4 flex w-full">
-            <select
-              className="mx-2 w-1/3 rounded border border-gray-300 p-2 text-gray-600"
-              value={filter}
-              onChange={(e) => setFilter(e.target.value as SearchFilter)}
-            >
-              <option value="All">All</option>
-              <option value="Baseball">Baseball</option>
-              <option value="Basketball">Basketball</option>
-              <option value="Football">Football</option>
-              <option value="Hockey">Hockey</option>
-            </select>
+          <div className="mt-4 flex w-full min-w-full">
             <input
               type="text"
               value={search}
@@ -234,6 +97,9 @@ export const Search = () => {
             >
               Search
             </button>
+          </div>
+          <div className="mt-4 flex w-full">
+            <SearchFilter filter={filter} setFilter={setFilter} />
           </div>
         </form>
 
