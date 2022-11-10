@@ -21,7 +21,7 @@ async function fetchWithTimeout(url: string, options: requestOptions = {}) {
 
 export async function proxy<ProxyResult>(
   url: string,
-  options: RequestInit = {}
+  options: requestOptions = {}
 ): Promise<ProxyResult> {
   return await queryClient(url, async () => {
     const response = await fetchWithTimeout(`${corsAnywhere}${url}`, {
