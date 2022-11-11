@@ -10,7 +10,7 @@ const searchSoccer = async (query: string) => {
     return cached.filter((player) => player.name.toLowerCase().includes(q));
 
   const response = (await proxy(
-    `https://www.whoscored.com/StatisticsFeed/1/GetPlayerStatistics?category=summary&subcategory=all&statsAccumulationType=0&isCurrent=false&playerId=&teamIds=&age=&ageComparisonType=&appearances=&appearancesComparisonType=&field=Overall&nationality=&positionOptions=&isMinApp=false&page=&includeZeroValues=&numberOfPlayersToPick=10000`
+    `https://www.whoscored.com/StatisticsFeed/1/GetPlayerStatistics?category=summary&subcategory=all&statsAccumulationType=0&isCurrent=false&playerId=&teamIds=&age=&ageComparisonType=&appearances=&appearancesComparisonType=&field=Overall&nationality=&positionOptions=&isMinApp=false&page=&includeZeroValues=&numberOfPlayersToPick=1000`
   )) as SoccerPlayerRequest;
 
   const players: SoccerPlayer[] = [];

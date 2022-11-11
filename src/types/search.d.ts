@@ -1,8 +1,16 @@
+declare type SearchResultsProps = {
+  query: string;
+  filter: SearchFilter;
+  debouncedShow: SearchShowSport;
+  setShowSport: Dispatch<SetStateAction<SearchShowSport>>;
+};
+
 declare type SearchFilter = {
   baseball: boolean;
   basketball: boolean;
   football: boolean;
   hockey: boolean;
+  soccer: boolean;
 };
 
 declare type SearchFilterProps = {
@@ -15,4 +23,5 @@ declare type SearchShowSport = {
   basketball: boolean;
   football: boolean;
   hockey: boolean;
+  soccer: boolean;
 };

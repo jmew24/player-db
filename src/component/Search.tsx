@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { FC, useState, useCallback, useMemo } from "react";
 import Head from "next/head";
 
 import SearchFilter from "@component/SearchFilter";
@@ -6,6 +6,7 @@ import Baseball from "@component/Baseball";
 import Basketball from "@component/Basketball";
 import Football from "@component/Football";
 import Hockey from "@component/Hockey";
+import Soccer from "@component/Soccer";
 import useDebounce from "@hook/useDebounce";
 
 export const Search = () => {
@@ -16,58 +17,59 @@ export const Search = () => {
     basketball: true,
     football: true,
     hockey: true,
+    soccer: true,
   });
   const [filter, setFilter] = useState<SearchFilter>({
     baseball: true,
     basketball: true,
     football: true,
     hockey: true,
+    soccer: true,
   });
   const debouncedShow: SearchShowSport = useDebounce<SearchShowSport>(
     showSport,
     500
   );
+  const displayBaseball = useMemo(
+    () => query.trim() !== "" && filter.baseball && debouncedShow.baseball,
+    [query, filter.baseball, debouncedShow.baseball]
+  );
+  const displayBasketball = useMemo(
+    () => query.trim() !== "" && filter.basketball && debouncedShow.basketball,
+    [query, filter.basketball, debouncedShow.basketball]
+  );
+  const displayFootball = useMemo(
+    () => query.trim() !== "" && filter.football && debouncedShow.football,
+    [query, filter.football, debouncedShow.football]
+  );
+  const displayHockey = useMemo(
+    () => query.trim() !== "" && filter.hockey && debouncedShow.hockey,
+    [query, filter.hockey, debouncedShow.hockey]
+  );
+  const displaySoccer = useMemo(
+    () => query.trim() !== "" && filter.soccer && debouncedShow.soccer,
+    [query, filter.soccer, debouncedShow.soccer]
+  );
+  const gridColumns = () => {
+    let columns = 0;
+    if (displayBaseball) columns++;
+    if (displayBasketball) columns++;
+    if (displayFootball) columns++;
+    if (displayHockey) columns++;
+    if (displaySoccer) columns++;
+    return `grid-cols-${columns}`;
+  };
+
   const searchQuery = useCallback(() => {
     setShowSport({
       baseball: true,
       basketball: true,
       football: true,
       hockey: true,
+      soccer: true,
     });
     setQuery(search);
   }, [search]);
-
-  const leagueDisplay = useCallback(() => {
-    if (!query) return null;
-
-    const displayBaseball = filter.baseball && debouncedShow.baseball;
-    const displayBasketball = filter.basketball && debouncedShow.basketball;
-    const displayFootball = filter.football && debouncedShow.football;
-    const displayHockey = filter.hockey && debouncedShow.hockey;
-
-    let girdColumns = 0;
-    if (displayBaseball) girdColumns++;
-    if (displayBasketball) girdColumns++;
-    if (displayFootball) girdColumns++;
-    if (displayHockey) girdColumns++;
-    if (girdColumns == 0) girdColumns = 1;
-    if (girdColumns == 2) girdColumns = 3; // Fix odd display bug on 2 columns
-
-    return (
-      <div
-        className={`grid h-56 w-full min-w-full grid-cols-${girdColumns
-          .toString()
-          .trim()} content-start gap-8`}
-      >
-        {displayBaseball && <Baseball query={query} setShow={setShowSport} />}
-        {displayBasketball && (
-          <Basketball query={query} setShow={setShowSport} />
-        )}
-        {displayFootball && <Football query={query} setShow={setShowSport} />}
-        {displayHockey && <Hockey query={query} setShow={setShowSport} />}
-      </div>
-    );
-  }, [query, filter, debouncedShow]);
 
   return (
     <div className="flex min-h-screen w-full min-w-full flex-col items-center justify-center py-2">
@@ -105,8 +107,62 @@ export const Search = () => {
           </div>
         </form>
 
-        {leagueDisplay()}
+        <SearchResults
+          query={query}
+          filter={filter}
+          debouncedShow={debouncedShow}
+          setShowSport={setShowSport}
+        />
       </main>
+    </div>
+  );
+};
+
+const SearchResults: FC<SearchResultsProps> = ({
+  query,
+  filter,
+  debouncedShow,
+  setShowSport,
+}) => {
+  const displayBaseball = useMemo(
+    () => query.trim() !== "" && filter.baseball && debouncedShow.baseball,
+    [query, filter.baseball, debouncedShow.baseball]
+  );
+  const displayBasketball = useMemo(
+    () => query.trim() !== "" && filter.basketball && debouncedShow.basketball,
+    [query, filter.basketball, debouncedShow.basketball]
+  );
+  const displayFootball = useMemo(
+    () => query.trim() !== "" && filter.football && debouncedShow.football,
+    [query, filter.football, debouncedShow.football]
+  );
+  const displayHockey = useMemo(
+    () => query.trim() !== "" && filter.hockey && debouncedShow.hockey,
+    [query, filter.hockey, debouncedShow.hockey]
+  );
+  const displaySoccer = useMemo(
+    () => query.trim() !== "" && filter.soccer && debouncedShow.soccer,
+    [query, filter.soccer, debouncedShow.soccer]
+  );
+  const gridColumns = () => {
+    let columns = 0;
+    if (displayBaseball) columns++;
+    if (displayBasketball) columns++;
+    if (displayFootball) columns++;
+    if (displayHockey) columns++;
+    if (displaySoccer) columns++;
+    return `grid-cols-${columns}`;
+  };
+
+  return (
+    <div
+      className={`grid h-56 w-full min-w-full ${gridColumns()} content-start gap-8`}
+    >
+      {displayBaseball && <Baseball query={query} setShow={setShowSport} />}
+      {displayBasketball && <Basketball query={query} setShow={setShowSport} />}
+      {displayFootball && <Football query={query} setShow={setShowSport} />}
+      {displayHockey && <Hockey query={query} setShow={setShowSport} />}
+      {displaySoccer && <Soccer query={query} setShow={setShowSport} />}
     </div>
   );
 };

@@ -10,6 +10,7 @@ const SearchFilter: FC<SearchFilterProps> = ({ filter, setFilter }) => {
         basketball: value,
         football: value,
         hockey: value,
+        soccer: value,
       }));
       setShowAll(value);
     },
@@ -18,11 +19,13 @@ const SearchFilter: FC<SearchFilterProps> = ({ filter, setFilter }) => {
 
   useEffect(() => {
     setShowAll(
-      filter.baseball && filter.basketball && filter.football && filter.hockey
+      filter.baseball &&
+        filter.basketball &&
+        filter.football &&
+        filter.hockey &&
+        filter.soccer
     );
   }, [filter]);
-
-  // focus:ring-2 focus:ring-blue-500
 
   return (
     <ul className="w-full items-center rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:flex">
@@ -39,7 +42,7 @@ const SearchFilter: FC<SearchFilterProps> = ({ filter, setFilter }) => {
             htmlFor="all-checkbox-list"
             className="ml-2 w-full cursor-pointer py-3 text-sm font-medium text-gray-900 dark:text-gray-300"
           >
-            All
+            All Filters
           </label>
         </div>
       </li>
