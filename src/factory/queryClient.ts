@@ -1,4 +1,5 @@
 const makeQueryClient = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fetchMap = new Map<string, Promise<any>>();
 
   return function queryClient<QueryResult>(
