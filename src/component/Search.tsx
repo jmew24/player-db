@@ -6,7 +6,7 @@ import Baseball from "@component/Baseball";
 import Basketball from "@component/Basketball";
 import Football from "@component/Football";
 import Hockey from "@component/Hockey";
-import Soccer from "@component/Soccer";
+//import Soccer from "@component/Soccer";
 import useDebounce from "@hook/useDebounce";
 
 export const Search = () => {
@@ -17,48 +17,19 @@ export const Search = () => {
     basketball: true,
     football: true,
     hockey: true,
-    soccer: true,
+    //soccer: false,
   });
   const [filter, setFilter] = useState<SearchFilter>({
     baseball: true,
     basketball: true,
     football: true,
     hockey: true,
-    soccer: true,
+    //soccer: false,
   });
   const debouncedShow: SearchShowSport = useDebounce<SearchShowSport>(
     showSport,
     500
   );
-  const displayBaseball = useMemo(
-    () => query.trim() !== "" && filter.baseball && debouncedShow.baseball,
-    [query, filter.baseball, debouncedShow.baseball]
-  );
-  const displayBasketball = useMemo(
-    () => query.trim() !== "" && filter.basketball && debouncedShow.basketball,
-    [query, filter.basketball, debouncedShow.basketball]
-  );
-  const displayFootball = useMemo(
-    () => query.trim() !== "" && filter.football && debouncedShow.football,
-    [query, filter.football, debouncedShow.football]
-  );
-  const displayHockey = useMemo(
-    () => query.trim() !== "" && filter.hockey && debouncedShow.hockey,
-    [query, filter.hockey, debouncedShow.hockey]
-  );
-  const displaySoccer = useMemo(
-    () => query.trim() !== "" && filter.soccer && debouncedShow.soccer,
-    [query, filter.soccer, debouncedShow.soccer]
-  );
-  const gridColumns = () => {
-    let columns = 0;
-    if (displayBaseball) columns++;
-    if (displayBasketball) columns++;
-    if (displayFootball) columns++;
-    if (displayHockey) columns++;
-    if (displaySoccer) columns++;
-    return `grid-cols-${columns}`;
-  };
 
   const searchQuery = useCallback(() => {
     setShowSport({
@@ -66,7 +37,7 @@ export const Search = () => {
       basketball: true,
       football: true,
       hockey: true,
-      soccer: true,
+      //soccer: false,
     });
     setQuery(search);
   }, [search]);
@@ -140,18 +111,21 @@ const SearchResults: FC<SearchResultsProps> = ({
     () => query.trim() !== "" && filter.hockey && debouncedShow.hockey,
     [query, filter.hockey, debouncedShow.hockey]
   );
+  /*
   const displaySoccer = useMemo(
     () => query.trim() !== "" && filter.soccer && debouncedShow.soccer,
     [query, filter.soccer, debouncedShow.soccer]
   );
+  */
   const gridColumns = () => {
     let columns = 0;
     if (displayBaseball) columns++;
     if (displayBasketball) columns++;
     if (displayFootball) columns++;
     if (displayHockey) columns++;
-    if (displaySoccer) columns++;
-    return `grid-cols-${columns}`;
+    //if (displaySoccer) columns++;
+    return `grid-cols-4`;
+    //return `grid-cols-${columns}`;
   };
 
   return (
@@ -162,7 +136,7 @@ const SearchResults: FC<SearchResultsProps> = ({
       {displayBasketball && <Basketball query={query} setShow={setShowSport} />}
       {displayFootball && <Football query={query} setShow={setShowSport} />}
       {displayHockey && <Hockey query={query} setShow={setShowSport} />}
-      {displaySoccer && <Soccer query={query} setShow={setShowSport} />}
+      {/*displaySoccer && <Soccer query={query} setShow={setShowSport} />*/}
     </div>
   );
 };
