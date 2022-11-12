@@ -131,7 +131,7 @@ const SearchResults: FC<SearchResultsProps> = ({
 
   return (
     <div
-      className={`grid h-56 w-full min-w-full grid-cols-${gridColumns} content-start gap-8`}
+      className={`grid h-56 w-full min-w-full grid-cols-4 content-start gap-8`}
     >
       {displayBaseball && <Baseball query={query} setShow={setShowSport} />}
       {displayBasketball && <Basketball query={query} setShow={setShowSport} />}
