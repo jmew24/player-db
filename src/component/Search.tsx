@@ -1,4 +1,4 @@
-import { FC, useState, useCallback, useMemo, useEffect } from "react";
+import { FC, useState, useCallback, useMemo } from "react";
 import Head from "next/head";
 
 import SearchFilter from "@component/SearchFilter";
@@ -95,7 +95,6 @@ const SearchResults: FC<SearchResultsProps> = ({
   debouncedShow,
   setShowSport,
 }) => {
-  const [gridColumns, setGridColumns] = useState(4);
   const displayBaseball = useMemo(
     () => query.trim() !== "" && filter.baseball && debouncedShow.baseball,
     [query, filter.baseball, debouncedShow.baseball]
@@ -119,19 +118,9 @@ const SearchResults: FC<SearchResultsProps> = ({
   );
   */
 
-  useEffect(() => {
-    let columns = 0;
-    if (displayBaseball) columns++;
-    if (displayBasketball) columns++;
-    if (displayFootball) columns++;
-    if (displayHockey) columns++;
-    //if (displaySoccer) columns++;
-    setGridColumns(columns);
-  }, [displayBaseball, displayBasketball, displayFootball, displayHockey]);
-
   return (
     <div
-      className={`grid h-56 w-full min-w-full grid-cols-4 content-start gap-8`}
+      className={`grid h-56 w-full min-w-full auto-cols-auto grid-flow-col content-start gap-8`}
     >
       {displayBaseball && <Baseball query={query} setShow={setShowSport} />}
       {displayBasketball && <Basketball query={query} setShow={setShowSport} />}
