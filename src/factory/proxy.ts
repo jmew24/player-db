@@ -11,12 +11,17 @@ async function fetchWithTimeout(url: string, options: requestOptions = {}) {
 
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
-  const response = await fetch(url, {
-    ...options,
-    signal: controller.signal,
-  });
-  clearTimeout(id);
-  return response;
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    clearTimeout(id);
+    return response;
+  } catch {
+    clearTimeout(id);
+    return new Response();
+  }
 }
 
 export async function proxy<ProxyResult>(
