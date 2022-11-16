@@ -3,6 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { proxy } from "@factory/proxy";
 import { footballCache } from "@factory/cache";
 
+const blankTeam: NFLTeam = {
+  name: "Unknown",
+  abbreviation: "",
+  teamName: "Unknown",
+};
+
 const teams: NFLTeam[] = [
   { name: "Arizona Cardinals", abbreviation: "ARI", teamName: "Cardinals" },
   { name: "Atlanta Falcons", abbreviation: "ATL", teamName: "Falcons" },
@@ -50,26 +56,69 @@ const searchNFL = async (query: string) => {
       player.fullNameForSearch.toLowerCase().includes(q)
     );
 
+  const players: NFLPlayer[] = [];
+  const cbsResponse = (await proxy(
+    `https://www.cbssports.com/search/football/players/xhr/?last_name_begins=${query}&leagueAbbreviation=NFL&page=1l&resultsOnly=true`
+  )) as NFLCBSRequest;
+  for (const item of cbsResponse.results) {
+    const teamAbbr = item.teamAbbreviation;
+    const team = teams.find(
+      (team) =>
+        team.abbreviation.toLowerCase() === teamAbbr.toLowerCase() ||
+        team.teamName.toLowerCase() === teamAbbr.toLowerCase()
+    ) || { ...blankTeam };
+    players.push({
+      id: item.playerId,
+      assetname: item.playerSlug,
+      fullNameForSearch: `${item.playerFirstName} ${item.playerLastName}`,
+      firstName: item.playerFirstName,
+      lastName: item.playerLastName,
+      jerseyNum: -1,
+      position: item.playerPosition,
+      portraitId: item.playerId,
+      team: team,
+      url: `https://www.cbssports.com/nfl/players/${item.playerId}/${item.playerSlug}/`,
+      image: `https://sportshub.cbsistatic.com/i/sports/player/headshot/${item.playerId}.png?width=160`,
+      source: "CBS Sports",
+    });
+  }
+
   const response = (await proxy(
     `https://ratings-api.ea.com/v2/entities/m23-ratings?filter=((fullNameForSearch%3A*${q}*))&sort=firstName%3AASC`
   )) as NFLPlayerRequest;
 
-  const players: NFLPlayer[] = [];
-  for (const player of response.docs) {
-    const teamName = player.team.toLowerCase();
-    const team = teams.find((t) => t.teamName.toLowerCase() === teamName);
+  for (const item of response.docs) {
+    const teamName = item.team.toLowerCase();
+    const team = teams.find(
+      (team) =>
+        team.abbreviation.toLowerCase() === teamName ||
+        team.teamName.toLowerCase() === teamName.toLowerCase()
+    ) || {
+      ...blankTeam,
+    };
+
+    if (
+      players.find(
+        (player) =>
+          player.firstName === item.firstName &&
+          player.lastName === item.lastName &&
+          player.team.name === team.name
+      )
+    )
+      continue;
+
     players.push({
-      id: player.primaryKey,
-      assetname: player.plyrAssetname,
-      fullNameForSearch: player.fullNameForSearch,
-      firstName: player.firstName,
-      lastName: player.lastName,
-      jerseyNum: player.jerseyNum,
-      position: player.position,
-      portraitId: player.plyrPortrait,
+      id: item.primaryKey,
+      assetname: item.plyrAssetname,
+      fullNameForSearch: item.fullNameForSearch,
+      firstName: item.firstName,
+      lastName: item.lastName,
+      jerseyNum: item.jerseyNum,
+      position: item.position,
+      portraitId: item.plyrPortrait,
       team: team,
-      url: `https://www.ea.com/games/madden-nfl/player-ratings/player-name/${player.firstName}%20${player.lastName}/${player.primaryKey}`,
-      image: `https://madden-assets-cdn.pulse.ea.com/madden23/portraits/64/${player.plyrPortrait}.png`,
+      url: `https://www.ea.com/games/madden-nfl/player-ratings/player-name/${item.firstName}%20${item.lastName}/${item.primaryKey}`,
+      image: `https://madden-assets-cdn.pulse.ea.com/madden23/portraits/64/${item.plyrPortrait}.png`,
       source: "EA.com",
     } as NFLPlayer);
   }

@@ -36,6 +36,16 @@ declare type NFLTeamFilter = {
   team: string;
 };
 
+declare type NFLCBSPlayer = {
+  playerId: number;
+  playerFirstName: string;
+  playerLastName: string;
+  playerLeagueAbbreviation: string;
+  playerPosition: string;
+  playerSlug: string;
+  teamAbbreviation: string;
+};
+
 declare type NFLPlayer = {
   id: number;
   assetname: string;
@@ -62,6 +72,11 @@ declare type NFLRequestPlayers = {
   plyrPortrait: number;
   team: string;
   teamId: number;
+};
+
+declare type NFLCBSRequest = {
+  results: NFLCBSPlayer[];
+  hasMore: boolean;
 };
 
 declare type NFLPlayerRequest = {
