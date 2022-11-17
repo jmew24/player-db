@@ -1,0 +1,52 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model Team {
+  id           String   @id @unique @default(cuid())
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+  identifier   Int      @unique @default(autoincrement())
+  fullName     String   @map("full_name")
+  city         String
+  abbreviation String
+  shortName    String   @map("short_name")
+  sport        Sport    @default(UNKNOWN)
+  league       String
+  players      Player[]
+
+  @@map("team")
+}
+
+model Player {
+  id         String   @id @unique @default(cuid())
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+  identifier Int      @unique @default(autoincrement())
+  firstName  String   @map("first_name")
+  lastName   String   @map("last_name")
+  fullName   String   @map("full_name")
+  position   String
+  teamId     String   @map("team_id")
+  logoUrl    String   @map("logo_url")
+  linkUrl    String   @map("link_url")
+  team       Team     @relation(fields: [teamId], references: [id])
+
+  @@map("player")
+}
+
+enum Sport {
+  UNKNOWN
+  BASEBALL
+  BASKETBALL
+  FOOTBALL
+  HOCKEY
+  SOCCER
+}
