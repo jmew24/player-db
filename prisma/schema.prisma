@@ -13,13 +13,13 @@ model Team {
   id           String   @id @unique @default(cuid())
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
-  identifier   Int      @unique @default(autoincrement())
   fullName     String   @map("full_name")
   city         String
   abbreviation String
   shortName    String   @map("short_name")
-  sport        Sport    @default(UNKNOWN)
   league       String
+  identifier   String   @unique
+  sport        String   @default("UNKNOWN")
   players      Player[]
 
   @@map("team")
@@ -29,7 +29,6 @@ model Player {
   id         String   @id @unique @default(cuid())
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
-  identifier Int      @unique @default(autoincrement())
   firstName  String   @map("first_name")
   lastName   String   @map("last_name")
   fullName   String   @map("full_name")
@@ -37,16 +36,9 @@ model Player {
   teamId     String   @map("team_id")
   logoUrl    String   @map("logo_url")
   linkUrl    String   @map("link_url")
+  identifier String   @unique
+  sport      String   @default("UNKNOWN")
   team       Team     @relation(fields: [teamId], references: [id])
 
   @@map("player")
-}
-
-enum Sport {
-  UNKNOWN
-  BASEBALL
-  BASKETBALL
-  FOOTBALL
-  HOCKEY
-  SOCCER
 }

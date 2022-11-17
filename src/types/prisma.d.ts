@@ -1,11 +1,18 @@
-declare enum Sport {
-  UNKNOWN,
-  BASEBALL,
-  BASKETBALL,
-  FOOTBALL,
-  HOCKEY,
-  SOCCER,
+declare global {
+  namespace NodeJS {
+    interface Global {
+      prisma: PrismaClient;
+    }
+  }
 }
+
+declare type Sport =
+  | "UNKNOWN"
+  | "BASEBALL"
+  | "BASKETBALL"
+  | "FOOTBALL"
+  | "HOCKEY"
+  | "SOCCER";
 
 declare type Team = {
   id: string;

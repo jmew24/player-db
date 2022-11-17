@@ -15,12 +15,15 @@
     "jsx": "preserve",
     "incremental": true,
     "noUncheckedIndexedAccess": true,
+    "typeRoots": ["./node_modules/@types", "./src/types"],
     "paths": {
       "*": ["./src/types/*.d.ts"],
       "@component/*": ["./src/component/*"],
       "@factory/*": ["./src/factory/*"],
       "@hook/*": ["./src/hooks/*"],
       "@page/*": ["./src/pages/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@api/*": ["./src/pages/api/*"],
       "@style/*": ["./src/styles/*"]
     }
   },
