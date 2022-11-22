@@ -1,3 +1,7 @@
+import { Player, Sport, Team } from "@prisma/client";
+
+declare type BaseballResponse = Player & { team: Team; sport: Sport };
+declare type BaseballPlayer = MLBPlayer & { team: Team; sport: Sport };
 declare interface BaseballProps {
   query: string;
   setShow: Dispatch<SetStateAction<SearchShowSport>>;
@@ -47,17 +51,15 @@ declare type MLBTeamFilter = {
   team: string;
 };
 
+declare type BaseballCache = { [key: string]: BaseballPlayer[] };
+
 declare type MLBPlayer = {
-  id: number;
+  id: string;
   fullName: string;
   firstName: string;
   lastName: string;
-  primaryNumber: string;
-  team: MLBTeam;
-  primaryPosition: {
-    name: string;
-    abbreviation: MLBPosition;
-  };
+  number: number;
+  position: string;
   isPlayer: boolean;
   url: string;
   image: string;
@@ -105,14 +107,8 @@ declare type MLBPlayerRequest = {
 
 declare type MLBRequest = {
   query: string;
-  mlbResults: MLBPlayer[];
-  baseballSavantResults: MLBPlayer[];
-};
-
-declare type MLBCache = {
-  lastQuery: string;
-  mlbResults: MLBPlayer[];
-  baseballSavantResults: MLBPlayer[];
+  mlbResults: BaseballPlayer[];
+  baseballSavantResults: BaseballPlayer[];
 };
 
 declare type MLBPlayerResult = MLBPlayer[];

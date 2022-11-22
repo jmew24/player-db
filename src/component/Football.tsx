@@ -1,31 +1,112 @@
 import { FC, memo, useState, useEffect, useRef, useMemo } from "react";
+import {
+  FootballProps,
+  FootballPlayer,
+  NFLPlayerFilter,
+  NFLPosition,
+} from "football";
 
 import useGetFootball from "@hook/useGetFootball";
 import ImageWithFallback from "@component/ImageWithFallback";
 
 const Football: FC<FootballProps> = ({ query, setShow }) => {
-  const [results, setResults] = useState<NFLPlayer[]>([]);
+  const [results, setResults] = useState<FootballPlayer[]>([]);
   const [filter, setFilter] = useState<NFLPlayerFilter>({
     position: "",
     team: "",
   });
   const { isFetching, isLoading, data } = useGetFootball(query);
-  const resultsRef = useRef<NFLPlayer[]>([]);
+  const resultsRef = useRef<FootballPlayer[]>([]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
     const positionFilter = filter.position;
 
     return results.filter((player) => {
       const team = {
-        name: player.team.name?.toLowerCase(),
+        name: player.team.fullName?.toLowerCase(),
         abbreviation: player.team.abbreviation?.toLowerCase(),
-        teamName: player.team.teamName?.toLowerCase(),
+        city: player.team.city?.toLowerCase(),
+        shortName: player.team.shortName?.toLowerCase(),
       };
       const hasTeamName =
         team.name?.includes(teamFilter) ||
         team.abbreviation?.includes(teamFilter) ||
-        team.teamName?.includes(teamFilter);
-      const hasPosition = player.position === positionFilter;
+        team.city?.includes(teamFilter) ||
+        team.shortName?.includes(teamFilter);
+      let position = player.position;
+      switch (player.position) {
+        case "Quarterback":
+          position = "QB";
+          break;
+        case "Center":
+          position = "C";
+          break;
+        case "Offensive Guard":
+          position = "OG";
+          break;
+        case "Full Back":
+          position = "FB";
+          break;
+        case "Half Back":
+          position = "HB";
+          break;
+        case "Wide Receiver":
+          position = "WR";
+          break;
+        case "Tight End":
+          position = "TE";
+          break;
+        case "Left Tackle":
+          position = "LT";
+          break;
+        case "Right Tackle":
+          position = "RT";
+          break;
+        case "Defensive End":
+          position = "DE";
+          break;
+        case "Offensive Tackle":
+          position = "OT";
+          break;
+        case "Defensive Tackle":
+          position = "DT";
+          break;
+        case "Middle Linebacker":
+          position = "LB";
+          break;
+        case "Right Outside Linebacker":
+          position = "LB";
+          break;
+        case "Outside Linebacker":
+          position = "LB";
+          break;
+        case "Left Outside Linebacker":
+          position = "LB";
+          break;
+        case "Cornerback":
+          position = "CB";
+          break;
+        case "Safety":
+          position = "S";
+          break;
+        case "Strong Safety":
+          position = "S";
+          break;
+        case "Free Safety":
+          position = "S";
+          break;
+        case "Kicker":
+          position = "K";
+          break;
+        case "Punter":
+          position = "P";
+          break;
+        default:
+          position = player.position;
+          break;
+      }
+      const hasPosition =
+        position.toLowerCase() === positionFilter.toLowerCase();
 
       if (teamFilter !== "" && positionFilter !== "")
         return hasTeamName && hasPosition;
@@ -86,14 +167,11 @@ const Football: FC<FootballProps> = ({ query, setShow }) => {
             <option value="LT">Left Tackle</option>
             <option value="RT">Right Tackle</option>
             <option value="DE">Defensive End</option>
+            <option value="OT">Offensive Tackle</option>
             <option value="DT">Defensive Tackle</option>
-            <option value="MLB">Middle Linebacker</option>
-            <option value="ROLB">Right Outside Linebacker</option>
-            <option value="OLB">Outside Linebacker</option>
-            <option value="LOLB">Left Outside Linebacker</option>
+            <option value="LB">Linebacker</option>
             <option value="CB">Cornerback</option>
-            <option value="FS">Free Safety</option>
-            <option value="SS">Strong Safety</option>
+            <option value="S">Safety</option>
             <option value="K">Kicker</option>
             <option value="P">Punter</option>
           </select>
@@ -109,9 +187,12 @@ const Football: FC<FootballProps> = ({ query, setShow }) => {
 
       {filteredResults.length > 0 ? (
         <ul className="mt-4 flex w-full flex-col items-center justify-center">
-          {filteredResults.map((player: NFLPlayer, index: number) => (
+          {filteredResults.map((player: FootballPlayer, index: number) => (
             <li
-              key={`${player.assetname}-${index}`}
+              key={`${player.id}-${player.fullName.replaceAll(
+                " ",
+                "-"
+              )}-${index}`}
               className="my-2 flex w-full items-center justify-between rounded-lg border border-gray-200 p-4 text-lg"
             >
               <ImageWithFallback
@@ -125,19 +206,17 @@ const Football: FC<FootballProps> = ({ query, setShow }) => {
               <a href={player.url} target="_blank" rel="noreferrer">
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1"
-                  title={`${player.firstName} ${player.lastName}`}
+                  title={player.fullName}
                 >
                   <label className="px-1 font-bold">Name: </label>
-                  <span className="capitalize">
-                    {player.firstName} {player.lastName}
-                  </span>
+                  <span className="capitalize">{player.fullName}</span>
                 </p>
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1"
-                  title={player.team.name}
+                  title={player.team.fullName}
                 >
                   <label className="px-1 font-bold">Team: </label>
-                  {player.team.name}
+                  {player.team.fullName}
                 </p>
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1 text-sm"

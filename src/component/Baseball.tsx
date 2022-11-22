@@ -1,35 +1,40 @@
 import { FC, memo, useState, useEffect, useRef, useMemo } from "react";
+import {
+  BaseballProps,
+  BaseballPlayer,
+  MLBPlayerFilter,
+  MLBPosition,
+} from "baseball";
 
 import useGetBaseball from "@hook/useGetBaseball";
 import ImageWithFallback from "@component/ImageWithFallback";
 
 const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
-  const [results, setResults] = useState<MLBPlayer[]>([]);
+  const [results, setResults] = useState<BaseballPlayer[]>([]);
   const [filter, setFilter] = useState<MLBPlayerFilter>({
     position: "",
     team: "",
   });
   const { isFetching, isLoading, data } = useGetBaseball(query);
-  const resultsRef = useRef<MLBPlayer[]>([]);
+  const resultsRef = useRef<BaseballPlayer[]>([]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
     const positionFilter = filter.position;
 
     return results.filter((player) => {
       const team = {
-        name: player.team.name?.toLowerCase(),
+        name: player.team.fullName?.toLowerCase(),
         abbreviation: player.team.abbreviation?.toLowerCase(),
-        teamName: player.team.teamName?.toLowerCase(),
+        city: player.team.city?.toLowerCase(),
         shortName: player.team.shortName?.toLowerCase(),
       };
       const hasTeamName =
         team.name?.includes(teamFilter) ||
         team.abbreviation?.includes(teamFilter) ||
-        team.teamName?.includes(teamFilter) ||
+        team.city?.includes(teamFilter) ||
         team.shortName?.includes(teamFilter);
       const hasPosition =
-        player.primaryPosition.name === positionFilter ||
-        player.primaryPosition.abbreviation === positionFilter;
+        player.position.toLowerCase() === positionFilter.toLowerCase();
 
       if (teamFilter !== "" && positionFilter !== "")
         return hasTeamName && hasPosition;
@@ -102,7 +107,7 @@ const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
 
       {filteredResults.length > 0 ? (
         <ul className="mt-4 flex w-full flex-col items-center justify-center ">
-          {filteredResults.map((player: MLBPlayer, index: number) => (
+          {filteredResults.map((player: BaseballPlayer, index: number) => (
             <li
               key={`${player.id}-${player.fullName.replaceAll(
                 " ",
@@ -128,10 +133,10 @@ const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
                 </p>
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1"
-                  title={player.team.name}
+                  title={player.team.fullName}
                 >
                   <label className="px-1 font-bold">Team: </label>
-                  {player.team.name}
+                  {player.team.fullName}
                 </p>
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1 text-sm"
@@ -143,9 +148,9 @@ const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
               </a>
               <span
                 className="flex justify-end rounded bg-gray-500 px-2 py-1 text-sm text-white"
-                title={player.primaryPosition.name}
+                title={player.position}
               >
-                {player.primaryPosition.abbreviation}
+                {player.position}
               </span>
             </li>
           ))}

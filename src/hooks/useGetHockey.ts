@@ -1,70 +1,68 @@
 import { useQuery } from "@tanstack/react-query";
+import { Team } from "@prisma/client";
+import { HockeyResponse, HockeyPlayer, EliteProspectsResult } from "hockey";
 
+import { fetchRequest } from "@factory/fetchRequest";
 import { proxy } from "@factory/proxy";
-import { hockeyCache, hockeyTeamCache } from "@factory/cache";
+import { hockeyTeamCache, hockeyCache } from "@factory/cache";
 
-const blankTeam: NHLTeam = {
-  id: -1,
-  name: "Unknown",
-  abbreviation: "",
-  teamName: "Unknown",
-  shortName: "",
+const blankTeam: Team = {
+  id: "-1",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  identifier: "-1",
+  fullName: "Unknown",
+  city: "Unknown",
+  shortName: "Unknown",
+  abbreviation: "Unknown",
+  league: "Unknown",
+  source: "Unknown",
+  sportId: "-1",
 };
 
-const getTeams = async () => {
-  const cached = hockeyTeamCache.get();
-  if (cached.length > 0) return cached;
+const searchNHL = async (query: string) => {
+  const q = query.trim();
+  const teams = hockeyTeamCache.get();
+  const players = hockeyCache.get(q.toLowerCase());
+  if (players.length > 0) return players;
 
-  const response = (await proxy(
-    `https://statsapi.web.nhl.com/api/v1/teams`
-  )) as NHLTeamRequest;
+  if (teams.length <= 0) {
+    const teamResponse = (await fetchRequest(
+      "/api/teams?sport=hockey"
+    )) as Team[];
 
-  const teams: NHLTeam[] = [blankTeam];
-  for (const item of response.teams) {
-    teams.push({
-      id: item.id,
-      name: item.name,
-      abbreviation: item.abbreviation,
-      teamName: item.teamName,
-      shortName: item.shortName,
-    } as NHLTeam);
+    for (const team of teamResponse) {
+      teams.push(team);
+      hockeyTeamCache.add(team);
+    }
   }
 
-  return hockeyTeamCache.set(teams);
-};
+  const response = (await fetchRequest(
+    `/api/players?sport=hockey&query=${q}`
+  )) as HockeyResponse[];
 
-const searchNHL = async (query: string, t: NHLTeam[] | undefined) => {
-  const teams = t || ([] as NHLTeam[]);
-  const q = query.trim();
-  const cached = hockeyCache.get(q.toLowerCase());
-  if (cached.length > 0) return cached;
-
-  const nhlResponse = (await proxy(
-    `https://suggest.svc.nhl.com/svc/suggest/v1/players/${q}/99999`
-  )) as NHLPlayerResult;
-
-  const players: NHLPlayer[] = [];
-  for (const item of nhlResponse.suggestions) {
-    const person = item.person;
-    const position = item.position;
-    const teamAbbreviation = item.team.abbreviation;
-    const team = teams.find(
-      (team) => team.abbreviation === teamAbbreviation
-    ) || { ...blankTeam };
+  for (const item of response) {
+    const team =
+      teams.find((team) => team.identifier === item.team.identifier) ||
+      item.team ||
+      blankTeam;
 
     players.push({
-      id: parseInt(person.id || "-1"),
-      lastName: person.lastName,
-      firstName: person.firstName,
+      id: item.id,
+      fullName: item.fullName,
+      firstName: item.firstName,
+      lastName: item.lastName,
+      number: item.number,
       team: team,
-      position: position.abbreviation,
-      number: parseInt(item.jerseyNumber || "-1"),
+      position: item.position,
+      isPlayer: true,
       experience: "NHL",
-      _type: item.type,
-      url: `https://www.nhl.com/player/${person.otherNames.slug}`,
-      image: `https://cms.nhl.bamgrid.com/images/headshots/current/168x168/${person.id}.jpg`,
-      source: "NHL.com",
-    } as NHLPlayer);
+      _type: "player",
+      url: item.linkUrl,
+      image: item.headshotUrl,
+      source: item.source,
+      sport: item.sport,
+    } as HockeyPlayer);
   }
 
   const eliteProspectsResponse = (await proxy(
@@ -78,26 +76,27 @@ const searchNHL = async (query: string, t: NHLTeam[] | undefined) => {
     const firstName = item.fullname?.split(" ")[0] || "";
     const lastName = item.fullname.split(" ")[1] || "";
     const teamName = item.team;
-    const team = teams.find(
-      (team) =>
-        team.name === teamName ||
-        team.abbreviation === teamName ||
-        team.teamName === teamName ||
-        team.shortName === teamName
-    ) || { ...blankTeam };
+    const team =
+      teams.find(
+        (team) =>
+          team.abbreviation.toLowerCase() === teamName.toLowerCase() ||
+          team.fullName.toLowerCase() === teamName.toLowerCase() ||
+          team.shortName.toLowerCase() === teamName.toLowerCase() ||
+          team.city.toLowerCase() === teamName.toLowerCase()
+      ) || blankTeam;
 
     if (
       players.find(
         (player) =>
-          player.firstName === firstName &&
-          player.lastName === lastName &&
-          player.team.name === team.name
+          player.fullName.toLowerCase() === item.fullname.toLowerCase() &&
+          player.team.id === team.id
       )
     )
       continue;
 
     players.push({
-      id: parseInt(item.id || "-1"),
+      id: item.id,
+      fullName: item.fullname,
       lastName: lastName,
       firstName: firstName,
       team: team,
@@ -105,6 +104,7 @@ const searchNHL = async (query: string, t: NHLTeam[] | undefined) => {
       number: -1,
       experience: item.experience,
       _type: _type,
+      isPlayer: _type === "player",
       url:
         _type === "player"
           ? `https://www.eliteprospects.com/player/${
@@ -115,7 +115,7 @@ const searchNHL = async (query: string, t: NHLTeam[] | undefined) => {
             }/${firstName.toLocaleLowerCase()}-${lastName.toLocaleLowerCase()}`,
       image: `https://cms.nhl.bamgrid.com/images/headshots/current/168x168/skater.jpg`,
       source: "EliteProspects.com",
-    } as NHLPlayer);
+    } as HockeyPlayer);
   }
 
   return hockeyCache.set(q.toLowerCase(), players);
@@ -123,31 +123,22 @@ const searchNHL = async (query: string, t: NHLTeam[] | undefined) => {
 
 export default function useGetHockey(query: string) {
   const {
-    isFetching: nhlTeamIsFetching,
-    isLoading: nhlTeamIsLoading,
-    isError: nhlTeamIsError,
-    error: nhlTeamError,
-    data: nhlTeamsData,
-  } = useQuery(["useGetNHLTeams"], async () => await getTeams());
-  const {
     isFetching: nhlIsFetching,
     isLoading: nhlIsLoading,
     isError: nhlIsError,
     error: nhlError,
     data: nhlData,
   } = useQuery(
-    ["searchNHL", query, nhlTeamsData],
-    async () => await searchNHL(query.toLowerCase(), nhlTeamsData),
-    {
-      enabled: !!query && nhlTeamsData !== undefined,
-    }
+    ["searchNHL", query],
+    async () => await searchNHL(query.toLowerCase()),
+    { enabled: !!query }
   );
 
   return {
-    isFetching: nhlTeamIsFetching || nhlIsFetching,
-    isLoading: nhlTeamIsLoading || nhlIsLoading,
-    isError: nhlTeamIsError || nhlIsError,
-    error: { nhlTeamError, nhlError },
+    isFetching: nhlIsFetching,
+    isLoading: nhlIsLoading,
+    isError: nhlIsError,
+    error: nhlError,
     data: nhlData,
   };
 }

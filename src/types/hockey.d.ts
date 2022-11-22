@@ -1,3 +1,7 @@
+import { Player, Sport, Team } from "@prisma/client";
+
+declare type HockeyResponse = Player & { team: Team; sport: Sport };
+declare type HockeyPlayer = NHLPlayer & { team: Team; sport: Sport };
 declare interface HockeyProps {
   query: string;
   setShow: Dispatch<SetStateAction<SearchShowSport>>;
@@ -30,14 +34,15 @@ declare type NHLPosition = "F" | "C" | "RW" | "LW" | "D" | "G" | "Staff" | "";
 declare type NHLTypes = "player" | "staff" | "";
 
 declare type NHLPlayer = {
-  id: number;
+  id: string;
+  fullName: string;
   firstName: string;
   lastName: string;
-  team: NHLTeam;
-  position: NHLPosition;
   number: number;
-  experience: string;
+  position: string;
+  isPlayer: boolean;
   _type: NHLTypes;
+  experience: string;
   url: string;
   image: string;
   source: string;
@@ -74,15 +79,12 @@ declare type NHLPlayerResult = {
   ];
 };
 
-declare type NHLFilter = {
+declare type NHLPlayerFilter = {
   position: NHLPosition;
   team: string;
 };
 
-declare type NHLRequest = {
-  query: string;
-  results: NHLPlayer[];
-};
+declare type HockeyCache = { [key: string]: HockeyPlayer[] };
 
 declare type NHLResult = NHLPlayer[];
 
@@ -96,7 +98,7 @@ declare type EliteProspectsResult = {
   fullname: string;
   id: string;
   matches: [number, number][];
-  position: NHLPosition;
+  position: string;
   season: string;
   team: string;
   verified: string;

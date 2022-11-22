@@ -1,31 +1,37 @@
 import { FC, memo, useState, useEffect, useRef, useMemo } from "react";
+import {
+  HockeyProps,
+  HockeyPlayer,
+  NHLPlayerFilter,
+  NHLPosition,
+} from "hockey";
 
 import useGetHockey from "@hook/useGetHockey";
 import ImageWithFallback from "@component/ImageWithFallback";
 
 const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
-  const [results, setResults] = useState<NHLPlayer[]>([]);
-  const [filter, setFilter] = useState<NHLFilter>({
+  const [results, setResults] = useState<HockeyPlayer[]>([]);
+  const [filter, setFilter] = useState<NHLPlayerFilter>({
     position: "",
     team: "",
   });
   const { isFetching, isLoading, data } = useGetHockey(query.toLowerCase());
-  const resultsRef = useRef<NHLPlayer[]>([]);
+  const resultsRef = useRef<HockeyPlayer[]>([]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
     const positionFilter = filter.position;
 
     return results.filter((player) => {
       const team = {
-        name: player.team.name?.toLowerCase(),
+        name: player.team.fullName?.toLowerCase(),
         abbreviation: player.team.abbreviation?.toLowerCase(),
-        teamName: player.team.teamName?.toLowerCase(),
+        city: player.team.city?.toLowerCase(),
         shortName: player.team.shortName?.toLowerCase(),
       };
       const hasTeamName =
         team.name?.includes(teamFilter) ||
         team.abbreviation?.includes(teamFilter) ||
-        team.teamName?.includes(teamFilter) ||
+        team.city?.includes(teamFilter) ||
         team.shortName?.includes(teamFilter);
 
       if (teamFilter !== "" && positionFilter !== "")
@@ -105,10 +111,13 @@ const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
 
       {filteredResults.length > 0 ? (
         <ul className="mt-4 flex w-full flex-col items-center justify-center">
-          {filteredResults.map((player: NHLPlayer, index: number) => {
+          {filteredResults.map((player: HockeyPlayer, index: number) => {
             return (
               <li
-                key={`${player.id}-${player.firstName}-${player.lastName}-${index}`}
+                key={`${player.id}-${player.fullName.replaceAll(
+                  " ",
+                  "-"
+                )}-${index}`}
                 className="my-2 flex w-full items-center justify-between rounded-lg border border-gray-200 p-4 text-lg"
               >
                 <ImageWithFallback
@@ -122,19 +131,17 @@ const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
                 <a href={player.url} target="_blank" rel="noreferrer">
                   <p
                     className="w-fill m-1 flex items-center justify-center py-2 px-1"
-                    title={`${player.firstName} ${player.lastName}`}
+                    title={player.fullName}
                   >
                     <label className="px-1 font-bold">Name: </label>
-                    <span className="capitalize">
-                      {player.firstName} {player.lastName}
-                    </span>
+                    <span className="capitalize">{player.fullName}</span>
                   </p>
                   <p
                     className="w-fill m-1 flex items-center justify-center py-2 px-1"
-                    title={player.team.name}
+                    title={player.team.fullName}
                   >
                     <label className="px-1 font-bold">Team: </label>
-                    {player.team.name}
+                    {player.team.fullName}
                   </p>
                   <p
                     className="w-fill m-1 flex items-center justify-center py-2 px-1 text-sm"
