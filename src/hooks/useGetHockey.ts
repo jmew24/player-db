@@ -20,10 +20,10 @@ const blankTeam: Team = {
   sportId: "-1",
 };
 
-const searchNHL = async (query: string) => {
+const searchHockey = async (query: string) => {
   const q = query.trim();
   const teams = hockeyTeamCache.get();
-  const players = hockeyCache.get(q.toLowerCase());
+  const players = hockeyCache.get(q);
   if (players.length > 0) return players;
 
   if (teams.length <= 0) {
@@ -49,6 +49,7 @@ const searchNHL = async (query: string) => {
 
     players.push({
       id: item.id,
+      updatedAt: item.updatedAt,
       fullName: item.fullName,
       firstName: item.firstName,
       lastName: item.lastName,
@@ -96,6 +97,7 @@ const searchNHL = async (query: string) => {
 
     players.push({
       id: item.id,
+      updatedAt: null,
       fullName: item.fullname,
       lastName: lastName,
       firstName: firstName,
@@ -118,27 +120,21 @@ const searchNHL = async (query: string) => {
     } as HockeyPlayer);
   }
 
-  return hockeyCache.set(q.toLowerCase(), players);
+  return hockeyCache.set(q, players);
 };
 
 export default function useGetHockey(query: string) {
-  const {
-    isFetching: nhlIsFetching,
-    isLoading: nhlIsLoading,
-    isError: nhlIsError,
-    error: nhlError,
-    data: nhlData,
-  } = useQuery(
-    ["searchNHL", query],
-    async () => await searchNHL(query.toLowerCase()),
+  const { isFetching, isLoading, isError, error, data } = useQuery(
+    ["searchHockey", query],
+    async () => await searchHockey(query.toLowerCase()),
     { enabled: !!query }
   );
 
   return {
-    isFetching: nhlIsFetching,
-    isLoading: nhlIsLoading,
-    isError: nhlIsError,
-    error: nhlError,
-    data: nhlData,
+    isFetching,
+    isLoading,
+    isError,
+    error,
+    data,
   };
 }

@@ -24,10 +24,10 @@ const blankTeam: Team = {
   sportId: "-1",
 };
 
-const searchMLB = async (query: string) => {
+const searchBaseball = async (query: string) => {
   const q = query.trim();
   const teams = baseballTeamCache.get();
-  const players = baseballCache.get(q.toLowerCase());
+  const players = baseballCache.get(q);
   if (players.length > 0) return players;
 
   if (teams.length <= 0) {
@@ -53,6 +53,7 @@ const searchMLB = async (query: string) => {
 
     players.push({
       id: item.id,
+      updatedAt: item.updatedAt,
       fullName: item.fullName,
       firstName: item.firstName,
       lastName: item.lastName,
@@ -105,6 +106,7 @@ const searchMLB = async (query: string) => {
 
     players.push({
       id: item.id,
+      updatedAt: null,
       fullName: `${firstName} ${lastName}`,
       firstName: firstName,
       lastName: lastName,
@@ -118,27 +120,21 @@ const searchMLB = async (query: string) => {
     } as BaseballPlayer);
   }
 
-  return baseballCache.set(q.toLowerCase(), players);
+  return baseballCache.set(q, players);
 };
 
 export default function useGetBaseball(query: string) {
-  const {
-    isFetching: mlbIsFetching,
-    isLoading: mlbIsLoading,
-    isError: mlbIsError,
-    error: mlbError,
-    data: mlbData,
-  } = useQuery(
-    ["searchMLB", query],
-    async () => await searchMLB(query.toLowerCase()),
+  const { isFetching, isLoading, isError, error, data } = useQuery(
+    ["searchBaseball", query],
+    async () => await searchBaseball(query.toLowerCase()),
     { enabled: !!query }
   );
 
   return {
-    isFetching: mlbIsFetching,
-    isLoading: mlbIsLoading,
-    isError: mlbIsError,
-    error: mlbError,
-    data: mlbData,
+    isFetching,
+    isLoading,
+    isError,
+    error,
+    data,
   };
 }

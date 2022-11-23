@@ -1,50 +1,75 @@
 import { useQuery } from "@tanstack/react-query";
+import { Team } from "@prisma/client";
+import { SoccerResponse, SoccerPlayer } from "soccer";
 
-import { proxy } from "@factory/proxy";
-import { soccerCache } from "@factory/cache";
+import { fetchRequest } from "@factory/fetchRequest";
+import { soccerTeamCache, soccerCache } from "@factory/cache";
+
+const blankTeam: Team = {
+  id: "-1",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  identifier: "-1",
+  fullName: "Unknown",
+  city: "Unknown",
+  shortName: "Unknown",
+  abbreviation: "Unknown",
+  league: "Unknown",
+  source: "Unknown",
+  sportId: "-1",
+};
 
 const searchSoccer = async (query: string) => {
-  const q = query.trim().toLowerCase();
-  const cached = soccerCache.get("Soccer");
-  if (cached.length > 0)
-    return cached.filter((player) => player.name.toLowerCase().includes(q));
+  const q = query.trim();
+  const teams = soccerTeamCache.get();
+  const players = soccerCache.get(q);
+  if (players.length > 0) return players;
 
-  const response = (await proxy(
-    `https://www.whoscored.com/StatisticsFeed/1/GetPlayerStatistics?category=summary&subcategory=all&statsAccumulationType=0&isCurrent=false&playerId=&teamIds=&age=&ageComparisonType=&appearances=&appearancesComparisonType=&field=Overall&nationality=&positionOptions=&isMinApp=false&page=&includeZeroValues=&numberOfPlayersToPick=1000`
-  )) as SoccerPlayerRequest;
+  if (teams.length <= 0) {
+    const teamResponse = (await fetchRequest(
+      "/api/teams?sport=soccer"
+    )) as Team[];
 
-  const players: SoccerPlayer[] = [];
-  for (const player of response.playerTableStats) {
+    for (const team of teamResponse) {
+      teams.push(team);
+      soccerTeamCache.add(team);
+    }
+  }
+
+  const response = (await fetchRequest(
+    `/api/players?sport=soccer&query=${q}`
+  )) as SoccerResponse[];
+
+  for (const item of response) {
+    const team =
+      teams.find((team) => team.identifier === item.team.identifier) ||
+      item.team ||
+      blankTeam;
+
     players.push({
-      id: player.playerId,
-      name: player.name,
-      firstName: player.firstName,
-      lastName: player.lastName,
-      playedPositions: player.playedPositions,
-      playedPositionsShort: player.playedPositionsShort,
-      positionText: player.positionText,
-      teamRegionName: player.teamRegionName,
-      regionCode: player.regionCode,
-      teamId: player.teamId,
-      teamName: player.teamName,
-      url: `https://www.whoscored.com/Players/${player.playerId}/Show`,
-      image: `https://d2zywfiolv4f83.cloudfront.net/img/players/${player.playerId}.jpg`,
-      source: "whoscored.com",
+      id: item.id,
+      updatedAt: item.updatedAt,
+      fullName: item.fullName,
+      firstName: item.firstName,
+      lastName: item.lastName,
+      number: item.number,
+      team: team,
+      position: item.position,
+      url: item.linkUrl,
+      image: item.headshotUrl,
+      source: item.source,
+      sport: item.sport,
     } as SoccerPlayer);
   }
 
-  return soccerCache
-    .set("Soccer", players)
-    .filter((player) => player.name.toLowerCase().includes(q));
+  return soccerCache.set(q, players);
 };
 
 export default function useGetSoccer(query: string) {
   const { isFetching, isLoading, isError, error, data } = useQuery(
     ["searchSoccer", query],
     async () => await searchSoccer(query.toLowerCase()),
-    {
-      enabled: !!query,
-    }
+    { enabled: !!query }
   );
 
   return {

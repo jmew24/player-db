@@ -26,6 +26,7 @@ export default async function handle(
         },
         select: {
           identifier: true,
+          updatedAt: true,
           fullName: true,
           city: true,
           shortName: true,

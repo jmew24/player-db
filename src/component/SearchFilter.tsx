@@ -10,7 +10,7 @@ const SearchFilter: FC<SearchFilterProps> = ({ filter, setFilter }) => {
         basketball: value,
         football: value,
         hockey: value,
-        //soccer: value,
+        soccer: value,
       }));
       setShowAll(value);
     },
@@ -19,8 +19,11 @@ const SearchFilter: FC<SearchFilterProps> = ({ filter, setFilter }) => {
 
   useEffect(() => {
     setShowAll(
-      filter.baseball && filter.basketball && filter.football && filter.hockey //&&
-      //filter.soccer
+      filter.baseball &&
+        filter.basketball &&
+        filter.football &&
+        filter.hockey &&
+        filter.soccer
     );
   }, [filter]);
 

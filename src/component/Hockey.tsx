@@ -8,6 +8,7 @@ import {
 
 import useGetHockey from "@hook/useGetHockey";
 import ImageWithFallback from "@component/ImageWithFallback";
+import { GetLocal } from "@shared/utils";
 
 const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
   const [results, setResults] = useState<HockeyPlayer[]>([]);
@@ -15,7 +16,7 @@ const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
     position: "",
     team: "",
   });
-  const { isFetching, isLoading, data } = useGetHockey(query.toLowerCase());
+  const { isFetching, isLoading, data } = useGetHockey(query);
   const resultsRef = useRef<HockeyPlayer[]>([]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
@@ -35,7 +36,10 @@ const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
         team.shortName?.includes(teamFilter);
 
       if (teamFilter !== "" && positionFilter !== "")
-        return hasTeamName && player.position === positionFilter;
+        return (
+          hasTeamName &&
+          player.position.toLowerCase() === positionFilter.toLowerCase()
+        );
       if (teamFilter !== "") return hasTeamName;
       if (positionFilter !== "") {
         if (positionFilter === "F")
@@ -44,7 +48,7 @@ const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
             player.position === "RW" ||
             player.position === "LW"
           );
-        return player.position === positionFilter;
+        return player.position.toLowerCase() === positionFilter.toLowerCase();
       }
       return true;
     });
@@ -149,6 +153,10 @@ const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
                   >
                     <label className="px-1 font-bold">Source: </label>
                     {player.source}
+                  </p>
+                  <p className="w-fill m-1 flex items-center justify-center py-2 px-1 text-xs">
+                    {player.updatedAt &&
+                      `Updated At: ${GetLocal(player.updatedAt)}`}
                   </p>
                 </a>
                 <span

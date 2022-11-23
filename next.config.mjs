@@ -35,6 +35,7 @@ export default defineNextConfig({
       "ak-static.cms.nba.com",
       "madden-assets-cdn.pulse.ea.com",
       "a.espncdn.com",
+      "images.mlssoccer.com",
       "d2zywfiolv4f83.cloudfront.net",
       "sportshub.cbsistatic.com",
     ],

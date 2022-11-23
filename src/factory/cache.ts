@@ -1,8 +1,10 @@
 import { Team } from "@prisma/client";
 
 import { BaseballPlayer, BaseballCache } from "baseball";
+import { BasketballPlayer, BasketballCache } from "basketball";
 import { FootballPlayer, FootballCache } from "football";
 import { HockeyPlayer, HockeyCache } from "hockey";
+import { SoccerPlayer, SoccerCache } from "soccer";
 
 const proxyCache = new Map<string, unknown>();
 
@@ -52,24 +54,39 @@ export const baseballCache = {
   set: setBaseballCache,
 };
 
-const basketballRequest: NBARequest = {
-  query: "",
-  results: [] as NBAPlayer[],
+const basketballTeamRequest = [] as Team[];
+
+export const getBasketballTeamCache = () => basketballTeamRequest;
+
+export const addBasketballTeamCache = (team: Team) => {
+  basketballTeamRequest.push(team);
+  return basketballTeamRequest;
 };
 
+export const basketballTeamCache = {
+  get: getBasketballTeamCache,
+  add: addBasketballTeamCache,
+};
+
+const basketballRequest = {} as BasketballCache;
+
 export const getBasketballCache = (query: string) => {
-  if (query === basketballRequest.query) {
-    return basketballRequest.results;
+  const cached = basketballRequest[query.toLowerCase().trim()];
+  if (cached) {
+    return cached;
   } else {
-    return [] as NBAPlayer[];
+    return [] as BasketballPlayer[];
   }
 };
 
-export const setBasketballCache = (query: string, results: NBAPlayer[]) => {
-  basketballRequest.query = query;
-  basketballRequest.results = results;
+export const setBasketballCache = (
+  query: string,
+  results: BasketballPlayer[]
+) => {
+  const q = query.toLowerCase().trim();
+  basketballRequest[q] = results;
 
-  return basketballRequest.results;
+  return basketballRequest[q];
 };
 
 export const basketballCache = {
@@ -151,24 +168,36 @@ export const hockeyCache = {
   set: setHockeyCache,
 };
 
-const soccerRequest: SoccerRequest = {
-  query: "",
-  results: [] as SoccerPlayer[],
+const soccerTeamRequest = [] as Team[];
+
+export const getSoccerTeamCache = () => soccerTeamRequest;
+
+export const addSoccerTeamCache = (team: Team) => {
+  soccerTeamRequest.push(team);
+  return soccerTeamRequest;
 };
 
+export const soccerTeamCache = {
+  get: getSoccerTeamCache,
+  add: addSoccerTeamCache,
+};
+
+const soccerRequest = {} as SoccerCache;
+
 export const getSoccerCache = (query: string) => {
-  if (query === soccerRequest.query) {
-    return soccerRequest.results;
+  const cached = soccerRequest[query.toLowerCase().trim()];
+  if (cached) {
+    return cached;
   } else {
     return [] as SoccerPlayer[];
   }
 };
 
 export const setSoccerCache = (query: string, results: SoccerPlayer[]) => {
-  soccerRequest.query = query;
-  soccerRequest.results = results;
+  const q = query.toLowerCase().trim();
+  soccerRequest[q] = results;
 
-  return soccerRequest.results;
+  return soccerRequest[q];
 };
 
 export const soccerCache = {

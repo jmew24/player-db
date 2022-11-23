@@ -1,7 +1,14 @@
 import { FC, memo, useState, useEffect, useRef, useMemo } from "react";
+import {
+  SoccerProps,
+  SoccerPlayer,
+  SoccerPlayerFilter,
+  SoccerPosition,
+} from "soccer";
 
 import useGetSoccer from "@hook/useGetSoccer";
 import ImageWithFallback from "@component/ImageWithFallback";
+import { GetLocal } from "@shared/utils";
 
 const Soccer: FC<SoccerProps> = ({ query, setShow }) => {
   const [results, setResults] = useState<SoccerPlayer[]>([]);
@@ -17,20 +24,18 @@ const Soccer: FC<SoccerProps> = ({ query, setShow }) => {
 
     return results.filter((player) => {
       const team = {
-        name: player.teamName?.toLowerCase(),
-        city: player.teamRegionName?.toLowerCase(),
+        name: player.team.fullName?.toLowerCase(),
+        abbreviation: player.team.abbreviation?.toLowerCase(),
+        city: player.team.city?.toLowerCase(),
+        shortName: player.team.shortName?.toLowerCase(),
       };
       const hasTeamName =
-        team.name?.includes(teamFilter) || team.city?.includes(teamFilter);
+        team.name?.includes(teamFilter) ||
+        team.abbreviation?.includes(teamFilter) ||
+        team.city?.includes(teamFilter) ||
+        team.shortName?.includes(teamFilter);
       const hasPosition =
-        player.playedPositions
-          .split("-")
-          .find(
-            (value: string) =>
-              value.trim().toLowerCase() === positionFilter.toLowerCase()
-          ) !== undefined ||
-        player.positionText === positionFilter ||
-        player.playedPositionsShort === positionFilter;
+        player.position.toLowerCase() === positionFilter.toLowerCase();
 
       if (teamFilter !== "" && positionFilter !== "")
         return hasTeamName && hasPosition;
@@ -81,12 +86,10 @@ const Soccer: FC<SoccerProps> = ({ query, setShow }) => {
             }
           >
             <option value="">All Positions</option>
-            <option value="C">Center</option>
-            <option value="F">Forward</option>
-            <option value="C-F">Center-Forward</option>
-            <option value="F-C">Forward-Center</option>
-            <option value="G">Guard</option>
-            <option value="F-G">Forward-Guard</option>
+            <option value="Forward">Forward</option>
+            <option value="Midfielder">Midfielder</option>
+            <option value="Defender">Defender</option>
+            <option value="Goalkeeper">Goalkeeper</option>
           </select>
           <input
             className="mx-2 h-10 w-1/2 flex-grow rounded-l px-5 text-gray-600 outline-double outline-1 focus:outline-none focus:ring"
@@ -102,7 +105,10 @@ const Soccer: FC<SoccerProps> = ({ query, setShow }) => {
         <ul className="mt-4 flex w-full flex-col items-center justify-center">
           {filteredResults.map((player: SoccerPlayer, index: number) => (
             <li
-              key={`${player.id}-${player.name}-${index}`}
+              key={`${player.id}-${player.fullName.replaceAll(
+                " ",
+                "-"
+              )}-${index}`}
               className="my-2 flex w-full items-center justify-between rounded-lg border border-gray-200 p-4 text-lg"
             >
               <ImageWithFallback
@@ -116,17 +122,17 @@ const Soccer: FC<SoccerProps> = ({ query, setShow }) => {
               <a href={player.url} target="_blank" rel="noreferrer">
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1"
-                  title={player.name}
+                  title={player.fullName}
                 >
                   <label className="px-1 font-bold">Name: </label>
-                  <span className="capitalize">{player.name}</span>
+                  <span className="capitalize">{player.fullName}</span>
                 </p>
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1"
-                  title={`${player.teamRegionName} ${player.teamName}`}
+                  title={player.team.fullName}
                 >
                   <label className="px-1 font-bold">Team: </label>
-                  {player.teamRegionName} {player.teamName}
+                  {player.team.fullName}
                 </p>
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1 text-sm"
@@ -135,12 +141,16 @@ const Soccer: FC<SoccerProps> = ({ query, setShow }) => {
                   <label className="px-1 font-bold">Source: </label>
                   {player.source}
                 </p>
+                <p className="w-fill m-1 flex items-center justify-center py-2 px-1 text-xs">
+                  {player.updatedAt &&
+                    `Updated At: ${GetLocal(player.updatedAt)}`}
+                </p>
               </a>
               <span
                 className="flex justify-end rounded bg-gray-500 px-2 py-1 text-sm text-white"
-                title={player.playedPositions}
+                title={player.position}
               >
-                {player.playedPositions}
+                {player.position}
               </span>
             </li>
           ))}

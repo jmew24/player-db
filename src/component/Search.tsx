@@ -6,7 +6,7 @@ import Baseball from "@component/Baseball";
 import Basketball from "@component/Basketball";
 import Football from "@component/Football";
 import Hockey from "@component/Hockey";
-//import Soccer from "@component/Soccer";
+import Soccer from "@component/Soccer";
 import useDebounce from "@hook/useDebounce";
 
 export const Search = () => {
@@ -17,14 +17,14 @@ export const Search = () => {
     basketball: true,
     football: true,
     hockey: true,
-    //soccer: false,
+    soccer: true,
   });
   const [filter, setFilter] = useState<SearchFilter>({
     baseball: true,
     basketball: true,
     football: true,
     hockey: true,
-    //soccer: false,
+    soccer: true,
   });
   const debouncedShow: SearchShowSport = useDebounce<SearchShowSport>(
     showSport,
@@ -37,7 +37,7 @@ export const Search = () => {
       basketball: true,
       football: true,
       hockey: true,
-      //soccer: false,
+      soccer: true,
     });
     setQuery(search);
   }, [search]);
@@ -111,12 +111,10 @@ const SearchResults: FC<SearchResultsProps> = ({
     () => query.trim() !== "" && filter.hockey && debouncedShow.hockey,
     [query, filter.hockey, debouncedShow.hockey]
   );
-  /*
   const displaySoccer = useMemo(
     () => query.trim() !== "" && filter.soccer && debouncedShow.soccer,
     [query, filter.soccer, debouncedShow.soccer]
   );
-  */
 
   return (
     <div
@@ -126,7 +124,7 @@ const SearchResults: FC<SearchResultsProps> = ({
       {displayBasketball && <Basketball query={query} setShow={setShowSport} />}
       {displayFootball && <Football query={query} setShow={setShowSport} />}
       {displayHockey && <Hockey query={query} setShow={setShowSport} />}
-      {/*displaySoccer && <Soccer query={query} setShow={setShowSport} />*/}
+      {displaySoccer && <Soccer query={query} setShow={setShowSport} />}
     </div>
   );
 };

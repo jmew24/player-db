@@ -1,31 +1,41 @@
 import { FC, memo, useState, useEffect, useRef, useMemo } from "react";
+import {
+  BasketballProps,
+  BasketballPlayer,
+  NBAPlayerFilter,
+  NBAPosition,
+} from "basketball";
 
 import useGetBasketball from "@hook/useGetBasketball";
 import ImageWithFallback from "@component/ImageWithFallback";
+import { GetLocal } from "@shared/utils";
 
 const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
-  const [results, setResults] = useState<NBAPlayer[]>([]);
+  const [results, setResults] = useState<BasketballPlayer[]>([]);
   const [filter, setFilter] = useState<NBAPlayerFilter>({
     position: "",
     team: "",
   });
   const { isFetching, isLoading, data } = useGetBasketball(query);
-  const resultsRef = useRef<NBAPlayer[]>([]);
+  const resultsRef = useRef<BasketballPlayer[]>([]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
     const positionFilter = filter.position;
 
     return results.filter((player) => {
       const team = {
-        name: player.team.name?.toLowerCase(),
+        name: player.team.fullName?.toLowerCase(),
         abbreviation: player.team.abbreviation?.toLowerCase(),
         city: player.team.city?.toLowerCase(),
+        shortName: player.team.shortName?.toLowerCase(),
       };
       const hasTeamName =
         team.name?.includes(teamFilter) ||
         team.abbreviation?.includes(teamFilter) ||
-        team.city?.includes(teamFilter);
-      const hasPosition = player.position === positionFilter;
+        team.city?.includes(teamFilter) ||
+        team.shortName?.includes(teamFilter);
+      const hasPosition =
+        player.position.toLowerCase() === positionFilter.toLowerCase();
 
       if (teamFilter !== "" && positionFilter !== "")
         return hasTeamName && hasPosition;
@@ -95,9 +105,12 @@ const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
 
       {filteredResults.length > 0 ? (
         <ul className="mt-4 flex w-full flex-col items-center justify-center">
-          {filteredResults.map((player: NBAPlayer, index: number) => (
+          {filteredResults.map((player: BasketballPlayer, index: number) => (
             <li
-              key={`${player.id}-${player.code}-${index}`}
+              key={`${player.id}-${player.fullName.replaceAll(
+                " ",
+                "-"
+              )}-${index}`}
               className="my-2 flex w-full items-center justify-between rounded-lg border border-gray-200 p-4 text-lg"
             >
               <ImageWithFallback
@@ -111,17 +124,17 @@ const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
               <a href={player.url} target="_blank" rel="noreferrer">
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1"
-                  title={player.displayName}
+                  title={player.fullName}
                 >
                   <label className="px-1 font-bold">Name: </label>
-                  <span className="capitalize">{player.displayName}</span>
+                  <span className="capitalize">{player.fullName}</span>
                 </p>
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1"
-                  title={`${player.team.city} ${player.team.name}`}
+                  title={`${player.team.city} ${player.team.fullName}`}
                 >
                   <label className="px-1 font-bold">Team: </label>
-                  {player.team.city} {player.team.name}
+                  {player.team.city} {player.team.fullName}
                 </p>
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1 text-sm"
@@ -129,6 +142,10 @@ const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
                 >
                   <label className="px-1 font-bold">Source: </label>
                   {player.source}
+                </p>
+                <p className="w-fill m-1 flex items-center justify-center py-2 px-1 text-xs">
+                  {player.updatedAt &&
+                    `Updated At: ${GetLocal(player.updatedAt)}`}
                 </p>
               </a>
               <span

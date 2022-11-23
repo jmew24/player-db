@@ -2,6 +2,8 @@ import { Player, Sport, Team } from "@prisma/client";
 
 declare type BaseballResponse = Player & { team: Team; sport: Sport };
 declare type BaseballPlayer = MLBPlayer & { team: Team; sport: Sport };
+declare type BaseballCache = { [key: string]: BaseballPlayer[] };
+
 declare interface BaseballProps {
   query: string;
   setShow: Dispatch<SetStateAction<SearchShowSport>>;
@@ -51,10 +53,9 @@ declare type MLBTeamFilter = {
   team: string;
 };
 
-declare type BaseballCache = { [key: string]: BaseballPlayer[] };
-
 declare type MLBPlayer = {
   id: string;
+  updatedAt: Date | null;
   fullName: string;
   firstName: string;
   lastName: string;

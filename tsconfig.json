@@ -23,6 +23,7 @@
       "@hook/*": ["./src/hooks/*"],
       "@page/*": ["./src/pages/*"],
       "@lib/*": ["./src/lib/*"],
+      "@shared/*": ["./src/shared/*"],
       "@api/*": ["./src/pages/api/*"],
       "@style/*": ["./src/styles/*"]
     }

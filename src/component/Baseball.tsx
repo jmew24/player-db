@@ -8,6 +8,7 @@ import {
 
 import useGetBaseball from "@hook/useGetBaseball";
 import ImageWithFallback from "@component/ImageWithFallback";
+import { GetLocal } from "@shared/utils";
 
 const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
   const [results, setResults] = useState<BaseballPlayer[]>([]);
@@ -144,6 +145,10 @@ const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
                 >
                   <label className="px-1 font-bold">Source: </label>
                   {player.source}
+                </p>
+                <p className="w-fill m-1 flex items-center justify-center py-2 px-1 text-xs">
+                  {player.updatedAt &&
+                    `Updated At: ${GetLocal(player.updatedAt)}`}
                 </p>
               </a>
               <span

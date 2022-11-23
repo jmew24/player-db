@@ -20,10 +20,10 @@ const blankTeam: Team = {
   sportId: "-1",
 };
 
-const searchNFL = async (query: string) => {
+const searchFootball = async (query: string) => {
   const q = query.trim();
   const teams = footballTeamCache.get();
-  const players = footballCache.get(q.toLowerCase());
+  const players = footballCache.get(q);
   if (players.length > 0) return players;
 
   if (teams.length <= 0) {
@@ -49,6 +49,7 @@ const searchNFL = async (query: string) => {
 
     players.push({
       id: item.id,
+      updatedAt: item.updatedAt,
       fullName: item.fullName,
       firstName: item.firstName,
       lastName: item.lastName,
@@ -99,6 +100,7 @@ const searchNFL = async (query: string) => {
 
     players.push({
       id: item.primaryKey,
+      updatedAt: null,
       fullName: item.fullNameForSearch,
       firstName: item.firstName,
       lastName: item.lastName,
@@ -112,16 +114,14 @@ const searchNFL = async (query: string) => {
     } as FootballPlayer);
   }
 
-  return footballCache.set(q.toLowerCase(), players);
+  return footballCache.set(q, players);
 };
 
 export default function useGetFootball(query: string) {
   const { isFetching, isLoading, isError, error, data } = useQuery(
-    ["searchNFL", query],
-    async () => await searchNFL(query.toLowerCase()),
-    {
-      enabled: !!query,
-    }
+    ["searchFootball", query],
+    async () => await searchFootball(query.toLowerCase()),
+    { enabled: !!query }
   );
 
   return {

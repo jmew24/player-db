@@ -5,11 +5,3 @@ declare global {
     }
   }
 }
-
-declare type Sport =
-  | "UNKNOWN"
-  | "BASEBALL"
-  | "BASKETBALL"
-  | "FOOTBALL"
-  | "HOCKEY"
-  | "SOCCER";

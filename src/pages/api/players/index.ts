@@ -65,6 +65,7 @@ export default async function handle(
           },
           select: {
             identifier: true,
+            updatedAt: true,
             fullName: true,
             firstName: true,
             lastName: true,
@@ -103,6 +104,7 @@ export default async function handle(
           },
           select: {
             identifier: true,
+            updatedAt: true,
             fullName: true,
             firstName: true,
             lastName: true,
