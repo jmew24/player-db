@@ -206,6 +206,15 @@ const Football: FC<FootballProps> = ({ query, setShow }) => {
               />
               <a href={player.url} target="_blank" rel="noreferrer">
                 <p
+                  className="w-fill m-1 flex items-center justify-center py-2 px-1 text-xs text-gray-400"
+                  title={
+                    (player.team.league && `League: ${player.team.league}`) ??
+                    ""
+                  }
+                >
+                  {player.team.league && `League: ${player.team.league}`}
+                </p>
+                <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1"
                   title={player.fullName}
                 >
