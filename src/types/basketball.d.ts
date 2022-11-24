@@ -78,4 +78,5 @@ declare type NBAPlayerResult = NBAPlayer[];
 declare type NBAPlayerFilter = {
   team: string;
   position: string;
+  league: string;
 };

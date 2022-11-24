@@ -15,12 +15,24 @@ const Football: FC<FootballProps> = ({ query, setShow }) => {
   const [filter, setFilter] = useState<NFLPlayerFilter>({
     position: "",
     team: "",
+    league: "",
   });
   const { isFetching, isLoading, data } = useGetFootball(query);
   const resultsRef = useRef<FootballPlayer[]>([]);
+  const leagueFilters = useMemo(() => {
+    const leagues: string[] = [];
+
+    data?.forEach((player) => {
+      if (!leagues.includes(player.team.league))
+        leagues.push(player.team.league);
+    });
+
+    return leagues;
+  }, [data]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
     const positionFilter = filter.position;
+    const leagueFilter = filter.league;
 
     return results.filter((player) => {
       const team = {
@@ -108,14 +120,23 @@ const Football: FC<FootballProps> = ({ query, setShow }) => {
       }
       const hasPosition =
         position.toLowerCase() === positionFilter.toLowerCase();
+      const hasLeague =
+        player.team.league.toLowerCase() === leagueFilter.toLowerCase();
 
+      if (teamFilter !== "" && positionFilter !== "" && leagueFilter !== "")
+        return hasTeamName && hasPosition && hasLeague;
       if (teamFilter !== "" && positionFilter !== "")
         return hasTeamName && hasPosition;
+      if (teamFilter !== "" && leagueFilter !== "")
+        return hasTeamName && hasLeague;
+      if (positionFilter !== "" && leagueFilter !== "")
+        return hasPosition && hasLeague;
       if (teamFilter !== "") return hasTeamName;
       if (positionFilter !== "") return hasPosition;
+      if (leagueFilter !== "") return hasLeague;
       return true;
     });
-  }, [filter.position, filter.team, results]);
+  }, [filter.team, filter.position, filter.league, results]);
 
   useEffect(() => {
     if (data && data !== resultsRef.current) {
@@ -125,8 +146,10 @@ const Football: FC<FootballProps> = ({ query, setShow }) => {
         ...state,
         football: resultsRef.current.length > 0,
       }));
+      if (leagueFilters.length > 0 && leagueFilters.indexOf(filter.league) < 0)
+        setFilter((state) => ({ ...state, league: leagueFilters[0] ?? "" }));
     }
-  }, [data, setShow]);
+  }, [data, setShow, filter.league, leagueFilters]);
 
   if (isFetching || isLoading)
     return (
@@ -183,6 +206,23 @@ const Football: FC<FootballProps> = ({ query, setShow }) => {
             onChange={(e) => setFilter({ ...filter, team: e.target.value })}
             placeholder="Team"
           />
+        </div>
+        <div className="mt-4 flex w-full">
+          <select
+            className="mx-2 w-full rounded border border-gray-300 p-2 text-center text-gray-600"
+            value={filter.league}
+            onChange={(e) =>
+              setFilter({ ...filter, league: e.target.value as string })
+            }
+            title="League Filter"
+          >
+            <option value="">All Leagues</option>
+            {leagueFilters.map((league) => (
+              <option key={`leagueFilter-${league}`} value={league}>
+                {league}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

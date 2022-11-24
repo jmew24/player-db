@@ -85,6 +85,7 @@ declare type NHLPlayerResult = {
 declare type NHLPlayerFilter = {
   position: NHLPosition;
   team: string;
+  league: string;
 };
 
 declare type NHLResult = NHLPlayer[];

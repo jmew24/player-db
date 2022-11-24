@@ -99,4 +99,5 @@ declare type NFLPlayerResult = NFLPlayer[];
 declare type NFLPlayerFilter = {
   team: string;
   position: string;
+  league: string;
 };
