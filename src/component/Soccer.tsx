@@ -120,6 +120,9 @@ const Soccer: FC<SoccerProps> = ({ query, setShow }) => {
                 fallbackSrc="https://d2zywfiolv4f83.cloudfront.net/img/comparision_player.png"
               />
               <a href={player.url} target="_blank" rel="noreferrer">
+                <p className="w-fill m-1 flex items-center justify-center py-2 px-1 text-xs text-gray-400">
+                  {player.team.league && `League: ${player.team.league}`}
+                </p>
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1"
                   title={player.fullName}
