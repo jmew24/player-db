@@ -68,6 +68,8 @@ const searchFootball = async (query: string) => {
     `https://ratings-api.ea.com/v2/entities/m23-ratings?filter=((fullNameForSearch%3A*${q}*))&sort=firstName%3AASC`
   )) as NFLPlayerRequest;
 
+  const queryFirstName = q.split(" ")[0] || "";
+  const queryLastName = q.split(" ")[1] || "";
   for (const item of EAResponse.docs) {
     const teamName = item.team.toLowerCase();
     const team =
@@ -82,19 +84,20 @@ const searchFootball = async (query: string) => {
     if (
       players.find(
         (player) =>
-          player.fullName.toLowerCase() ===
-            item.fullNameForSearch.toLowerCase() && player.team.id === team.id
+          (player.fullName.toLowerCase() ===
+            item.fullNameForSearch.toLowerCase() ||
+            (player.firstName === item.firstName &&
+              player.lastName === item.lastName)) &&
+          player.team.id === team.id
       )
     )
       continue;
 
     if (
-      players.find(
-        (player) =>
-          player.firstName === item.firstName &&
-          player.lastName === item.lastName &&
-          player.team.id === team.id
-      )
+      queryFirstName !== "" &&
+      queryLastName !== "" &&
+      (!item.firstName.toLowerCase().includes(queryFirstName.toLowerCase()) ||
+        !item.lastName.toLowerCase().includes(queryLastName.toLowerCase()))
     )
       continue;
 
