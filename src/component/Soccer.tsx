@@ -1,4 +1,5 @@
 import { FC, memo, useState, useEffect, useRef, useMemo } from "react";
+import { GoLinkExternal } from "react-icons/go";
 import {
   SoccerProps,
   SoccerPlayer,
@@ -75,7 +76,7 @@ const Soccer: FC<SoccerProps> = ({ query, setShow }) => {
         soccer: resultsRef.current.length > 0,
       }));
       if (leagueFilters.length > 0 && leagueFilters.indexOf(filter.league) < 0)
-        setFilter((state) => ({ ...state, league: leagueFilters[0] ?? "" }));
+        setFilter((state) => ({ ...state, league: "" }));
     }
   }, [data, setShow, filter.league, leagueFilters]);
 
@@ -149,8 +150,16 @@ const Soccer: FC<SoccerProps> = ({ query, setShow }) => {
                 " ",
                 "-"
               )}-${index}`}
-              className="my-2 flex w-full items-center justify-between rounded-lg border border-gray-200 p-4 text-lg"
+              className="my-2 block w-full items-center justify-between rounded-lg border border-gray-200 p-4 text-lg"
             >
+              <p
+                className="w-fill m-1 flex items-center justify-center py-2 px-1 text-xs text-gray-400"
+                title={
+                  (player.team.league && `League: ${player.team.league}`) ?? ""
+                }
+              >
+                {player.team.league && `League: ${player.team.league}`}
+              </p>
               <ImageWithFallback
                 className="justify-start rounded px-2 py-1 text-sm text-white"
                 alt={`${player.id}`}
@@ -159,48 +168,44 @@ const Soccer: FC<SoccerProps> = ({ query, setShow }) => {
                 src={player.image}
                 fallbackSrc="https://d2zywfiolv4f83.cloudfront.net/img/comparision_player.png"
               />
-              <a href={player.url} target="_blank" rel="noreferrer">
-                <p
-                  className="w-fill m-1 flex items-center justify-center py-2 px-1 text-xs text-gray-400"
-                  title={
-                    (player.team.league && `League: ${player.team.league}`) ??
-                    ""
-                  }
-                >
-                  {player.team.league && `League: ${player.team.league}`}
-                </p>
-                <p
-                  className="w-fill m-1 flex items-center justify-center py-2 px-1"
-                  title={player.fullName}
-                >
-                  <label className="px-1 font-bold">Name: </label>
-                  <span className="capitalize">{player.fullName}</span>
-                </p>
-                <p
-                  className="w-fill m-1 flex items-center justify-center py-2 px-1"
-                  title={player.team.fullName}
-                >
-                  <label className="px-1 font-bold">Team: </label>
-                  {player.team.fullName}
-                </p>
-                <p
-                  className="w-fill m-1 flex items-center justify-center py-2 px-1 text-sm"
-                  title={player.source}
-                >
-                  <label className="px-1 font-bold">Source: </label>
-                  {player.source}
-                </p>
-                <p className="w-fill m-1 flex items-center justify-center py-2 px-1 text-xs">
-                  {player.updatedAt &&
-                    `Updated At: ${GetLocal(player.updatedAt)}`}
-                </p>
-              </a>
-              <span
-                className="flex justify-end rounded bg-gray-500 px-2 py-1 text-sm text-white"
-                title={player.position}
+              <p
+                className="w-fill m-1 flex items-center justify-center py-2 px-1"
+                title={player.fullName}
               >
-                {player.position}
-              </span>
+                <label className="px-1 font-bold">Name: </label>
+                <span className="capitalize">{player.fullName}</span>
+              </p>
+              <p
+                className="w-fill m-1 flex items-center justify-center py-2 px-1"
+                title={player.team.fullName}
+              >
+                <label className="px-1 font-bold">Team: </label>
+                {player.team.fullName}
+              </p>
+              <a href={player.url} target="_blank" rel="noreferrer">
+                <div className="flex items-center justify-center">
+                  <p
+                    className="w-fill m-1 mx-1 flex items-center justify-center py-2 px-1 text-sm"
+                    title={player.source}
+                  >
+                    <GoLinkExternal className="mx-1" />
+                    <label className="x-1 mx-1 font-bold">Source: </label>
+                    {player.source}
+                  </p>
+                </div>
+              </a>
+              <p className="w-fill m-1 flex items-center justify-center py-2 px-1 text-xs">
+                {player.updatedAt &&
+                  `Updated At: ${GetLocal(player.updatedAt)}`}
+              </p>
+              {player.updatedAt && (
+                <span
+                  className="flex justify-center rounded bg-gray-500 px-2 py-1 text-sm text-white"
+                  title={player.position}
+                >
+                  {`Updated At: ${GetLocal(player.updatedAt)}`}
+                </span>
+              )}
             </li>
           ))}
         </ul>

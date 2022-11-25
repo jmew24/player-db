@@ -72,6 +72,8 @@ const searchBaseball = async (query: string) => {
     `https://baseballsavant.mlb.com/player/search-all?search=${q}`
   )) as BaseballSavantRequest;
 
+  const queryFirstName = q.split(" ")[0] || "";
+  const queryLastName = q.split(" ")[1] || "";
   for (const item of baseballSavantResponse) {
     const firstName = item.name?.split(" ")[0] || "";
     const lastName = item.name.split(" ")[1] || "";
@@ -101,6 +103,14 @@ const searchBaseball = async (query: string) => {
           player.fullName.toLowerCase() === item.name.toLowerCase() &&
           player.team.id === team.id
       )
+    )
+      continue;
+
+    if (
+      queryFirstName !== "" &&
+      queryLastName !== "" &&
+      (!firstName.toLowerCase().includes(queryFirstName.toLowerCase()) ||
+        !lastName.toLowerCase().includes(queryLastName.toLowerCase()))
     )
       continue;
 

@@ -70,6 +70,8 @@ const searchHockey = async (query: string) => {
     `https://autocomplete.eliteprospects.com/all?q=${q}`
   )) as EliteProspectsResult[];
 
+  const queryFirstName = q.split(" ")[0] || "";
+  const queryLastName = q.split(" ")[1] || "";
   for (const item of eliteProspectsResponse) {
     const _type = item._type?.toLowerCase();
     if (_type !== "player" && _type !== "staff") continue;
@@ -92,6 +94,14 @@ const searchHockey = async (query: string) => {
           player.fullName.toLowerCase() === item.fullname.toLowerCase() &&
           player.team.id === team.id
       )
+    )
+      continue;
+
+    if (
+      queryFirstName !== "" &&
+      queryLastName !== "" &&
+      (!firstName.toLowerCase().includes(queryFirstName.toLowerCase()) ||
+        !lastName.toLowerCase().includes(queryLastName.toLowerCase()))
     )
       continue;
 
