@@ -1,4 +1,4 @@
-import { FC, useMemo, useEffect, memo } from "react";
+import { FC, useMemo, memo } from "react";
 
 const Pagination: FC<PaginationProps> = ({
   selected,
