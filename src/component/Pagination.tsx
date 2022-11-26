@@ -1,4 +1,4 @@
-import { FC, useMemo, memo } from "react";
+import { FC, useMemo, useEffect, memo } from "react";
 
 const Pagination: FC<PaginationProps> = ({
   selected,
@@ -15,9 +15,20 @@ const Pagination: FC<PaginationProps> = ({
 
   return (
     <nav aria-label="Page navigation" className="w-full">
-      <p className="text-center text-gray-200">
-        Showing Results {data.start + 1}-{endCount} of {data.count}
-      </p>
+      {data.count > 0 ? (
+        <p
+          className={`text-center text-gray-200 ${
+            pagesDisplay.length <= 1 &&
+            "my-5 translate-y-2 transform text-center"
+          }`}
+        >
+          Showing Results {data.start + 1}-{endCount} of {data.count}
+        </p>
+      ) : (
+        <p className="my-5 translate-y-2 transform text-center text-gray-200">
+          No Results
+        </p>
+      )}
       {pagesDisplay.length > 1 && (
         <ul className="inline-flex">
           <li className={`${selected === 0 && "disabled"}`}>

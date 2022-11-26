@@ -102,6 +102,10 @@ const Soccer: FC<SoccerProps> = ({ query, setShow }) => {
   }, [data, setShow, filter.league, leagueFilters]);
 
   useEffect(() => {
+    setPage(0);
+  }, [filter]);
+
+  useEffect(() => {
     if (filteredResults.length > 0) {
       const start = page * playersPerPage;
       const end = start + playersPerPage;
@@ -174,20 +178,20 @@ const Soccer: FC<SoccerProps> = ({ query, setShow }) => {
         </div>
       </div>
 
-      {pagePlayers.length > 0 ? (
-        <div className="mt-4 flex w-full flex-col items-center justify-center">
-          <Pagination
-            selected={page}
-            pages={pages}
-            pagesArray={pagesArray}
-            pagesDisplay={pagesDisplay}
-            setPage={setPage}
-            data={{
-              count: filteredResults.length,
-              start: paginationData.start,
-              end: paginationData.end,
-            }}
-          />
+      <div className="mt-4 flex w-full flex-col items-center justify-center">
+        <Pagination
+          selected={page}
+          pages={pages}
+          pagesArray={pagesArray}
+          pagesDisplay={pagesDisplay}
+          setPage={setPage}
+          data={{
+            count: filteredResults.length,
+            start: paginationData.start,
+            end: paginationData.end,
+          }}
+        />
+        {pagePlayers.length > 0 ? (
           <ul className="mt-4 flex w-full flex-col items-center justify-center">
             {pagePlayers.map((player: SoccerPlayer, index: number) => (
               <li
@@ -262,8 +266,8 @@ const Soccer: FC<SoccerProps> = ({ query, setShow }) => {
               </li>
             ))}
           </ul>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
     </div>
   ) : null;
 };

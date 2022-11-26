@@ -112,6 +112,10 @@ const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
     }
   }, [page, filteredResults]);
 
+  useEffect(() => {
+    setPage(0);
+  }, [filter]);
+
   if (isFetching || isLoading)
     return (
       <div className="items-center justify-center py-2">
@@ -179,20 +183,20 @@ const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
         </div>
       </div>
 
-      {pagePlayers.length > 0 ? (
-        <div className="mt-4 flex w-full flex-col items-center justify-center">
-          <Pagination
-            selected={page}
-            pages={pages}
-            pagesArray={pagesArray}
-            pagesDisplay={pagesDisplay}
-            setPage={setPage}
-            data={{
-              count: filteredResults.length,
-              start: paginationData.start,
-              end: paginationData.end,
-            }}
-          />
+      <div className="mt-4 flex w-full flex-col items-center justify-center">
+        <Pagination
+          selected={page}
+          pages={pages}
+          pagesArray={pagesArray}
+          pagesDisplay={pagesDisplay}
+          setPage={setPage}
+          data={{
+            count: filteredResults.length,
+            start: paginationData.start,
+            end: paginationData.end,
+          }}
+        />
+        {pagePlayers.length > 0 ? (
           <ul className="mt-4 flex w-full flex-col items-center justify-center ">
             {pagePlayers.map((player: BaseballPlayer, index: number) => (
               <li
@@ -263,8 +267,8 @@ const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
               </li>
             ))}
           </ul>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
     </div>
   ) : null;
 };
