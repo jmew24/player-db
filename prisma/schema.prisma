@@ -1,0 +1,60 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model Sport {
+  id        String   @id @unique @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  players   Player[]
+  teams     Team[]
+
+  @@map("sport")
+}
+
+model Team {
+  id           String   @id @unique @default(cuid())
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+  fullName     String   @map("full_name")
+  city         String
+  abbreviation String
+  shortName    String   @map("short_name")
+  league       String
+  identifier   String   @unique
+  source       String   @default("UNKNOWN")
+  sportId      String   @map("sport_id")
+  sport        Sport    @relation(fields: [sportId], references: [id], onDelete: Cascade)
+  players      Player[]
+
+  @@map("team")
+}
+
+model Player {
+  id          String   @id @unique @default(cuid())
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+  firstName   String   @map("first_name")
+  lastName    String   @map("last_name")
+  fullName    String   @map("full_name")
+  position    String
+  teamId      String   @map("team_id")
+  linkUrl     String   @map("link_url")
+  identifier  String   @unique
+  source      String   @default("UNKNOWN")
+  number      Int
+  sportId     String   @map("sport_id")
+  headshotUrl String   @map("headshot_url")
+  sport       Sport    @relation(fields: [sportId], references: [id], onDelete: Cascade)
+  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@map("player")
+}

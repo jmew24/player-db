@@ -10,12 +10,12 @@ declare type SearchFilter = {
   basketball: boolean;
   football: boolean;
   hockey: boolean;
-  //soccer: boolean;
+  soccer: boolean;
 };
 
 declare type SearchFilterProps = {
-  filter: SearchFilter;
   setFilter: Dispatch<SetStateAction<SearchFilter>>;
+  debouncedShow: SearchShowSport;
 };
 
 declare type SearchShowSport = {
@@ -23,5 +23,5 @@ declare type SearchShowSport = {
   basketball: boolean;
   football: boolean;
   hockey: boolean;
-  //soccer: boolean;
+  soccer: boolean;
 };

@@ -1,28 +1,7 @@
 import { queryClient } from "@factory/queryClient";
+import { requestOptions, fetchWithTimeout } from "@factory/fetchRequest";
 
 const corsAnywhere = process.env.NEXT_PUBLIC_CORS || "";
-
-type requestOptions = RequestInit & {
-  timeout?: number;
-};
-
-async function fetchWithTimeout(url: string, options: requestOptions = {}) {
-  const { timeout = 10000 } = options;
-
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
-  try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-    });
-    clearTimeout(id);
-    return response;
-  } catch {
-    clearTimeout(id);
-    return new Response();
-  }
-}
 
 export async function proxy<ProxyResult>(
   url: string,

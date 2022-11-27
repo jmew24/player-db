@@ -6,7 +6,7 @@ import Baseball from "@component/Baseball";
 import Basketball from "@component/Basketball";
 import Football from "@component/Football";
 import Hockey from "@component/Hockey";
-//import Soccer from "@component/Soccer";
+import Soccer from "@component/Soccer";
 import useDebounce from "@hook/useDebounce";
 
 export const Search = () => {
@@ -17,14 +17,14 @@ export const Search = () => {
     basketball: true,
     football: true,
     hockey: true,
-    //soccer: false,
+    soccer: true,
   });
   const [filter, setFilter] = useState<SearchFilter>({
     baseball: true,
     basketball: true,
     football: true,
     hockey: true,
-    //soccer: false,
+    soccer: true,
   });
   const debouncedShow: SearchShowSport = useDebounce<SearchShowSport>(
     showSport,
@@ -37,7 +37,7 @@ export const Search = () => {
       basketball: true,
       football: true,
       hockey: true,
-      //soccer: false,
+      soccer: true,
     });
     setQuery(search);
   }, [search]);
@@ -64,7 +64,7 @@ export const Search = () => {
               value={search}
               placeholder="Enter a name here..."
               onChange={(e) => setSearch(e.target.value)}
-              className="mx-2 h-10 flex-grow rounded-l px-5 text-gray-600 outline-double outline-1 focus:outline-none focus:ring"
+              className="mx-2 h-10 flex-grow justify-center rounded-l px-5 text-center text-xl text-gray-600 outline-double outline-1 focus:outline-none focus:ring"
             />
             <button
               onClick={() => searchQuery()}
@@ -73,9 +73,7 @@ export const Search = () => {
               Search
             </button>
           </div>
-          <div className="mt-4 flex w-full">
-            <SearchFilter filter={filter} setFilter={setFilter} />
-          </div>
+          <SearchFilter setFilter={setFilter} debouncedShow={debouncedShow} />
         </form>
 
         <SearchResults
@@ -111,12 +109,10 @@ const SearchResults: FC<SearchResultsProps> = ({
     () => query.trim() !== "" && filter.hockey && debouncedShow.hockey,
     [query, filter.hockey, debouncedShow.hockey]
   );
-  /*
   const displaySoccer = useMemo(
     () => query.trim() !== "" && filter.soccer && debouncedShow.soccer,
     [query, filter.soccer, debouncedShow.soccer]
   );
-  */
 
   return (
     <div
@@ -126,7 +122,7 @@ const SearchResults: FC<SearchResultsProps> = ({
       {displayBasketball && <Basketball query={query} setShow={setShowSport} />}
       {displayFootball && <Football query={query} setShow={setShowSport} />}
       {displayHockey && <Hockey query={query} setShow={setShowSport} />}
-      {/*displaySoccer && <Soccer query={query} setShow={setShowSport} />*/}
+      {displaySoccer && <Soccer query={query} setShow={setShowSport} />}
     </div>
   );
 };

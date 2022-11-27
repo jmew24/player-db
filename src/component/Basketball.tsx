@@ -1,39 +1,91 @@
 import { FC, memo, useState, useEffect, useRef, useMemo } from "react";
+import { GoLinkExternal } from "react-icons/go";
+import {
+  BasketballProps,
+  BasketballPlayer,
+  NBAPlayerFilter,
+  NBAPosition,
+} from "basketball";
 
 import useGetBasketball from "@hook/useGetBasketball";
 import ImageWithFallback from "@component/ImageWithFallback";
+import Pagination from "@component/Pagination";
+import { GetLocal } from "@shared/utils";
 
 const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
-  const [results, setResults] = useState<NBAPlayer[]>([]);
+  const [results, setResults] = useState<BasketballPlayer[]>([]);
   const [filter, setFilter] = useState<NBAPlayerFilter>({
     position: "",
     team: "",
+    league: "",
   });
+  const [page, setPage] = useState<number>(0);
+  const [paginationData, setPaginationData] = useState({
+    start: 0,
+    end: 0,
+  });
+  const [pagePlayers, setPagePlayers] = useState<BasketballPlayer[]>([]);
+  const playersPerPage = 10;
   const { isFetching, isLoading, data } = useGetBasketball(query);
-  const resultsRef = useRef<NBAPlayer[]>([]);
+  const resultsRef = useRef<BasketballPlayer[]>([]);
+  const leagueFilters = useMemo(() => {
+    const leagues: string[] = [];
+
+    data?.forEach((player) => {
+      if (!leagues.includes(player.team.league))
+        leagues.push(player.team.league);
+    });
+
+    return leagues;
+  }, [data]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
     const positionFilter = filter.position;
+    const leagueFilter = filter.league;
 
     return results.filter((player) => {
       const team = {
-        name: player.team.name?.toLowerCase(),
+        name: player.team.fullName?.toLowerCase(),
         abbreviation: player.team.abbreviation?.toLowerCase(),
         city: player.team.city?.toLowerCase(),
+        shortName: player.team.shortName?.toLowerCase(),
       };
       const hasTeamName =
         team.name?.includes(teamFilter) ||
         team.abbreviation?.includes(teamFilter) ||
-        team.city?.includes(teamFilter);
-      const hasPosition = player.position === positionFilter;
+        team.city?.includes(teamFilter) ||
+        team.shortName?.includes(teamFilter);
+      const hasPosition =
+        player.position?.toLowerCase() === positionFilter.toLowerCase();
+      const hasLeague =
+        player.team?.league?.toLowerCase() === leagueFilter.toLowerCase();
 
+      if (teamFilter !== "" && positionFilter !== "" && leagueFilter !== "")
+        return hasTeamName && hasPosition && hasLeague;
       if (teamFilter !== "" && positionFilter !== "")
         return hasTeamName && hasPosition;
+      if (teamFilter !== "" && leagueFilter !== "")
+        return hasTeamName && hasLeague;
+      if (positionFilter !== "" && leagueFilter !== "")
+        return hasPosition && hasLeague;
       if (teamFilter !== "") return hasTeamName;
       if (positionFilter !== "") return hasPosition;
+      if (leagueFilter !== "") return hasLeague;
       return true;
     });
-  }, [filter.position, filter.team, results]);
+  }, [filter.team, filter.position, filter.league, results]);
+  const pages = useMemo(
+    () => Math.ceil(filteredResults.length / playersPerPage),
+    [filteredResults.length]
+  );
+  const pagesArray = useMemo(() => Array.from(Array(pages).keys()), [pages]);
+  const pagesDisplay = useMemo(() => {
+    const selectedPage = page - 1;
+    const firstPage = selectedPage - 1 < 0 ? 0 : selectedPage - 1;
+    const lastPage = selectedPage + 4 >= pages ? pages : selectedPage + 4;
+
+    return pagesArray.slice(firstPage, lastPage);
+  }, [pages, pagesArray, page]);
 
   useEffect(() => {
     if (data && data !== resultsRef.current) {
@@ -43,8 +95,26 @@ const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
         ...state,
         basketball: resultsRef.current.length > 0,
       }));
+      if (leagueFilters.length > 0 && leagueFilters.indexOf(filter.league) < 0)
+        setFilter((state) => ({ ...state, league: "" }));
+      setPage(0);
     }
-  }, [data, setShow]);
+  }, [data, setShow, filter.league, leagueFilters]);
+
+  useEffect(() => {
+    if (filteredResults.length > 0) {
+      const start = page * playersPerPage;
+      const end = start + playersPerPage;
+      setPaginationData({ start, end });
+      setPagePlayers(filteredResults.slice(start, end));
+    } else {
+      setPagePlayers([]);
+    }
+  }, [page, filteredResults]);
+
+  useEffect(() => {
+    setPage(0);
+  }, [filter]);
 
   if (isFetching || isLoading)
     return (
@@ -58,7 +128,7 @@ const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
       </div>
     );
 
-  return resultsRef.current.length > 0 ? (
+  return (
     <div className="items-center justify-center py-2">
       <div className="mt-4 w-full">
         <h1 className="text-6xl font-bold">Basketball</h1>
@@ -74,6 +144,7 @@ const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
                 position: e.target.value as NBAPosition,
               })
             }
+            disabled={filteredResults.length === 0}
           >
             <option value="">All Positions</option>
             <option value="C">Center</option>
@@ -89,60 +160,117 @@ const Basketball: FC<BasketballProps> = ({ query, setShow }) => {
             value={filter.team}
             onChange={(e) => setFilter({ ...filter, team: e.target.value })}
             placeholder="Team"
+            disabled={filteredResults.length === 0}
           />
+        </div>
+        <div className="mt-4 flex w-full">
+          <select
+            className="mx-2 w-full rounded border border-gray-300 p-2 text-center text-gray-600"
+            value={filter.league}
+            onChange={(e) =>
+              setFilter({ ...filter, league: e.target.value as string })
+            }
+            title="League Filter"
+            disabled={filteredResults.length === 0}
+          >
+            <option value="">All Leagues</option>
+            {leagueFilters.map((league) => (
+              <option key={`leagueFilter-${league}`} value={league}>
+                {league}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
-      {filteredResults.length > 0 ? (
-        <ul className="mt-4 flex w-full flex-col items-center justify-center">
-          {filteredResults.map((player: NBAPlayer, index: number) => (
-            <li
-              key={`${player.id}-${player.code}-${index}`}
-              className="my-2 flex w-full items-center justify-between rounded-lg border border-gray-200 p-4 text-lg"
-            >
-              <ImageWithFallback
-                className="justify-start rounded px-2 py-1 text-sm text-white"
-                alt={`${player.id}`}
-                width={67}
-                height={67}
-                src={player.image}
-                fallbackSrc="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_426,q_auto:best/v1/people/1/headshot/67/current.jpg"
-              />
-              <a href={player.url} target="_blank" rel="noreferrer">
+      <div className="mt-4 flex w-full flex-col items-center justify-center">
+        <Pagination
+          selected={page}
+          pages={pages}
+          pagesArray={pagesArray}
+          pagesDisplay={pagesDisplay}
+          setPage={setPage}
+          data={{
+            count: filteredResults.length,
+            start: paginationData.start,
+            end: paginationData.end,
+          }}
+        />
+        {pagePlayers.length > 0 ? (
+          <ul className="mt-4 flex w-full flex-col items-center justify-center">
+            {pagePlayers.map((player: BasketballPlayer, index: number) => (
+              <li
+                key={`${player.id}-${player.fullName.replaceAll(
+                  " ",
+                  "-"
+                )}-${index}`}
+                className="my-2 block w-full items-center justify-between rounded-lg border border-gray-200 p-4 text-lg"
+              >
+                <p
+                  className="w-fill m-1 flex items-center justify-center py-2 px-1 text-xs text-gray-400"
+                  title={
+                    (player.team.league && `League: ${player.team.league}`) ??
+                    ""
+                  }
+                >
+                  {player.team.league && `League: ${player.team.league}`}
+                </p>
+                <ImageWithFallback
+                  className="justify-start rounded px-2 py-1 text-sm text-white"
+                  alt={`${player.id}`}
+                  width={67}
+                  height={67}
+                  src={player.image}
+                  fallbackSrc="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_426,q_auto:best/v1/people/1/headshot/67/current.jpg"
+                />
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1"
-                  title={player.displayName}
+                  title={player.fullName}
                 >
                   <label className="px-1 font-bold">Name: </label>
-                  <span className="capitalize">{player.displayName}</span>
+                  <span className="capitalize">{player.fullName}</span>
                 </p>
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1"
-                  title={`${player.team.city} ${player.team.name}`}
+                  title={`${player.team.city} ${player.team.fullName}`}
                 >
                   <label className="px-1 font-bold">Team: </label>
-                  {player.team.city} {player.team.name}
+                  {player.team.city} {player.team.fullName}
                 </p>
                 <p
-                  className="w-fill m-1 flex items-center justify-center py-2 px-1 text-sm"
-                  title={player.source}
+                  className="w-fill m-1 flex items-center justify-center py-2 px-1"
+                  title={player?.position ?? ""}
                 >
-                  <label className="px-1 font-bold">Source: </label>
-                  {player.source}
+                  <label className="x-1 mx-1 font-bold">Position: </label>
+                  {player?.position ?? "Unknown"}
                 </p>
-              </a>
-              <span
-                className="flex justify-end rounded bg-gray-500 px-2 py-1 text-sm text-white"
-                title={player.position}
-              >
-                {player.position}
-              </span>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+                <a href={player.url} target="_blank" rel="noreferrer">
+                  <div className="flex items-center justify-center">
+                    <p
+                      className="w-fill m-1 mx-1 flex items-center justify-center py-2 px-1 text-sm"
+                      title={player.source}
+                    >
+                      <GoLinkExternal className="mx-1" />
+                      <label className="x-1 mx-1 font-bold">Source: </label>
+                      {player.source}
+                    </p>
+                  </div>
+                </a>
+                {player.updatedAt && (
+                  <span
+                    className="flex justify-center rounded bg-gray-500 px-2 py-1 text-sm text-white"
+                    title={player.position}
+                  >
+                    {`Updated At: ${GetLocal(player.updatedAt)}`}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
     </div>
-  ) : null;
+  );
 };
 
 export default memo(Basketball);
