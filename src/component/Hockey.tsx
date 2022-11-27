@@ -1,19 +1,24 @@
-import { FC, memo, useState, useEffect, useRef, useMemo } from "react";
+import { memo, useState, useEffect, useMemo } from "react";
+import { useAtomValue, useSetAtom } from "jotai";
 import { GoLinkExternal } from "react-icons/go";
-import {
-  HockeyProps,
-  HockeyPlayer,
-  NHLPlayerFilter,
-  NHLPosition,
-} from "hockey";
+import { HockeyPlayer, NHLPlayerFilter, NHLPosition } from "hockey";
 
 import useGetHockey from "@hook/useGetHockey";
 import ImageWithFallback from "@component/ImageWithFallback";
 import Pagination from "@component/Pagination";
 import { GetLocal } from "@shared/utils";
+import {
+  queryAtom,
+  showAtom,
+  hockeyItemsAtom,
+  setHockeyItemsAtom,
+} from "@shared/jotai";
 
-const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
-  const [results, setResults] = useState<HockeyPlayer[]>([]);
+const Hockey = () => {
+  const query = useAtomValue(queryAtom);
+  const setShow = useSetAtom(showAtom);
+  const hockeyItems = useAtomValue(hockeyItemsAtom);
+  const setHockeyItems = useSetAtom(setHockeyItemsAtom);
   const [filter, setFilter] = useState<NHLPlayerFilter>({
     position: "",
     team: "",
@@ -27,7 +32,6 @@ const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
   const [pagePlayers, setPagePlayers] = useState<HockeyPlayer[]>([]);
   const playersPerPage = 10;
   const { isFetching, isLoading, data } = useGetHockey(query);
-  const resultsRef = useRef<HockeyPlayer[]>([]);
   const leagueFilters = useMemo(() => {
     const leagues: string[] = [];
 
@@ -43,7 +47,7 @@ const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
     const positionFilter = filter.position;
     const leagueFilter = filter.league;
 
-    return results.filter((player) => {
+    return hockeyItems.filter((player) => {
       const team = {
         name: player.team.fullName?.toLowerCase(),
         abbreviation: player.team.abbreviation?.toLowerCase(),
@@ -82,7 +86,7 @@ const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
       if (leagueFilter !== "") return hasLeague;
       return true;
     });
-  }, [filter.team, filter.position, filter.league, results]);
+  }, [filter.team, filter.position, filter.league, hockeyItems]);
   const pages = useMemo(
     () => Math.ceil(filteredResults.length / playersPerPage),
     [filteredResults.length]
@@ -97,18 +101,21 @@ const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
   }, [pages, pagesArray, page]);
 
   useEffect(() => {
-    if (data && data !== resultsRef.current) {
-      resultsRef.current = data;
-      setResults(data);
-      setShow((state: SearchShowSport) => ({
-        ...state,
-        hockey: resultsRef.current.length > 0,
-      }));
+    if (data && data !== hockeyItems) {
+      setHockeyItems(data);
+      setShow({ hockey: data.length > 0 });
       if (leagueFilters.length > 0 && leagueFilters.indexOf(filter.league) < 0)
         setFilter((state) => ({ ...state, league: "" }));
       setPage(0);
     }
-  }, [data, setShow, filter.league, leagueFilters]);
+  }, [
+    data,
+    setShow,
+    filter.league,
+    leagueFilters,
+    hockeyItems,
+    setHockeyItems,
+  ]);
 
   useEffect(() => {
     if (filteredResults.length > 0) {
@@ -145,7 +152,7 @@ const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
         <h1 className="text-lg font-bold">Filters</h1>
         <div className="mt-4 flex w-full">
           <select
-            className="mx-2 w-1/2 rounded border border-gray-300 p-2 text-gray-600"
+            className="mx-2 w-1/2 justify-center  rounded border border-gray-500 bg-gray-700 p-2 text-center text-lg text-gray-200"
             value={filter.position}
             onChange={(e) =>
               setFilter({
@@ -165,7 +172,7 @@ const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
             <option value="Staff">Staff</option>
           </select>
           <input
-            className="mx-2 h-10 w-1/2 flex-grow rounded-l px-5 text-gray-600 outline-double outline-1 focus:outline-none focus:ring"
+            className="mx-2 h-10 w-1/2 flex-grow rounded border-gray-500 bg-gray-700 px-5 text-gray-200 outline-double outline-1 focus:outline-none focus:ring"
             type="text"
             value={filter.team}
             onChange={(e) => setFilter({ ...filter, team: e.target.value })}
@@ -175,7 +182,7 @@ const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
         </div>
         <div className="mt-4 flex w-full">
           <select
-            className="mx-2 w-full rounded border border-gray-300 p-2 text-center text-gray-600"
+            className="mx-2 w-full justify-center  rounded border border-gray-500 bg-gray-700 p-2 text-center text-lg text-gray-200"
             value={filter.league}
             onChange={(e) =>
               setFilter({ ...filter, league: e.target.value as string })

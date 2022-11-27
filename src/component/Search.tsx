@@ -1,5 +1,13 @@
-import { FC, useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import Head from "next/head";
+import { useSetAtom, useAtomValue } from "jotai";
+
+import {
+  filterAtom,
+  showAtom,
+  queryAtom,
+  debouncedShowAtom,
+} from "@shared/jotai";
 
 import SearchFilter from "@component/SearchFilter";
 import Baseball from "@component/Baseball";
@@ -11,21 +19,10 @@ import useDebounce from "@hook/useDebounce";
 
 export const Search = () => {
   const [search, setSearch] = useState("");
-  const [query, setQuery] = useState("");
-  const [showSport, setShowSport] = useState<SearchShowSport>({
-    baseball: true,
-    basketball: true,
-    football: true,
-    hockey: true,
-    soccer: true,
-  });
-  const [filter, setFilter] = useState<SearchFilter>({
-    baseball: true,
-    basketball: true,
-    football: true,
-    hockey: true,
-    soccer: true,
-  });
+  const setQuery = useSetAtom(queryAtom);
+  const showSport = useAtomValue(showAtom);
+  const setShowSport = useSetAtom(showAtom);
+  const setDebouncedShow = useSetAtom(debouncedShowAtom);
   const debouncedShow: SearchShowSport = useDebounce<SearchShowSport>(
     showSport,
     500
@@ -40,7 +37,11 @@ export const Search = () => {
       soccer: true,
     });
     setQuery(search);
-  }, [search]);
+  }, [search, setQuery, setShowSport]);
+
+  useEffect(() => {
+    setDebouncedShow(debouncedShow);
+  }, [debouncedShow, setDebouncedShow]);
 
   return (
     <div className="flex min-h-screen w-full min-w-full flex-col items-center justify-center py-2">
@@ -64,7 +65,7 @@ export const Search = () => {
               value={search}
               placeholder="Enter a name here..."
               onChange={(e) => setSearch(e.target.value)}
-              className="mx-2 h-10 flex-grow justify-center rounded-l px-5 text-center text-xl text-gray-600 outline-double outline-1 focus:outline-none focus:ring"
+              className="mx-2 h-10 flex-grow justify-center rounded border-gray-500 bg-gray-700 px-5 text-center text-xl  text-gray-200 outline-double outline-1 focus:outline-none focus:ring"
             />
             <button
               onClick={() => searchQuery()}
@@ -73,26 +74,20 @@ export const Search = () => {
               Search
             </button>
           </div>
-          <SearchFilter setFilter={setFilter} debouncedShow={debouncedShow} />
+          <SearchFilter />
         </form>
 
-        <SearchResults
-          query={query}
-          filter={filter}
-          debouncedShow={debouncedShow}
-          setShowSport={setShowSport}
-        />
+        <SearchResults />
       </main>
     </div>
   );
 };
 
-const SearchResults: FC<SearchResultsProps> = ({
-  query,
-  filter,
-  debouncedShow,
-  setShowSport,
-}) => {
+const SearchResults = () => {
+  const query = useAtomValue(queryAtom);
+  const filter = useAtomValue(filterAtom);
+  const debouncedShow = useAtomValue(debouncedShowAtom);
+
   const displayBaseball = useMemo(
     () => query.trim() !== "" && filter.baseball && debouncedShow.baseball,
     [query, filter.baseball, debouncedShow.baseball]
@@ -118,11 +113,11 @@ const SearchResults: FC<SearchResultsProps> = ({
     <div
       className={`grid h-56 w-full min-w-full auto-cols-auto grid-flow-col content-start gap-8`}
     >
-      {displayBaseball && <Baseball query={query} setShow={setShowSport} />}
-      {displayBasketball && <Basketball query={query} setShow={setShowSport} />}
-      {displayFootball && <Football query={query} setShow={setShowSport} />}
-      {displayHockey && <Hockey query={query} setShow={setShowSport} />}
-      {displaySoccer && <Soccer query={query} setShow={setShowSport} />}
+      {displayBaseball && <Baseball />}
+      {displayBasketball && <Basketball />}
+      {displayFootball && <Football />}
+      {displayHockey && <Hockey />}
+      {displaySoccer && <Soccer />}
     </div>
   );
 };

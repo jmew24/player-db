@@ -1,19 +1,24 @@
-import { FC, memo, useState, useEffect, useRef, useMemo } from "react";
+import { memo, useState, useEffect, useMemo } from "react";
+import { useAtomValue, useSetAtom } from "jotai";
 import { GoLinkExternal } from "react-icons/go";
-import {
-  BaseballProps,
-  BaseballPlayer,
-  MLBPlayerFilter,
-  MLBPosition,
-} from "baseball";
+import { BaseballPlayer, MLBPlayerFilter, MLBPosition } from "baseball";
 
 import useGetBaseball from "@hook/useGetBaseball";
 import ImageWithFallback from "@component/ImageWithFallback";
 import Pagination from "@component/Pagination";
 import { GetLocal } from "@shared/utils";
+import {
+  queryAtom,
+  showAtom,
+  baseballItemsAtom,
+  setBaseballItemsAtom,
+} from "@shared/jotai";
 
-const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
-  const [results, setResults] = useState<BaseballPlayer[]>([]);
+const Baseball = () => {
+  const query = useAtomValue(queryAtom);
+  const setShow = useSetAtom(showAtom);
+  const baseballItems = useAtomValue(baseballItemsAtom);
+  const setBaseballItems = useSetAtom(setBaseballItemsAtom);
   const [filter, setFilter] = useState<MLBPlayerFilter>({
     position: "",
     team: "",
@@ -27,7 +32,6 @@ const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
   const [pagePlayers, setPagePlayers] = useState<BaseballPlayer[]>([]);
   const playersPerPage = 10;
   const { isFetching, isLoading, data } = useGetBaseball(query);
-  const resultsRef = useRef<BaseballPlayer[]>([]);
   const leagueFilters = useMemo(() => {
     const leagues: string[] = [];
 
@@ -43,7 +47,7 @@ const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
     const positionFilter = filter.position;
     const leagueFilter = filter.league;
 
-    return results.filter((player) => {
+    return baseballItems.filter((player) => {
       const team = {
         name: player.team.fullName?.toLowerCase(),
         abbreviation: player.team.abbreviation?.toLowerCase(),
@@ -73,7 +77,7 @@ const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
       if (leagueFilter !== "") return hasLeague;
       return true;
     });
-  }, [filter.team, filter.position, filter.league, results]);
+  }, [filter.team, filter.position, filter.league, baseballItems]);
   const pages = useMemo(
     () => Math.ceil(filteredResults.length / playersPerPage),
     [filteredResults.length]
@@ -88,18 +92,21 @@ const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
   }, [pages, pagesArray, page]);
 
   useEffect(() => {
-    if (data && data !== resultsRef.current) {
-      resultsRef.current = data;
-      setResults(data);
-      setShow((state: SearchShowSport) => ({
-        ...state,
-        baseball: resultsRef.current.length > 0,
-      }));
+    if (data && data !== baseballItems) {
+      setBaseballItems(data);
+      setShow({ baseball: data.length > 0 });
       if (leagueFilters.length > 0 && leagueFilters.indexOf(filter.league) < 0)
         setFilter((state) => ({ ...state, league: "" }));
       setPage(0);
     }
-  }, [data, setShow, filter.league, leagueFilters]);
+  }, [
+    data,
+    baseballItems,
+    setShow,
+    filter.league,
+    leagueFilters,
+    setBaseballItems,
+  ]);
 
   useEffect(() => {
     if (filteredResults.length > 0) {
@@ -136,7 +143,7 @@ const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
         <h1 className="text-lg font-bold">Filters</h1>
         <div className="mt-4 flex w-full">
           <select
-            className="mx-2 w-1/2 rounded border border-gray-300 p-2 text-gray-600"
+            className="mx-2 w-1/2 justify-center  rounded border border-gray-500 bg-gray-700 p-2 text-center text-lg text-gray-200"
             value={filter.position}
             onChange={(e) =>
               setFilter({
@@ -158,7 +165,7 @@ const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
             <option value="LF">LF</option>
           </select>
           <input
-            className="mx-2 h-10 w-1/2 flex-grow rounded-l px-5 text-gray-600 outline-double outline-1 focus:outline-none focus:ring"
+            className="mx-2 h-10 w-1/2 flex-grow rounded border-gray-500 bg-gray-700 px-5 text-gray-200 outline-double outline-1 focus:outline-none focus:ring"
             type="text"
             value={filter.team}
             onChange={(e) => setFilter({ ...filter, team: e.target.value })}
@@ -168,7 +175,7 @@ const Baseball: FC<BaseballProps> = ({ query, setShow }) => {
         </div>
         <div className="mt-4 flex w-full">
           <select
-            className="mx-2 w-full rounded border border-gray-300 p-2 text-center text-gray-600"
+            className="mx-2 w-full justify-center  rounded border border-gray-500 bg-gray-700 p-2 text-center text-lg text-gray-200"
             value={filter.league}
             onChange={(e) =>
               setFilter({ ...filter, league: e.target.value as string })

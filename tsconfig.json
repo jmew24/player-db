@@ -25,7 +25,8 @@
       "@lib/*": ["./src/lib/*"],
       "@shared/*": ["./src/shared/*"],
       "@api/*": ["./src/pages/api/*"],
-      "@style/*": ["./src/styles/*"]
+      "@style/*": ["./src/styles/*"],
+      "@types/*": ["./src/types/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.cjs", "**/*.mjs"],
