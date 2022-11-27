@@ -14,8 +14,8 @@ declare type SearchFilter = {
 };
 
 declare type SearchFilterProps = {
-  filter: SearchFilter;
   setFilter: Dispatch<SetStateAction<SearchFilter>>;
+  debouncedShow: SearchShowSport;
 };
 
 declare type SearchShowSport = {

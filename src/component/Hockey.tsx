@@ -137,7 +137,7 @@ const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
       </div>
     );
 
-  return resultsRef.current.length > 0 ? (
+  return (
     <div className="items-center justify-center py-2">
       <div className="mt-4 w-full">
         <h1 className="text-6xl font-bold">Hockey</h1>
@@ -153,6 +153,7 @@ const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
                 position: e.target.value as NHLPosition,
               })
             }
+            disabled={filteredResults.length === 0}
           >
             <option value="">All Positions</option>
             <option value="F">Forward</option>
@@ -169,6 +170,7 @@ const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
             value={filter.team}
             onChange={(e) => setFilter({ ...filter, team: e.target.value })}
             placeholder="Team"
+            disabled={filteredResults.length === 0}
           />
         </div>
         <div className="mt-4 flex w-full">
@@ -179,6 +181,7 @@ const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
               setFilter({ ...filter, league: e.target.value as string })
             }
             title="League Filter"
+            disabled={filteredResults.length === 0}
           >
             <option value="">All Leagues</option>
             {leagueFilters.map((league) => (
@@ -279,7 +282,7 @@ const Hockey: FC<HockeyProps> = ({ query, setShow }) => {
         ) : null}
       </div>
     </div>
-  ) : null;
+  );
 };
 
 export default memo(Hockey);

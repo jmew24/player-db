@@ -64,7 +64,7 @@ export const Search = () => {
               value={search}
               placeholder="Enter a name here..."
               onChange={(e) => setSearch(e.target.value)}
-              className="mx-2 h-10 flex-grow rounded-l px-5 text-gray-600 outline-double outline-1 focus:outline-none focus:ring"
+              className="mx-2 h-10 flex-grow justify-center rounded-l px-5 text-center text-xl text-gray-600 outline-double outline-1 focus:outline-none focus:ring"
             />
             <button
               onClick={() => searchQuery()}
@@ -73,9 +73,7 @@ export const Search = () => {
               Search
             </button>
           </div>
-          <div className="mt-4 flex w-full">
-            <SearchFilter filter={filter} setFilter={setFilter} />
-          </div>
+          <SearchFilter setFilter={setFilter} debouncedShow={debouncedShow} />
         </form>
 
         <SearchResults
