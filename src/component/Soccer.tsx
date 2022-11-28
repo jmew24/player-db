@@ -151,7 +151,7 @@ const Soccer = () => {
                 position: e.target.value as SoccerPosition,
               })
             }
-            disabled={filteredResults.length === 0}
+            disabled={data?.length === 0}
           >
             <option value="">All Positions</option>
             <option value="Forward">Forward</option>
@@ -165,7 +165,7 @@ const Soccer = () => {
             value={filter.team}
             onChange={(e) => setFilter({ ...filter, team: e.target.value })}
             placeholder="Team"
-            disabled={filteredResults.length === 0}
+            disabled={data?.length === 0}
           />
         </div>
         <div className="mt-4 flex w-full">
@@ -176,7 +176,7 @@ const Soccer = () => {
               setFilter({ ...filter, league: e.target.value as string })
             }
             title="League Filter"
-            disabled={filteredResults.length === 0}
+            disabled={data?.length === 0}
           >
             <option value="">All Leagues</option>
             {leagueFilters.map((league) => (
