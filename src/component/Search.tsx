@@ -38,7 +38,7 @@ const Search: FC<SearchProps> = ({ children }) => {
               value={search}
               placeholder="Enter a name here..."
               onChange={(e) => setSearch(e.target.value)}
-              className="mx-2 h-10 flex-grow justify-center rounded border-gray-500 bg-gray-700 px-5 text-center text-xl  text-gray-200 outline-double outline-1 outline-gray-500 focus:outline-none focus:ring"
+              className="mx-2 h-10 flex-grow justify-center rounded border-gray-500 bg-gray-700 px-5 text-center text-xl font-bold  text-gray-200 outline-double outline-1 outline-gray-500 focus:outline-none focus:ring"
             />
             <button
               onClick={() => searchQuery()}
