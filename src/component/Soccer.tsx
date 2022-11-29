@@ -7,16 +7,10 @@ import useGetSoccer from "@hook/useGetSoccer";
 import ImageWithFallback from "@component/ImageWithFallback";
 import Pagination from "@component/Pagination";
 import { GetLocal } from "@shared/utils";
-import {
-  queryAtom,
-  showAtom,
-  soccerItemsAtom,
-  setSoccerItemsAtom,
-} from "@shared/jotai";
+import { queryAtom, soccerItemsAtom, setSoccerItemsAtom } from "@shared/jotai";
 
 const Soccer = () => {
   const query = useAtomValue(queryAtom);
-  const setShow = useSetAtom(showAtom);
   const soccerItems = useAtomValue(soccerItemsAtom);
   const setSoccerItems = useSetAtom(setSoccerItemsAtom);
   const [filter, setFilter] = useState<SoccerPlayerFilter>({
@@ -94,19 +88,11 @@ const Soccer = () => {
   useEffect(() => {
     if (data && data !== soccerItems) {
       setSoccerItems(data);
-      setShow({ soccer: data.length > 0 });
       if (leagueFilters.length > 0 && leagueFilters.indexOf(filter.league) < 0)
         setFilter((state) => ({ ...state, league: "" }));
       setPage(0);
     }
-  }, [
-    data,
-    setShow,
-    filter.league,
-    leagueFilters,
-    soccerItems,
-    setSoccerItems,
-  ]);
+  }, [data, filter.league, leagueFilters, soccerItems, setSoccerItems]);
 
   useEffect(() => {
     setPage(0);
@@ -122,6 +108,18 @@ const Soccer = () => {
       setPagePlayers([]);
     }
   }, [page, filteredResults]);
+
+  if (query === "")
+    return (
+      <div className="items-center justify-center py-2">
+        <div className="mt-4 w-full">
+          <h1 className="text-6xl font-bold">Soccer</h1>
+        </div>
+        <div className="mt-4 w-full">
+          <h1 className="mt-4 text-2xl">Enter a players name to search...</h1>
+        </div>
+      </div>
+    );
 
   if (isFetching || isLoading)
     return (
@@ -261,10 +259,6 @@ const Soccer = () => {
                     </p>
                   </div>
                 </a>
-                <p className="w-fill m-1 flex items-center justify-center py-2 px-1 text-xs">
-                  {player.updatedAt &&
-                    `Updated At: ${GetLocal(player.updatedAt)}`}
-                </p>
                 {player.updatedAt && (
                   <span
                     className="flex justify-center rounded bg-gray-500 px-2 py-1 text-sm text-white"

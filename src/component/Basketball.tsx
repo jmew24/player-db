@@ -9,14 +9,12 @@ import Pagination from "@component/Pagination";
 import { GetLocal } from "@shared/utils";
 import {
   queryAtom,
-  showAtom,
   basketballItemsAtom,
   setBasketballItemsAtom,
 } from "@shared/jotai";
 
 const Basketball = () => {
   const query = useAtomValue(queryAtom);
-  const setShow = useSetAtom(showAtom);
   const basketballItems = useAtomValue(basketballItemsAtom);
   const setBasketballItems = useSetAtom(setBasketballItemsAtom);
   const [filter, setFilter] = useState<NBAPlayerFilter>({
@@ -94,19 +92,11 @@ const Basketball = () => {
   useEffect(() => {
     if (data && data !== basketballItems) {
       setBasketballItems(data);
-      setShow({ basketball: data.length > 0 });
       if (leagueFilters.length > 0 && leagueFilters.indexOf(filter.league) < 0)
         setFilter((state) => ({ ...state, league: "" }));
       setPage(0);
     }
-  }, [
-    data,
-    basketballItems,
-    setShow,
-    filter.league,
-    leagueFilters,
-    setBasketballItems,
-  ]);
+  }, [data, basketballItems, filter.league, leagueFilters, setBasketballItems]);
 
   useEffect(() => {
     if (filteredResults.length > 0) {
@@ -122,6 +112,18 @@ const Basketball = () => {
   useEffect(() => {
     setPage(0);
   }, [filter]);
+
+  if (query === "")
+    return (
+      <div className="items-center justify-center py-2">
+        <div className="mt-4 w-full">
+          <h1 className="text-6xl font-bold">Basketball</h1>
+        </div>
+        <div className="mt-4 w-full">
+          <h1 className="mt-4 text-2xl">Enter a players name to search...</h1>
+        </div>
+      </div>
+    );
 
   if (isFetching || isLoading)
     return (
