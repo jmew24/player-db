@@ -7,16 +7,10 @@ import useGetHockey from "@hook/useGetHockey";
 import ImageWithFallback from "@component/ImageWithFallback";
 import Pagination from "@component/Pagination";
 import { GetLocal } from "@shared/utils";
-import {
-  queryAtom,
-  showAtom,
-  hockeyItemsAtom,
-  setHockeyItemsAtom,
-} from "@shared/jotai";
+import { queryAtom, hockeyItemsAtom, setHockeyItemsAtom } from "@shared/jotai";
 
 const Hockey = () => {
   const query = useAtomValue(queryAtom);
-  const setShow = useSetAtom(showAtom);
   const hockeyItems = useAtomValue(hockeyItemsAtom);
   const setHockeyItems = useSetAtom(setHockeyItemsAtom);
   const [filter, setFilter] = useState<NHLPlayerFilter>({
@@ -103,19 +97,11 @@ const Hockey = () => {
   useEffect(() => {
     if (data && data !== hockeyItems) {
       setHockeyItems(data);
-      setShow({ hockey: data.length > 0 });
       if (leagueFilters.length > 0 && leagueFilters.indexOf(filter.league) < 0)
         setFilter((state) => ({ ...state, league: "" }));
       setPage(0);
     }
-  }, [
-    data,
-    setShow,
-    filter.league,
-    leagueFilters,
-    hockeyItems,
-    setHockeyItems,
-  ]);
+  }, [data, filter.league, leagueFilters, hockeyItems, setHockeyItems]);
 
   useEffect(() => {
     if (filteredResults.length > 0) {
@@ -131,6 +117,18 @@ const Hockey = () => {
   useEffect(() => {
     setPage(0);
   }, [filter]);
+
+  if (query === "")
+    return (
+      <div className="items-center justify-center py-2">
+        <div className="mt-4 w-full">
+          <h1 className="text-6xl font-bold">Hockey</h1>
+        </div>
+        <div className="mt-4 w-full">
+          <h1 className="mt-4 text-2xl">Enter a players name to search...</h1>
+        </div>
+      </div>
+    );
 
   if (isFetching || isLoading)
     return (

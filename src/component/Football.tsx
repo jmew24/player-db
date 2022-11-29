@@ -9,14 +9,12 @@ import Pagination from "@component/Pagination";
 import { GetLocal } from "@shared/utils";
 import {
   queryAtom,
-  showAtom,
   footballItemsAtom,
   setFootballItemsAtom,
 } from "@shared/jotai";
 
 const Football = () => {
   const query = useAtomValue(queryAtom);
-  const setShow = useSetAtom(showAtom);
   const footballItems = useAtomValue(footballItemsAtom);
   const setFootballItems = useSetAtom(setFootballItemsAtom);
   const [filter, setFilter] = useState<NFLPlayerFilter>({
@@ -166,19 +164,11 @@ const Football = () => {
   useEffect(() => {
     if (data && data !== footballItems) {
       setFootballItems(data);
-      setShow({ football: data.length > 0 });
       if (leagueFilters.length > 0 && leagueFilters.indexOf(filter.league) < 0)
         setFilter((state) => ({ ...state, league: "" }));
       setPage(0);
     }
-  }, [
-    data,
-    setShow,
-    filter.league,
-    leagueFilters,
-    footballItems,
-    setFootballItems,
-  ]);
+  }, [data, filter.league, leagueFilters, footballItems, setFootballItems]);
 
   useEffect(() => {
     if (filteredResults.length > 0) {
@@ -194,6 +184,18 @@ const Football = () => {
   useEffect(() => {
     setPage(0);
   }, [filter]);
+
+  if (query === "")
+    return (
+      <div className="items-center justify-center py-2">
+        <div className="mt-4 w-full">
+          <h1 className="text-6xl font-bold">Football</h1>
+        </div>
+        <div className="mt-4 w-full">
+          <h1 className="mt-4 text-2xl">Enter a players name to search...</h1>
+        </div>
+      </div>
+    );
 
   if (isFetching || isLoading)
     return (

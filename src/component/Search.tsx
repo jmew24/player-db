@@ -1,50 +1,22 @@
-import { FC, useState, useCallback, useMemo, useEffect } from "react";
+import { FC, useState, useCallback, memo } from "react";
 import { useSetAtom, useAtomValue } from "jotai";
 
-import {
-  filterAtom,
-  showAtom,
-  queryAtom,
-  debouncedShowAtom,
-} from "@shared/jotai";
+import { queryAtom } from "@shared/jotai";
 
 import SearchFilter from "@component/SearchFilter";
-import Baseball from "@component/Baseball";
-import Basketball from "@component/Basketball";
-import Football from "@component/Football";
-import Hockey from "@component/Hockey";
-import Soccer from "@component/Soccer";
-import useDebounce from "@hook/useDebounce";
 
 type SearchProps = {
   children?: JSX.Element | JSX.Element[] | string | string[];
 };
 
-export const Search: FC<SearchProps> = ({ children }) => {
-  const [search, setSearch] = useState("");
+const Search: FC<SearchProps> = ({ children }) => {
+  const query = useAtomValue(queryAtom);
   const setQuery = useSetAtom(queryAtom);
-  const showSport = useAtomValue(showAtom);
-  const setShowSport = useSetAtom(showAtom);
-  const setDebouncedShow = useSetAtom(debouncedShowAtom);
-  const debouncedShow: SearchShowSport = useDebounce<SearchShowSport>(
-    showSport,
-    500
-  );
+  const [search, setSearch] = useState(query || "");
 
   const searchQuery = useCallback(() => {
-    setShowSport({
-      baseball: true,
-      basketball: true,
-      football: true,
-      hockey: true,
-      soccer: true,
-    });
     setQuery(search);
-  }, [search, setQuery, setShowSport]);
-
-  useEffect(() => {
-    setDebouncedShow(debouncedShow);
-  }, [debouncedShow, setDebouncedShow]);
+  }, [search, setQuery]);
 
   return (
     <div className="flex min-h-screen w-full min-w-full flex-col items-center justify-center py-2">
@@ -81,41 +53,4 @@ export const Search: FC<SearchProps> = ({ children }) => {
   );
 };
 
-export const SearchResults = () => {
-  const query = useAtomValue(queryAtom);
-  const filter = useAtomValue(filterAtom);
-  const debouncedShow = useAtomValue(debouncedShowAtom);
-
-  const displayBaseball = useMemo(
-    () => query.trim() !== "" && filter.baseball && debouncedShow.baseball,
-    [query, filter.baseball, debouncedShow.baseball]
-  );
-  const displayBasketball = useMemo(
-    () => query.trim() !== "" && filter.basketball && debouncedShow.basketball,
-    [query, filter.basketball, debouncedShow.basketball]
-  );
-  const displayFootball = useMemo(
-    () => query.trim() !== "" && filter.football && debouncedShow.football,
-    [query, filter.football, debouncedShow.football]
-  );
-  const displayHockey = useMemo(
-    () => query.trim() !== "" && filter.hockey && debouncedShow.hockey,
-    [query, filter.hockey, debouncedShow.hockey]
-  );
-  const displaySoccer = useMemo(
-    () => query.trim() !== "" && filter.soccer && debouncedShow.soccer,
-    [query, filter.soccer, debouncedShow.soccer]
-  );
-
-  return (
-    <div
-      className={`grid h-56 w-full min-w-full auto-cols-auto grid-flow-col content-start gap-8`}
-    >
-      {displayBaseball && <Baseball />}
-      {displayBasketball && <Basketball />}
-      {displayFootball && <Football />}
-      {displayHockey && <Hockey />}
-      {displaySoccer && <Soccer />}
-    </div>
-  );
-};
+export default memo(Search);
