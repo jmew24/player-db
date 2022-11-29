@@ -30,6 +30,9 @@ const Search: FC<SearchProps> = ({ children }) => {
           className="flex w-full flex-col items-center justify-center"
         >
           <div className="mt-4 flex w-full min-w-full">
+            <SearchFilter />
+          </div>
+          <div className="mt-6 mb-6 flex w-full min-w-full">
             <input
               type="text"
               value={search}
@@ -44,7 +47,6 @@ const Search: FC<SearchProps> = ({ children }) => {
               Search
             </button>
           </div>
-          <SearchFilter />
         </form>
 
         {children ?? null}

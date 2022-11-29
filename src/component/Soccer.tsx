@@ -259,10 +259,6 @@ const Soccer = () => {
                     </p>
                   </div>
                 </a>
-                <p className="w-fill m-1 flex items-center justify-center py-2 px-1 text-xs">
-                  {player.updatedAt &&
-                    `Updated At: ${GetLocal(player.updatedAt)}`}
-                </p>
                 {player.updatedAt && (
                   <span
                     className="flex justify-center rounded bg-gray-500 px-2 py-1 text-sm text-white"

@@ -15,7 +15,7 @@ const BasketballPage: NextPage = () => {
   }, [setFilter]);
 
   return (
-    <div className="min-w-screen dark mx-auto h-full max-h-screen min-h-screen w-full text-white">
+    <div className="dark h-full max-h-screen min-h-screen w-full text-white">
       <Head>
         <title>Player DB - Basketball</title>
         <meta name="description" content="Player Database" />

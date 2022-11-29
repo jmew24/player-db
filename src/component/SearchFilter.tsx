@@ -13,16 +13,11 @@ const SearchFilter = () => {
   };
 
   return (
-    <div className="flex w-full min-w-full flex-1 flex-col items-center text-center">
+    <div className="flex w-full min-w-full flex-1 flex-col items-center justify-center text-center">
       <div className="mt-4 flex w-full min-w-full">
         <nav className="flex w-full min-w-full flex-wrap items-center rounded border border-gray-500 bg-gray-800 p-3 text-gray-200">
-          <div className="mr-4 inline-flex items-center p-2 ">
-            <span className="text-xl font-bold uppercase tracking-wide text-white">
-              Filter
-            </span>
-          </div>
           <button
-            className=" ml-auto inline-flex rounded p-3 text-white outline-none hover:cursor-pointer hover:bg-gray-700 hover:text-white lg:hidden"
+            className="ml-auto inline-flex rounded p-3 text-white outline-none hover:cursor-pointer hover:bg-gray-700 hover:text-white lg:hidden"
             onClick={handleClick}
           >
             <svg
@@ -43,14 +38,14 @@ const SearchFilter = () => {
           <div
             className={`${
               active ? "" : "hidden"
-            }   w-full lg:inline-flex lg:w-auto lg:flex-grow`}
+            }  w-full lg:inline-flex lg:flex-grow`}
           >
-            <div className="flex w-full transform flex-col items-start lg:ml-auto lg:inline-flex lg:h-auto lg:w-auto lg:flex-row lg:items-center">
+            <div className="flex w-full transform flex-col items-start lg:ml-auto lg:inline-flex lg:h-auto lg:flex-row lg:items-center">
               <Link href="/">
                 <a
                   className={`${
                     filter === "all" ? "outline-double outline-gray-500" : ""
-                  } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex lg:w-auto`}
+                  } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex `}
                 >
                   All
                 </a>
@@ -61,7 +56,7 @@ const SearchFilter = () => {
                     filter === "baseball"
                       ? "outline-double outline-gray-500"
                       : ""
-                  } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex lg:w-auto`}
+                  } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex `}
                 >
                   Baseball
                 </a>
@@ -72,7 +67,7 @@ const SearchFilter = () => {
                     filter === "basketball"
                       ? "outline-double outline-gray-500"
                       : ""
-                  } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex lg:w-auto`}
+                  } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex `}
                 >
                   Basketball
                 </a>
@@ -83,7 +78,7 @@ const SearchFilter = () => {
                     filter === "football"
                       ? "outline-double outline-gray-500"
                       : ""
-                  } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex lg:w-auto`}
+                  } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex `}
                 >
                   Football
                 </a>
@@ -92,7 +87,7 @@ const SearchFilter = () => {
                 <a
                   className={`${
                     filter === "hockey" ? "outline-double outline-gray-500" : ""
-                  } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex lg:w-auto`}
+                  } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex `}
                 >
                   Hockey
                 </a>
@@ -101,7 +96,7 @@ const SearchFilter = () => {
                 <a
                   className={`${
                     filter === "soccer" ? "outline-double outline-gray-500" : ""
-                  } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex lg:w-auto`}
+                  } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex `}
                 >
                   Soccer
                 </a>

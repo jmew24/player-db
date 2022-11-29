@@ -19,14 +19,14 @@ const Home: NextPage = () => {
   }, [setFilter]);
 
   return (
-    <div className="min-w-screen dark mx-auto h-full max-h-screen min-h-screen w-full text-white">
+    <div className="dark h-full max-h-screen min-h-screen w-full text-white">
       <Head>
         <title>Player DB</title>
         <meta name="description" content="Player Database" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="min-w-screen container mx-auto flex min-h-screen flex-col  items-center justify-center bg-slate-900 bg-cover p-4 text-white">
+      <main className="container flex min-h-screen w-full min-w-full flex-col  items-center justify-center bg-slate-900 bg-cover p-4 text-white">
         <Search>
           <div
             className={`grid h-56 w-full min-w-full auto-cols-auto grid-flow-col content-start gap-8`}
