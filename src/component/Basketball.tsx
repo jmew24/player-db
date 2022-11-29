@@ -273,10 +273,10 @@ const Basketball = () => {
                 </p>
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1"
-                  title={`${player.team.city} ${player.team.fullName}`}
+                  title={player.team.fullName}
                 >
                   <label className="px-1 font-bold">Team: </label>
-                  {player.team.city} {player.team.fullName}
+                  {player.team.fullName}
                 </p>
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1"
