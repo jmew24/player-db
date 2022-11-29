@@ -90,20 +90,6 @@ const SearchFilter = () => {
     }
   }, [debouncedShow, selectedFilter]);
 
-  useEffect(() => {
-    if (selectedFilter === "baseball" && itemCount.baseball === 0) {
-      setSelectedFilter("all");
-    } else if (selectedFilter === "basketball" && itemCount.basketball === 0) {
-      setSelectedFilter("all");
-    } else if (selectedFilter === "football" && itemCount.football === 0) {
-      setSelectedFilter("all");
-    } else if (selectedFilter === "hockey" && itemCount.hockey === 0) {
-      setSelectedFilter("all");
-    } else if (selectedFilter === "soccer" && itemCount.soccer === 0) {
-      setSelectedFilter("all");
-    }
-  }, [itemCount, selectedFilter]);
-
   return (
     <div className="flex w-full min-w-full flex-1 flex-col items-center text-center">
       <div className="mt-4 flex w-full min-w-full">
@@ -115,42 +101,37 @@ const SearchFilter = () => {
           onChange={(e) => setSelectedFilter(e.target.value)}
         >
           <option className={`bg-gray-700 text-gray-200`} value="all">
-            Filter: [All]
+            Filter: All
           </option>
-          <option
-            className={`bg-gray-700 text-gray-200`}
-            value="baseball"
-            disabled={itemCount.baseball === 0}
-          >
-            Filter: Baseball [{itemCount.baseball}]
+          <option className={`bg-gray-700 text-gray-200`} value="baseball">
+            Filter:{" "}
+            {selectedFilter === "baseball"
+              ? `Baseball [${itemCount.baseball}]`
+              : `Baseball`}
           </option>
-          <option
-            className={`bg-gray-700 text-gray-200`}
-            value="basketball"
-            disabled={itemCount.basketball === 0}
-          >
-            Filter: Basketball [{itemCount.basketball}]
+          <option className={`bg-gray-700 text-gray-200`} value="basketball">
+            Filter:{" "}
+            {selectedFilter === "basketball"
+              ? `Basketball [${itemCount.basketball}]`
+              : `Basketball`}
           </option>
-          <option
-            className={`bg-gray-700 text-gray-200`}
-            value="football"
-            disabled={itemCount.football === 0}
-          >
-            Filter: Football [{itemCount.football}]
+          <option className={`bg-gray-700 text-gray-200`} value="football">
+            Filter:{" "}
+            {selectedFilter === "football"
+              ? `Football [${itemCount.football}]`
+              : `Football`}
           </option>
-          <option
-            className={`bg-gray-700 text-gray-200`}
-            value="hockey"
-            disabled={itemCount.hockey === 0}
-          >
-            Filter: Hockey [{itemCount.hockey}]
+          <option className={`bg-gray-700 text-gray-200`} value="hockey">
+            Filter:{" "}
+            {selectedFilter === "hockey"
+              ? `Hockey [${itemCount.hockey}]`
+              : `Hockey`}
           </option>
-          <option
-            className={`bg-gray-700 text-gray-200`}
-            value="soccer"
-            disabled={itemCount.soccer === 0}
-          >
-            Filter: Soccer [{itemCount.soccer}]
+          <option className={`bg-gray-700 text-gray-200`} value="soccer">
+            Filter:{" "}
+            {selectedFilter === "soccer"
+              ? `Soccer [${itemCount.soccer}]`
+              : `Soccer`}
           </option>
         </select>
       </div>

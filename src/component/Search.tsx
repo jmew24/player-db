@@ -1,5 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
-import Head from "next/head";
+import { FC, useState, useCallback, useMemo, useEffect } from "react";
 import { useSetAtom, useAtomValue } from "jotai";
 
 import {
@@ -17,7 +16,11 @@ import Hockey from "@component/Hockey";
 import Soccer from "@component/Soccer";
 import useDebounce from "@hook/useDebounce";
 
-export const Search = () => {
+type SearchProps = {
+  children?: JSX.Element | JSX.Element[] | string | string[];
+};
+
+export const Search: FC<SearchProps> = ({ children }) => {
   const [search, setSearch] = useState("");
   const setQuery = useSetAtom(queryAtom);
   const showSport = useAtomValue(showAtom);
@@ -45,11 +48,6 @@ export const Search = () => {
 
   return (
     <div className="flex min-h-screen w-full min-w-full flex-col items-center justify-center py-2">
-      <Head>
-        <title>Player-DB Search</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
       <main className="flex w-full min-w-full flex-1 flex-col items-center px-5 text-center">
         <h1 className="text-6xl font-bold">Search For Person</h1>
         <form
@@ -65,7 +63,7 @@ export const Search = () => {
               value={search}
               placeholder="Enter a name here..."
               onChange={(e) => setSearch(e.target.value)}
-              className="mx-2 h-10 flex-grow justify-center rounded border-gray-500 bg-gray-700 px-5 text-center text-xl  text-gray-200 outline-double outline-1 focus:outline-none focus:ring"
+              className="mx-2 h-10 flex-grow justify-center rounded border-gray-500 bg-gray-700 px-5 text-center text-xl  text-gray-200 outline-double outline-1 outline-gray-500 focus:outline-none focus:ring"
             />
             <button
               onClick={() => searchQuery()}
@@ -77,13 +75,13 @@ export const Search = () => {
           <SearchFilter />
         </form>
 
-        <SearchResults />
+        {children ?? null}
       </main>
     </div>
   );
 };
 
-const SearchResults = () => {
+export const SearchResults = () => {
   const query = useAtomValue(queryAtom);
   const filter = useAtomValue(filterAtom);
   const debouncedShow = useAtomValue(debouncedShowAtom);

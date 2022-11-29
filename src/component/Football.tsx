@@ -245,7 +245,7 @@ const Football = () => {
             <option value="P">Punter</option>
           </select>
           <input
-            className="mx-2 h-10 w-1/2 flex-grow rounded border-gray-500 bg-gray-700 px-5 text-gray-200 outline-double outline-1 focus:outline-none focus:ring"
+            className="mx-2 h-10 w-1/2 flex-grow rounded border-gray-500 bg-gray-700 px-5 text-gray-200 outline-double outline-1 outline-gray-500 focus:outline-none focus:ring"
             type="text"
             value={filter.team}
             onChange={(e) => setFilter({ ...filter, team: e.target.value })}

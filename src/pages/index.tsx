@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 
-import { Search } from "@component/Search";
+import { Search, SearchResults } from "@component/Search";
 
 const Home: NextPage = () => {
   return (
@@ -13,7 +13,9 @@ const Home: NextPage = () => {
       </Head>
 
       <main className="min-w-screen container mx-auto flex min-h-screen flex-col  items-center justify-center bg-slate-900 bg-cover p-4 text-white">
-        <Search />
+        <Search>
+          <SearchResults />
+        </Search>
       </main>
     </div>
   );
