@@ -7,16 +7,28 @@ import useGetSoccer from "@hook/useGetSoccer";
 import ImageWithFallback from "@component/ImageWithFallback";
 import Pagination from "@component/Pagination";
 import { GetLocal } from "@shared/utils";
-import { queryAtom, soccerItemsAtom, setSoccerItemsAtom } from "@shared/jotai";
+import {
+  queryAtom,
+  soccerItemsAtom,
+  soccerTeamAtom,
+  soccerPositionAtom,
+  soccerLeagueAtom,
+} from "@shared/jotai";
 
 const Soccer = () => {
   const query = useAtomValue(queryAtom);
   const soccerItems = useAtomValue(soccerItemsAtom);
-  const setSoccerItems = useSetAtom(setSoccerItemsAtom);
+  const setSoccerItems = useSetAtom(soccerItemsAtom);
+  const soccerTeam = useAtomValue(soccerTeamAtom);
+  const setSoccerTeam = useSetAtom(soccerTeamAtom);
+  const soccerPosition = useAtomValue(soccerPositionAtom);
+  const setSoccerPosition = useSetAtom(soccerPositionAtom);
+  const soccerLeague = useAtomValue(soccerLeagueAtom);
+  const setSoccerLeague = useSetAtom(soccerLeagueAtom);
   const [filter, setFilter] = useState<SoccerPlayerFilter>({
-    position: "",
-    team: "",
-    league: "",
+    position: soccerPosition,
+    team: soccerTeam,
+    league: soccerLeague,
   });
   const [page, setPage] = useState<number>(0);
   const [paginationData, setPaginationData] = useState({
@@ -84,6 +96,30 @@ const Soccer = () => {
 
     return pagesArray.slice(firstPage, lastPage);
   }, [pages, pagesArray, page]);
+
+  useEffect(() => {
+    if (filter.team) {
+      setSoccerTeam(filter.team);
+    } else {
+      setSoccerTeam("");
+    }
+  }, [filter.team, setSoccerTeam]);
+
+  useEffect(() => {
+    if (filter.position) {
+      setSoccerPosition(filter.position);
+    } else {
+      setSoccerPosition("");
+    }
+  }, [filter.position, setSoccerPosition]);
+
+  useEffect(() => {
+    if (filter.league) {
+      setSoccerLeague(filter.league);
+    } else {
+      setSoccerLeague("");
+    }
+  }, [filter.league, setSoccerLeague]);
 
   useEffect(() => {
     if (data && data !== soccerItems) {

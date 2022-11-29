@@ -7,16 +7,28 @@ import useGetHockey from "@hook/useGetHockey";
 import ImageWithFallback from "@component/ImageWithFallback";
 import Pagination from "@component/Pagination";
 import { GetLocal } from "@shared/utils";
-import { queryAtom, hockeyItemsAtom, setHockeyItemsAtom } from "@shared/jotai";
+import {
+  queryAtom,
+  hockeyItemsAtom,
+  hockeyTeamAtom,
+  hockeyPositionAtom,
+  hockeyLeagueAtom,
+} from "@shared/jotai";
 
 const Hockey = () => {
   const query = useAtomValue(queryAtom);
   const hockeyItems = useAtomValue(hockeyItemsAtom);
-  const setHockeyItems = useSetAtom(setHockeyItemsAtom);
+  const setHockeyItems = useSetAtom(hockeyItemsAtom);
+  const hockeyTeam = useAtomValue(hockeyTeamAtom);
+  const setHockeyTeam = useSetAtom(hockeyTeamAtom);
+  const hockeyPosition = useAtomValue(hockeyPositionAtom);
+  const setHockeyPosition = useSetAtom(hockeyPositionAtom);
+  const hockeyLeague = useAtomValue(hockeyLeagueAtom);
+  const setHockeyLeague = useSetAtom(hockeyLeagueAtom);
   const [filter, setFilter] = useState<NHLPlayerFilter>({
-    position: "",
-    team: "",
-    league: "",
+    position: hockeyPosition,
+    team: hockeyTeam,
+    league: hockeyLeague,
   });
   const [page, setPage] = useState<number>(0);
   const [paginationData, setPaginationData] = useState({
@@ -93,6 +105,30 @@ const Hockey = () => {
 
     return pagesArray.slice(firstPage, lastPage);
   }, [pages, pagesArray, page]);
+
+  useEffect(() => {
+    if (filter.team) {
+      setHockeyTeam(filter.team);
+    } else {
+      setHockeyTeam("");
+    }
+  }, [filter.team, setHockeyTeam]);
+
+  useEffect(() => {
+    if (filter.position) {
+      setHockeyPosition(filter.position);
+    } else {
+      setHockeyPosition("");
+    }
+  }, [filter.position, setHockeyPosition]);
+
+  useEffect(() => {
+    if (filter.league) {
+      setHockeyLeague(filter.league);
+    } else {
+      setHockeyLeague("");
+    }
+  }, [filter.league, setHockeyLeague]);
 
   useEffect(() => {
     if (data && data !== hockeyItems) {

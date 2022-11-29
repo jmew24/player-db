@@ -10,17 +10,25 @@ import { GetLocal } from "@shared/utils";
 import {
   queryAtom,
   basketballItemsAtom,
-  setBasketballItemsAtom,
+  basketballTeamAtom,
+  basketballLeagueAtom,
+  basketballPositionAtom,
 } from "@shared/jotai";
 
 const Basketball = () => {
   const query = useAtomValue(queryAtom);
   const basketballItems = useAtomValue(basketballItemsAtom);
-  const setBasketballItems = useSetAtom(setBasketballItemsAtom);
+  const setBasketballItems = useSetAtom(basketballItemsAtom);
+  const basketballTeam = useAtomValue(basketballTeamAtom);
+  const setBasketballTeam = useSetAtom(basketballTeamAtom);
+  const basketballPosition = useAtomValue(basketballPositionAtom);
+  const setBasketballPosition = useSetAtom(basketballPositionAtom);
+  const basketballLeague = useAtomValue(basketballLeagueAtom);
+  const setBasketballLeague = useSetAtom(basketballLeagueAtom);
   const [filter, setFilter] = useState<NBAPlayerFilter>({
-    position: "",
-    team: "",
-    league: "",
+    position: basketballPosition,
+    team: basketballTeam,
+    league: basketballLeague,
   });
   const [page, setPage] = useState<number>(0);
   const [paginationData, setPaginationData] = useState({
@@ -88,6 +96,30 @@ const Basketball = () => {
 
     return pagesArray.slice(firstPage, lastPage);
   }, [pages, pagesArray, page]);
+
+  useEffect(() => {
+    if (filter.team) {
+      setBasketballTeam(filter.team);
+    } else {
+      setBasketballTeam("");
+    }
+  }, [filter.team, setBasketballTeam]);
+
+  useEffect(() => {
+    if (filter.position) {
+      setBasketballPosition(filter.position);
+    } else {
+      setBasketballPosition("");
+    }
+  }, [filter.position, setBasketballPosition]);
+
+  useEffect(() => {
+    if (filter.league) {
+      setBasketballLeague(filter.league);
+    } else {
+      setBasketballLeague("");
+    }
+  }, [filter.league, setBasketballLeague]);
 
   useEffect(() => {
     if (data && data !== basketballItems) {

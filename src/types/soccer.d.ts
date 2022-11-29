@@ -25,6 +25,6 @@ declare type SoccerPlayerBase = {
 
 declare type SoccerPlayerFilter = {
   team: string;
-  position: string;
+  position: SoccerPosition;
   league: string;
 };

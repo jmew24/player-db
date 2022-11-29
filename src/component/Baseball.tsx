@@ -10,17 +10,25 @@ import { GetLocal } from "@shared/utils";
 import {
   queryAtom,
   baseballItemsAtom,
-  setBaseballItemsAtom,
+  baseballTeamAtom,
+  baseballPositionAtom,
+  baseballLeagueAtom,
 } from "@shared/jotai";
 
 const Baseball = () => {
   const query = useAtomValue(queryAtom);
   const baseballItems = useAtomValue(baseballItemsAtom);
-  const setBaseballItems = useSetAtom(setBaseballItemsAtom);
+  const setBaseballItems = useSetAtom(baseballItemsAtom);
+  const baseballTeam = useAtomValue(baseballTeamAtom);
+  const setBaseballTeam = useSetAtom(baseballTeamAtom);
+  const baseballPosition = useAtomValue(baseballPositionAtom);
+  const setBaseballPosition = useSetAtom(baseballPositionAtom);
+  const baseballLeague = useAtomValue(baseballLeagueAtom);
+  const setBaseballLeague = useSetAtom(baseballLeagueAtom);
   const [filter, setFilter] = useState<MLBPlayerFilter>({
-    position: "",
-    team: "",
-    league: "",
+    position: baseballPosition,
+    team: baseballTeam,
+    league: baseballLeague,
   });
   const [page, setPage] = useState<number>(0);
   const [paginationData, setPaginationData] = useState({
@@ -88,6 +96,30 @@ const Baseball = () => {
 
     return pagesArray.slice(firstPage, lastPage);
   }, [pages, pagesArray, page]);
+
+  useEffect(() => {
+    if (filter.team) {
+      setBaseballTeam(filter.team);
+    } else {
+      setBaseballTeam("");
+    }
+  }, [filter.team, setBaseballTeam]);
+
+  useEffect(() => {
+    if (filter.position) {
+      setBaseballPosition(filter.position);
+    } else {
+      setBaseballPosition("");
+    }
+  }, [filter.position, setBaseballPosition]);
+
+  useEffect(() => {
+    if (filter.league) {
+      setBaseballLeague(filter.league);
+    } else {
+      setBaseballLeague("");
+    }
+  }, [filter.league, setBaseballLeague]);
 
   useEffect(() => {
     if (data && data !== baseballItems) {

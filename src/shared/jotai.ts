@@ -12,52 +12,41 @@ import {
   ItemCount,
 } from "../types/jotai";
 
+const baseAtomItem = {
+  show: false,
+  team: "",
+  position: "",
+  league: "",
+  items: [],
+};
+
 export const queryAtom = atom<string>("");
 
 export const filterAtom = atom<Filter>("all");
 
 export const baseballAtom: PrimitiveAtom<Baseball> = atom({
-  show: false,
-  items: [],
+  ...baseAtomItem,
 } as Baseball);
 
 export const basketballAtom: PrimitiveAtom<Basketball> = atom({
-  show: false,
-  items: [],
+  ...baseAtomItem,
 } as Basketball);
 
 export const footballAtom: PrimitiveAtom<Football> = atom({
-  show: false,
-  items: [],
+  ...baseAtomItem,
 } as Football);
 
 export const hockeyAtom: PrimitiveAtom<Hockey> = atom({
-  show: false,
-  items: [],
+  ...baseAtomItem,
 } as Hockey);
 
 export const soccerAtom: PrimitiveAtom<Soccer> = atom({
-  show: false,
-  items: [],
+  ...baseAtomItem,
 } as Soccer);
-
-export const setBaseballShowAtom = atom(
-  () => "",
-  (_get, set, item: boolean) => {
-    set(baseballAtom, (prev) => ({ ...prev, show: item }));
-  }
-);
 
 export const baseballShowAtom = focusAtom(
   baseballAtom,
   (optic: OpticFor<Baseball>) => optic.prop("show")
-);
-
-export const setBaseballItemsAtom = atom(
-  () => "",
-  (_get, set, item: Baseball["items"]) => {
-    set(baseballAtom, (prev) => ({ ...prev, items: item }));
-  }
 );
 
 export const baseballItemsAtom = focusAtom(
@@ -65,11 +54,19 @@ export const baseballItemsAtom = focusAtom(
   (optic: OpticFor<Baseball>) => optic.prop("items")
 );
 
-export const setBasketballShowAtom = atom(
-  () => "",
-  (_get, set, item: boolean) => {
-    set(basketballAtom, (prev) => ({ ...prev, show: item }));
-  }
+export const baseballTeamAtom = focusAtom(
+  baseballAtom,
+  (optic: OpticFor<Baseball>) => optic.prop("team")
+);
+
+export const baseballPositionAtom = focusAtom(
+  baseballAtom,
+  (optic: OpticFor<Baseball>) => optic.prop("position")
+);
+
+export const baseballLeagueAtom = focusAtom(
+  baseballAtom,
+  (optic: OpticFor<Baseball>) => optic.prop("league")
 );
 
 export const basketballShowAtom = focusAtom(
@@ -77,58 +74,52 @@ export const basketballShowAtom = focusAtom(
   (optic: OpticFor<Basketball>) => optic.prop("show")
 );
 
-export const setBasketballItemsAtom = atom(
-  () => "",
-  (_get, set, item: Basketball["items"]) => {
-    set(basketballAtom, (prev) => ({ ...prev, items: item }));
-  }
-);
-
 export const basketballItemsAtom = focusAtom(
   basketballAtom,
   (optic: OpticFor<Basketball>) => optic.prop("items")
 );
 
-export const setFootballShowAtom = atom(
-  () => "",
-  (_get, set, item: boolean) => {
-    set(footballAtom, (prev) => ({ ...prev, show: item }));
-  }
+export const basketballTeamAtom = focusAtom(
+  basketballAtom,
+  (optic: OpticFor<Basketball>) => optic.prop("team")
+);
+
+export const basketballPositionAtom = focusAtom(
+  basketballAtom,
+  (optic: OpticFor<Basketball>) => optic.prop("position")
+);
+
+export const basketballLeagueAtom = focusAtom(
+  basketballAtom,
+  (optic: OpticFor<Basketball>) => optic.prop("league")
 );
 
 export const footballShowAtom = focusAtom(
   footballAtom,
   (optic: OpticFor<Football>) => optic.prop("show")
 );
-
-export const setFootballItemsAtom = atom(
-  () => "",
-  (_get, set, item: Football["items"]) => {
-    set(footballAtom, (prev) => ({ ...prev, items: item }));
-  }
-);
-
 export const footballItemsAtom = focusAtom(
   footballAtom,
   (optic: OpticFor<Football>) => optic.prop("items")
 );
 
-export const setHockeyShowAtom = atom(
-  () => "",
-  (_get, set, item: boolean) => {
-    set(hockeyAtom, (prev) => ({ ...prev, show: item }));
-  }
+export const footballTeamAtom = focusAtom(
+  footballAtom,
+  (optic: OpticFor<Football>) => optic.prop("team")
+);
+
+export const footballPositionAtom = focusAtom(
+  footballAtom,
+  (optic: OpticFor<Football>) => optic.prop("position")
+);
+
+export const footballLeagueAtom = focusAtom(
+  footballAtom,
+  (optic: OpticFor<Football>) => optic.prop("league")
 );
 
 export const hockeyShowAtom = focusAtom(hockeyAtom, (optic: OpticFor<Hockey>) =>
   optic.prop("show")
-);
-
-export const setHockeyItemsAtom = atom(
-  () => "",
-  (_get, set, item: Hockey["items"]) => {
-    set(hockeyAtom, (prev) => ({ ...prev, items: item }));
-  }
 );
 
 export const hockeyItemsAtom = focusAtom(
@@ -136,27 +127,41 @@ export const hockeyItemsAtom = focusAtom(
   (optic: OpticFor<Hockey>) => optic.prop("items")
 );
 
-export const setSoccerShowAtom = atom(
-  () => "",
-  (_get, set, item: boolean) => {
-    set(soccerAtom, (prev) => ({ ...prev, show: item }));
-  }
+export const hockeyTeamAtom = focusAtom(hockeyAtom, (optic: OpticFor<Hockey>) =>
+  optic.prop("team")
+);
+
+export const hockeyPositionAtom = focusAtom(
+  hockeyAtom,
+  (optic: OpticFor<Hockey>) => optic.prop("position")
+);
+
+export const hockeyLeagueAtom = focusAtom(
+  hockeyAtom,
+  (optic: OpticFor<Hockey>) => optic.prop("league")
 );
 
 export const soccerShowAtom = focusAtom(soccerAtom, (optic: OpticFor<Soccer>) =>
   optic.prop("show")
 );
 
-export const setSoccerItemsAtom = atom(
-  () => "",
-  (_get, set, item: Soccer["items"]) => {
-    set(soccerAtom, (prev) => ({ ...prev, items: item }));
-  }
-);
-
 export const soccerItemsAtom = focusAtom(
   soccerAtom,
   (optic: OpticFor<Soccer>) => optic.prop("items")
+);
+
+export const soccerTeamAtom = focusAtom(soccerAtom, (optic: OpticFor<Soccer>) =>
+  optic.prop("team")
+);
+
+export const soccerPositionAtom = focusAtom(
+  soccerAtom,
+  (optic: OpticFor<Soccer>) => optic.prop("position")
+);
+
+export const soccerLeagueAtom = focusAtom(
+  soccerAtom,
+  (optic: OpticFor<Soccer>) => optic.prop("league")
 );
 
 export const itemCountAtom = atom((get) => {

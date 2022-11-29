@@ -10,17 +10,25 @@ import { GetLocal } from "@shared/utils";
 import {
   queryAtom,
   footballItemsAtom,
-  setFootballItemsAtom,
+  footballTeamAtom,
+  footballPositionAtom,
+  footballLeagueAtom,
 } from "@shared/jotai";
 
 const Football = () => {
   const query = useAtomValue(queryAtom);
   const footballItems = useAtomValue(footballItemsAtom);
-  const setFootballItems = useSetAtom(setFootballItemsAtom);
+  const setFootballItems = useSetAtom(footballItemsAtom);
+  const footballTeam = useAtomValue(footballTeamAtom);
+  const setFootballTeam = useSetAtom(footballTeamAtom);
+  const footballPosition = useAtomValue(footballPositionAtom);
+  const setFootballPosition = useSetAtom(footballPositionAtom);
+  const footballLeague = useAtomValue(footballLeagueAtom);
+  const setFootballLeague = useSetAtom(footballLeagueAtom);
   const [filter, setFilter] = useState<NFLPlayerFilter>({
-    position: "",
-    team: "",
-    league: "",
+    position: footballPosition,
+    team: footballTeam,
+    league: footballLeague,
   });
   const [page, setPage] = useState<number>(0);
   const [paginationData, setPaginationData] = useState({
@@ -160,6 +168,30 @@ const Football = () => {
 
     return pagesArray.slice(firstPage, lastPage);
   }, [pages, pagesArray, page]);
+
+  useEffect(() => {
+    if (filter.team) {
+      setFootballTeam(filter.team);
+    } else {
+      setFootballTeam("");
+    }
+  }, [filter.team, setFootballTeam]);
+
+  useEffect(() => {
+    if (filter.position) {
+      setFootballPosition(filter.position);
+    } else {
+      setFootballPosition("");
+    }
+  }, [filter.position, setFootballPosition]);
+
+  useEffect(() => {
+    if (filter.league) {
+      setFootballLeague(filter.league);
+    } else {
+      setFootballLeague("");
+    }
+  }, [filter.league, setFootballLeague]);
 
   useEffect(() => {
     if (data && data !== footballItems) {

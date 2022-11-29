@@ -116,6 +116,6 @@ declare type MLBPlayerResult = MLBPlayer[];
 
 declare type MLBPlayerFilter = {
   team: string;
-  position: string;
+  position: MLBPosition;
   league: string;
 };
