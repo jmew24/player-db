@@ -115,7 +115,7 @@ export default function useGetSoccer(
   searchType: "player" | "team" = "player"
 ) {
   const { isFetching, isLoading, isError, error, data, refetch } = useQuery(
-    ["searchBaseball", query],
+    ["searchSoccer", query],
     async () =>
       searchType === "player"
         ? await searchSoccer(query.toLowerCase())

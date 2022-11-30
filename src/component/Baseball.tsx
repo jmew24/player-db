@@ -56,12 +56,20 @@ const Baseball = () => {
     const leagueFilter = filter.league;
 
     return baseballItems.filter((player) => {
-      const team = {
-        name: player.team.fullName?.toLowerCase(),
-        abbreviation: player.team.abbreviation?.toLowerCase(),
-        city: player.team.city?.toLowerCase(),
-        shortName: player.team.shortName?.toLowerCase(),
-      };
+      const team =
+        searchType === "player"
+          ? {
+              name: player.team.fullName?.toLowerCase(),
+              abbreviation: player.team.abbreviation?.toLowerCase(),
+              city: player.team.city?.toLowerCase(),
+              shortName: player.team.shortName?.toLowerCase(),
+            }
+          : {
+              name: player.fullName?.toLowerCase(),
+              abbreviation: player.firstName?.toLowerCase(),
+              city: player.lastName?.toLowerCase(),
+              shortName: player.firstName?.toLowerCase(),
+            };
       const hasTeamName =
         team.name?.includes(teamFilter) ||
         team.abbreviation?.includes(teamFilter) ||
@@ -85,7 +93,7 @@ const Baseball = () => {
       if (leagueFilter !== "") return hasLeague;
       return true;
     });
-  }, [filter.team, filter.position, filter.league, baseballItems]);
+  }, [filter.team, filter.position, filter.league, baseballItems, searchType]);
   const pages = useMemo(
     () => Math.ceil(filteredResults.length / playersPerPage),
     [filteredResults.length]
@@ -205,7 +213,7 @@ const Baseball = () => {
             type="text"
             value={filter.team}
             onChange={(e) => setFilter({ ...filter, team: e.target.value })}
-            placeholder="Team"
+            placeholder={searchType === "player" ? "Team" : "Name"}
             disabled={data?.length === 0}
           />
         </div>
