@@ -183,7 +183,6 @@ export default function useGetBaseball(
   query: string,
   searchType: "player" | "team" = "player"
 ) {
-  console.log("useGetBaseball", query, searchType);
   const { isFetching, isLoading, isError, error, data, refetch } = useQuery(
     ["searchBaseball", query],
     async () =>

@@ -9,7 +9,6 @@ export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  console.log(req.query);
   if (req.query.sport) {
     const sportQuery = (req.query.sport as string).trim();
     const sport = await prisma.sport.findFirst({
@@ -99,7 +98,6 @@ export default async function handle(
         return res.json(results);
       } else if (req.query.team) {
         const teamQuery = (req.query.team as string).trim();
-        console.log(teamQuery);
 
         const results = await prisma.player.findMany({
           where: {
