@@ -4,6 +4,8 @@ import { FootballPlayer, NFLPosition } from "football";
 import { HockeyPlayer, NHLPosition } from "hockey";
 import { SoccerPlayer, SoccerPosition } from "soccer";
 
+export type SearchType = "player" | "team";
+
 export type Filter =
   | "all"
   | "baseball"

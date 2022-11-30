@@ -3,6 +3,7 @@ import { focusAtom } from "jotai/optics";
 import { OpticFor } from "optics-ts";
 
 import {
+  SearchType,
   Filter,
   Baseball,
   Basketball,
@@ -21,6 +22,8 @@ const baseAtomItem = {
 };
 
 export const queryAtom = atom<string>("");
+
+export const searchTypeAtom = atom<SearchType>("player");
 
 export const filterAtom = atom<Filter>("all");
 

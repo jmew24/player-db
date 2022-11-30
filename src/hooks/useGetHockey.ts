@@ -1,6 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { Team } from "@prisma/client";
-import { HockeyResponse, HockeyPlayer, EliteProspectsResult } from "hockey";
+import {
+  HockeyResponse,
+  HockeyPlayer,
+  HockeyRoster,
+  EliteProspectsResult,
+} from "hockey";
 
 import { fetchRequest } from "@factory/fetchRequest";
 import { proxy } from "@factory/proxy";
@@ -133,10 +138,61 @@ const searchHockey = async (query: string) => {
   return hockeyCache.set(q, players);
 };
 
-export default function useGetHockey(query: string) {
-  const { isFetching, isLoading, isError, error, data } = useQuery(
+const searchHockeyTeam = async (query: string) => {
+  const q = query.trim();
+  const players = hockeyCache.get(`team:${q}`);
+  if (players.length > 0) return players;
+
+  const results = (await fetchRequest(`/api/teams?sport=hockey&query=${q}`, {
+    timeout: 30000,
+  })) as HockeyRoster[];
+
+  for (const result of results) {
+    const team = {
+      ...blankTeam,
+      id: result.id,
+      identifier: result.id,
+      fullName: result.fullName,
+      city: result.city,
+      shortName: result.shortName,
+      abbreviation: result.abbreviation,
+      league: result.league,
+      source: result.source,
+      sportId: result.sport.id,
+    } as Team;
+
+    for (const item of result.players) {
+      players.push({
+        id: item.id,
+        updatedAt: item.updatedAt,
+        fullName: item.fullName,
+        firstName: item.firstName,
+        lastName: item.lastName,
+        number: item.number,
+        team: team,
+        position: item.position,
+        isPlayer: true,
+        url: item.linkUrl,
+        image: item.headshotUrl,
+        source: item.source,
+        sport: result.sport,
+      } as HockeyPlayer);
+    }
+  }
+
+  return hockeyCache.set(`team:${q}`, players);
+};
+
+export default function useGetHockey(
+  query: string,
+  searchType: "player" | "team" = "player"
+) {
+  const { isFetching, isLoading, isError, error, data, refetch } = useQuery(
     ["searchHockey", query],
-    async () => await searchHockey(query.toLowerCase()),
+    async () =>
+      searchType === "player"
+        ? await searchHockey(query.toLowerCase())
+        : await searchHockeyTeam(query.toLowerCase()),
     { enabled: !!query }
   );
 
@@ -146,5 +202,6 @@ export default function useGetHockey(query: string) {
     isError,
     error,
     data,
+    refetch,
   };
 }

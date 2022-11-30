@@ -4,10 +4,12 @@ import prisma from "@lib/prisma";
 
 // GET /api/players?sport=:sport
 // GET /api/players?sport=:sport&query=:query
+// GET /api/players?sport=:sport&team=:team
 export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  console.log(req.query);
   if (req.query.sport) {
     const sportQuery = (req.query.sport as string).trim();
     const sport = await prisma.sport.findFirst({
@@ -61,6 +63,82 @@ export default async function handle(
                       mode: "insensitive",
                     },
                   },
+            ],
+          },
+          select: {
+            identifier: true,
+            updatedAt: true,
+            fullName: true,
+            firstName: true,
+            lastName: true,
+            position: true,
+            number: true,
+            headshotUrl: true,
+            linkUrl: true,
+            source: true,
+            team: {
+              select: {
+                identifier: true,
+                fullName: true,
+                city: true,
+                shortName: true,
+                abbreviation: true,
+                league: true,
+                source: true,
+              },
+            },
+            sport: {
+              select: {
+                id: true,
+                name: true,
+                updatedAt: true,
+              },
+            },
+          },
+        });
+        return res.json(results);
+      } else if (req.query.team) {
+        const teamQuery = (req.query.team as string).trim();
+        console.log(teamQuery);
+
+        const results = await prisma.player.findMany({
+          where: {
+            sport: {
+              id: sport?.id,
+            },
+            OR: [
+              {
+                team: {
+                  fullName: {
+                    contains: teamQuery,
+                    mode: "insensitive",
+                  },
+                },
+              },
+              {
+                team: {
+                  shortName: {
+                    contains: teamQuery,
+                    mode: "insensitive",
+                  },
+                },
+              },
+              {
+                team: {
+                  city: {
+                    contains: teamQuery,
+                    mode: "insensitive",
+                  },
+                },
+              },
+              {
+                team: {
+                  abbreviation: {
+                    contains: teamQuery,
+                    mode: "insensitive",
+                  },
+                },
+              },
             ],
           },
           select: {

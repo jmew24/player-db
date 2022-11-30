@@ -9,6 +9,7 @@ import Pagination from "@component/Pagination";
 import { GetLocal } from "@shared/utils";
 import {
   queryAtom,
+  searchTypeAtom,
   soccerItemsAtom,
   soccerTeamAtom,
   soccerPositionAtom,
@@ -17,6 +18,7 @@ import {
 
 const Soccer = () => {
   const query = useAtomValue(queryAtom);
+  const searchType = useAtomValue(searchTypeAtom);
   const soccerItems = useAtomValue(soccerItemsAtom);
   const setSoccerItems = useSetAtom(soccerItemsAtom);
   const soccerTeam = useAtomValue(soccerTeamAtom);
@@ -37,7 +39,7 @@ const Soccer = () => {
   });
   const [pagePlayers, setPagePlayers] = useState<SoccerPlayer[]>([]);
   const playersPerPage = 10;
-  const { isFetching, isLoading, data } = useGetSoccer(query);
+  const { isFetching, isLoading, data } = useGetSoccer(query, searchType);
   const leagueFilters = useMemo(() => {
     const leagues: string[] = [];
 
@@ -152,7 +154,7 @@ const Soccer = () => {
           <h1 className="text-6xl font-bold">Soccer</h1>
         </div>
         <div className="mt-4 w-full">
-          <h1 className="mt-4 text-2xl">Enter a players name to search...</h1>
+          <h1 className="mt-4 text-2xl">{`Enter a ${searchType} name to search...`}</h1>
         </div>
       </div>
     );

@@ -4,6 +4,7 @@ import {
   BaseballResponse,
   BaseballPlayer,
   BaseballSavantRequest,
+  BaseballRoster,
 } from "baseball";
 
 import { fetchRequest } from "@factory/fetchRequest";
@@ -133,10 +134,62 @@ const searchBaseball = async (query: string) => {
   return baseballCache.set(q, players);
 };
 
-export default function useGetBaseball(query: string) {
-  const { isFetching, isLoading, isError, error, data } = useQuery(
+const searchBaseballTeam = async (query: string) => {
+  const q = query.trim();
+  const players = baseballCache.get(`team:${q}`);
+  if (players.length > 0) return players;
+
+  const results = (await fetchRequest(`/api/teams?sport=baseball&query=${q}`, {
+    timeout: 30000,
+  })) as BaseballRoster[];
+
+  for (const result of results) {
+    const team = {
+      ...blankTeam,
+      id: result.id,
+      identifier: result.id,
+      fullName: result.fullName,
+      city: result.city,
+      shortName: result.shortName,
+      abbreviation: result.abbreviation,
+      league: result.league,
+      source: result.source,
+      sportId: result.sport.id,
+    } as Team;
+
+    for (const item of result.players) {
+      players.push({
+        id: item.id,
+        updatedAt: item.updatedAt,
+        fullName: item.fullName,
+        firstName: item.firstName,
+        lastName: item.lastName,
+        number: item.number,
+        team: team,
+        position: item.position,
+        isPlayer: true,
+        url: item.linkUrl,
+        image: item.headshotUrl,
+        source: item.source,
+        sport: result.sport,
+      } as BaseballPlayer);
+    }
+  }
+
+  return baseballCache.set(`team:${q}`, players);
+};
+
+export default function useGetBaseball(
+  query: string,
+  searchType: "player" | "team" = "player"
+) {
+  console.log("useGetBaseball", query, searchType);
+  const { isFetching, isLoading, isError, error, data, refetch } = useQuery(
     ["searchBaseball", query],
-    async () => await searchBaseball(query.toLowerCase()),
+    async () =>
+      searchType === "player"
+        ? await searchBaseball(query.toLowerCase())
+        : await searchBaseballTeam(query.toLowerCase()),
     { enabled: !!query }
   );
 
@@ -146,5 +199,6 @@ export default function useGetBaseball(query: string) {
     isError,
     error,
     data,
+    refetch,
   };
 }

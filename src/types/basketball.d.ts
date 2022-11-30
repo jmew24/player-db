@@ -2,6 +2,7 @@ import { Player, Sport, Team } from "@prisma/client";
 
 declare type BasketballResponse = Player & { team: Team; sport: Sport };
 declare type BasketballPlayer = NBAPlayer & { team: Team; sport: Sport };
+declare type BasketballRoster = Team & { sport: Sport; players: Player[] };
 declare type BasketballCache = { [key: string]: BasketballPlayer[] };
 
 declare interface BasketballProps {

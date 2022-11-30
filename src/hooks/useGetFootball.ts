@@ -1,6 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { Team } from "@prisma/client";
-import { FootballResponse, FootballPlayer, NFLPlayerRequest } from "football";
+import {
+  FootballResponse,
+  FootballPlayer,
+  FootballRoster,
+  NFLPlayerRequest,
+} from "football";
 
 import { fetchRequest } from "@factory/fetchRequest";
 import { proxy } from "@factory/proxy";
@@ -120,10 +125,61 @@ const searchFootball = async (query: string) => {
   return footballCache.set(q, players);
 };
 
-export default function useGetFootball(query: string) {
-  const { isFetching, isLoading, isError, error, data } = useQuery(
+const searchFootballTeam = async (query: string) => {
+  const q = query.trim();
+  const players = footballCache.get(`team:${q}`);
+  if (players.length > 0) return players;
+
+  const results = (await fetchRequest(`/api/teams?sport=football&query=${q}`, {
+    timeout: 30000,
+  })) as FootballRoster[];
+
+  for (const result of results) {
+    const team = {
+      ...blankTeam,
+      id: result.id,
+      identifier: result.id,
+      fullName: result.fullName,
+      city: result.city,
+      shortName: result.shortName,
+      abbreviation: result.abbreviation,
+      league: result.league,
+      source: result.source,
+      sportId: result.sport.id,
+    } as Team;
+
+    for (const item of result.players) {
+      players.push({
+        id: item.id,
+        updatedAt: item.updatedAt,
+        fullName: item.fullName,
+        firstName: item.firstName,
+        lastName: item.lastName,
+        number: item.number,
+        team: team,
+        position: item.position,
+        isPlayer: true,
+        url: item.linkUrl,
+        image: item.headshotUrl,
+        source: item.source,
+        sport: result.sport,
+      } as FootballPlayer);
+    }
+  }
+
+  return footballCache.set(`team:${q}`, players);
+};
+
+export default function useGetFootball(
+  query: string,
+  searchType: "player" | "team" = "player"
+) {
+  const { isFetching, isLoading, isError, error, data, refetch } = useQuery(
     ["searchFootball", query],
-    async () => await searchFootball(query.toLowerCase()),
+    async () =>
+      searchType === "player"
+        ? await searchFootball(query.toLowerCase())
+        : await searchFootballTeam(query.toLowerCase()),
     { enabled: !!query }
   );
 
@@ -133,5 +189,6 @@ export default function useGetFootball(query: string) {
     isError,
     error,
     data,
+    refetch,
   };
 }
