@@ -1,7 +1,7 @@
 import { memo, useState, useEffect, useMemo } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { GoLinkExternal } from "react-icons/go";
-import { TennisPlayer, TennisPlayerFilter, TennisPosition } from "tennis";
+import { TennisPlayer, TennisPlayerFilter } from "tennis";
 
 import useGetTennis from "@hook/useGetTennis";
 import ImageWithFallback from "@component/ImageWithFallback";
