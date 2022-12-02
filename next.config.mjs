@@ -47,6 +47,9 @@ export default defineNextConfig({
       "wtatennis.com",
       "images.rogersdigitalmedia.com",
       "photoresources.wtatennis.com",
+      "www.formula1.com",
+      "www.indycar.com",
+      "digbza2f4g9qo.cloudfront.net",
     ],
   },
 });

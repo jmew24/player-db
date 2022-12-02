@@ -117,6 +117,18 @@ const SearchFilter = () => {
                   Tennis
                 </a>
               </Link>
+              <Link href="/autoRacing">
+                <a
+                  className={`${
+                    filter === "autoRacing"
+                      ? "outline-double outline-gray-500"
+                      : ""
+                  } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex `}
+                  title="AutoRacing"
+                >
+                  AutoRacing
+                </a>
+              </Link>
             </div>
           </div>
         </nav>

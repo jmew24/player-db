@@ -4,6 +4,7 @@ import { FootballPlayer, NFLPosition } from "football";
 import { HockeyPlayer, NHLPosition } from "hockey";
 import { SoccerPlayer, SoccerPosition } from "soccer";
 import { TennisPlayer, TennisPosition } from "tennis";
+import { AutoRacingPlayer, AutoRacingPosition } from "autoRacing";
 
 export type SearchType = "player" | "team";
 
@@ -14,7 +15,8 @@ export type Filter =
   | "football"
   | "hockey"
   | "soccer"
-  | "tennis";
+  | "tennis"
+  | "autoRacing";
 
 export type BaseJOTAI = {
   show: boolean;
@@ -50,6 +52,11 @@ export type Soccer = BaseJOTAI & {
 export type Tennis = BaseJOTAI & {
   position: TennisPosition;
   items: TennisPlayer[];
+};
+
+export type AutoRacing = BaseJOTAI & {
+  position: AutoRacingPosition;
+  items: AutoRacingPlayer[];
 };
 
 export type ItemCount = {

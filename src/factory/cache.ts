@@ -6,6 +6,7 @@ import { FootballPlayer, FootballCache } from "football";
 import { HockeyPlayer, HockeyCache } from "hockey";
 import { SoccerPlayer, SoccerCache } from "soccer";
 import { TennisPlayer, TennisCache } from "tennis";
+import { AutoRacingPlayer, AutoRacingCache } from "autoRacing";
 
 const proxyCache = new Map<string, unknown>();
 
@@ -241,4 +242,44 @@ export const setTennisCache = (query: string, results: TennisPlayer[]) => {
 export const tennisCache = {
   get: getTennisCache,
   set: setTennisCache,
+};
+
+const autoRacingTeamRequest = [] as Team[];
+
+export const getAutoRacingTeamCache = () => autoRacingTeamRequest;
+
+export const addAutoRacingTeamCache = (team: Team) => {
+  autoRacingTeamRequest.push(team);
+  return autoRacingTeamRequest;
+};
+
+export const autoRacingTeamCache = {
+  get: getAutoRacingTeamCache,
+  add: addAutoRacingTeamCache,
+};
+
+const autoRacingRequest = {} as AutoRacingCache;
+
+export const getAutoRacingCache = (query: string) => {
+  const cached = autoRacingRequest[query.toLowerCase().trim()];
+  if (cached) {
+    return cached;
+  } else {
+    return [] as AutoRacingPlayer[];
+  }
+};
+
+export const setAutoRacingCache = (
+  query: string,
+  results: AutoRacingPlayer[]
+) => {
+  const q = query.toLowerCase().trim();
+  autoRacingRequest[q] = results;
+
+  return autoRacingRequest[q];
+};
+
+export const autoRacingCache = {
+  get: getAutoRacingCache,
+  set: setAutoRacingCache,
 };
