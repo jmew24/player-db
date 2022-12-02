@@ -41,6 +41,12 @@ export default defineNextConfig({
       "images.mlssoccer.com",
       "d2zywfiolv4f83.cloudfront.net",
       "sportshub.cbsistatic.com",
+      "www.atptour.com",
+      "atptour.com",
+      "www.wtatennis.com",
+      "wtatennis.com",
+      "images.rogersdigitalmedia.com",
+      "photoresources.wtatennis.com",
     ],
   },
 });

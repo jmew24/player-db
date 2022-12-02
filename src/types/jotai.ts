@@ -3,6 +3,7 @@ import { BasketballPlayer, NBAPosition } from "basketball";
 import { FootballPlayer, NFLPosition } from "football";
 import { HockeyPlayer, NHLPosition } from "hockey";
 import { SoccerPlayer, SoccerPosition } from "soccer";
+import { TennisPlayer, TennisPosition } from "tennis";
 
 export type SearchType = "player" | "team";
 
@@ -12,7 +13,8 @@ export type Filter =
   | "basketball"
   | "football"
   | "hockey"
-  | "soccer";
+  | "soccer"
+  | "tennis";
 
 export type BaseJOTAI = {
   show: boolean;
@@ -43,6 +45,11 @@ export type Hockey = BaseJOTAI & {
 export type Soccer = BaseJOTAI & {
   position: SoccerPosition;
   items: SoccerPlayer[];
+};
+
+export type Tennis = BaseJOTAI & {
+  position: TennisPosition;
+  items: TennisPlayer[];
 };
 
 export type ItemCount = {

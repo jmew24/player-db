@@ -9,7 +9,6 @@ import Baseball from "@component/Baseball";
 import Basketball from "@component/Basketball";
 import Football from "@component/Football";
 import Hockey from "@component/Hockey";
-import Soccer from "@component/Soccer";
 
 const Home: NextPage = () => {
   const setFilter = useSetAtom(filterAtom);
@@ -35,7 +34,6 @@ const Home: NextPage = () => {
             <Basketball />
             <Football />
             <Hockey />
-            <Soccer />
           </div>
         </Search>
       </main>

@@ -46,8 +46,9 @@ const SearchFilter = () => {
                   className={`${
                     filter === "all" ? "outline-double outline-gray-500" : ""
                   } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex `}
+                  title="Baseball/Basketball/Football/Hockey"
                 >
-                  All
+                  All*
                 </a>
               </Link>
               <Link href="/baseball">
@@ -57,6 +58,7 @@ const SearchFilter = () => {
                       ? "outline-double outline-gray-500"
                       : ""
                   } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex `}
+                  title="Baseball"
                 >
                   Baseball
                 </a>
@@ -68,6 +70,7 @@ const SearchFilter = () => {
                       ? "outline-double outline-gray-500"
                       : ""
                   } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex `}
+                  title="Basketball"
                 >
                   Basketball
                 </a>
@@ -79,6 +82,7 @@ const SearchFilter = () => {
                       ? "outline-double outline-gray-500"
                       : ""
                   } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex `}
+                  title="Football"
                 >
                   Football
                 </a>
@@ -88,6 +92,7 @@ const SearchFilter = () => {
                   className={`${
                     filter === "hockey" ? "outline-double outline-gray-500" : ""
                   } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex `}
+                  title="Hockey"
                 >
                   Hockey
                 </a>
@@ -97,8 +102,19 @@ const SearchFilter = () => {
                   className={`${
                     filter === "soccer" ? "outline-double outline-gray-500" : ""
                   } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex `}
+                  title="Soccer"
                 >
                   Soccer
+                </a>
+              </Link>
+              <Link href="/tennis">
+                <a
+                  className={`${
+                    filter === "tennis" ? "outline-double outline-gray-500" : ""
+                  } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex `}
+                  title="Tennis"
+                >
+                  Tennis
                 </a>
               </Link>
             </div>

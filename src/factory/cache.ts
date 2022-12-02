@@ -5,6 +5,7 @@ import { BasketballPlayer, BasketballCache } from "basketball";
 import { FootballPlayer, FootballCache } from "football";
 import { HockeyPlayer, HockeyCache } from "hockey";
 import { SoccerPlayer, SoccerCache } from "soccer";
+import { TennisPlayer, TennisCache } from "tennis";
 
 const proxyCache = new Map<string, unknown>();
 
@@ -203,4 +204,41 @@ export const setSoccerCache = (query: string, results: SoccerPlayer[]) => {
 export const soccerCache = {
   get: getSoccerCache,
   set: setSoccerCache,
+};
+
+const tennisTeamRequest = [] as Team[];
+
+export const getTennisTeamCache = () => tennisTeamRequest;
+
+export const addTennisTeamCache = (team: Team) => {
+  tennisTeamRequest.push(team);
+  return tennisTeamRequest;
+};
+
+export const tennisTeamCache = {
+  get: getTennisTeamCache,
+  add: addTennisTeamCache,
+};
+
+const tennisRequest = {} as TennisCache;
+
+export const getTennisCache = (query: string) => {
+  const cached = tennisRequest[query.toLowerCase().trim()];
+  if (cached) {
+    return cached;
+  } else {
+    return [] as TennisPlayer[];
+  }
+};
+
+export const setTennisCache = (query: string, results: TennisPlayer[]) => {
+  const q = query.toLowerCase().trim();
+  tennisRequest[q] = results;
+
+  return tennisRequest[q];
+};
+
+export const tennisCache = {
+  get: getTennisCache,
+  set: setTennisCache,
 };
