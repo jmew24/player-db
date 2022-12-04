@@ -12,6 +12,7 @@ import {
   Soccer,
   Tennis,
   AutoRacing,
+  Golf,
   ItemCount,
 } from "../types/jotai";
 
@@ -56,6 +57,10 @@ export const tennisAtom: PrimitiveAtom<Tennis> = atom({
 export const autoRacingAtom: PrimitiveAtom<AutoRacing> = atom({
   ...baseAtomItem,
 } as AutoRacing);
+
+export const golfAtom: PrimitiveAtom<Golf> = atom({
+  ...baseAtomItem,
+} as Golf);
 
 export const baseballShowAtom = focusAtom(
   baseballAtom,
@@ -225,6 +230,26 @@ export const autoRacingLeagueAtom = focusAtom(
   (optic: OpticFor<AutoRacing>) => optic.prop("league")
 );
 
+export const golfShowAtom = focusAtom(golfAtom, (optic: OpticFor<Golf>) =>
+  optic.prop("show")
+);
+
+export const golfItemsAtom = focusAtom(golfAtom, (optic: OpticFor<Golf>) =>
+  optic.prop("items")
+);
+
+export const golfTeamAtom = focusAtom(golfAtom, (optic: OpticFor<Golf>) =>
+  optic.prop("team")
+);
+
+export const golfPositionAtom = focusAtom(golfAtom, (optic: OpticFor<Golf>) =>
+  optic.prop("position")
+);
+
+export const golfLeagueAtom = focusAtom(golfAtom, (optic: OpticFor<Golf>) =>
+  optic.prop("league")
+);
+
 export const itemCountAtom = atom((get) => {
   return {
     baseball: get(baseballAtom).items.length,
@@ -234,5 +259,6 @@ export const itemCountAtom = atom((get) => {
     soccer: get(soccerAtom).items.length,
     tennis: get(tennisAtom).items.length,
     autoRacing: get(autoRacingAtom).items.length,
+    golf: get(golfAtom).items.length,
   } as ItemCount;
 });

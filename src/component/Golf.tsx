@@ -1,45 +1,45 @@
 import { memo, useState, useEffect, useMemo } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { GoLinkExternal } from "react-icons/go";
-import { TennisPlayer, TennisPlayerFilter } from "tennis";
+import { GolfPlayer, GolfPlayerFilter } from "golf";
 
-import useGetTennis from "@hook/useGetTennis";
+import useGetGolf from "@hook/useGetGolf";
 import ImageWithFallback from "@component/ImageWithFallback";
 import Pagination from "@component/Pagination";
 import { GetLocal } from "@shared/utils";
 import {
   queryAtom,
   searchTypeAtom,
-  tennisItemsAtom,
-  tennisTeamAtom,
-  tennisLeagueAtom,
-  tennisPositionAtom,
+  golfItemsAtom,
+  golfTeamAtom,
+  golfLeagueAtom,
+  golfPositionAtom,
 } from "@shared/jotai";
 
-const Tennis = () => {
+const Golf = () => {
   const query = useAtomValue(queryAtom);
   const searchType = useAtomValue(searchTypeAtom);
-  const tennisItems = useAtomValue(tennisItemsAtom);
-  const setTennisItems = useSetAtom(tennisItemsAtom);
-  const tennisTeam = useAtomValue(tennisTeamAtom);
-  const setTennisTeam = useSetAtom(tennisTeamAtom);
-  const tennisPosition = useAtomValue(tennisPositionAtom);
-  const setTennisPosition = useSetAtom(tennisPositionAtom);
-  const tennisLeague = useAtomValue(tennisLeagueAtom);
-  const setTennisLeague = useSetAtom(tennisLeagueAtom);
-  const [filter, setFilter] = useState<TennisPlayerFilter>({
-    position: tennisPosition,
-    team: tennisTeam,
-    league: tennisLeague,
+  const golfItems = useAtomValue(golfItemsAtom);
+  const setGolfItems = useSetAtom(golfItemsAtom);
+  const golfTeam = useAtomValue(golfTeamAtom);
+  const setGolfTeam = useSetAtom(golfTeamAtom);
+  const golfPosition = useAtomValue(golfPositionAtom);
+  const setGolfPosition = useSetAtom(golfPositionAtom);
+  const golfLeague = useAtomValue(golfLeagueAtom);
+  const setGolfLeague = useSetAtom(golfLeagueAtom);
+  const [filter, setFilter] = useState<GolfPlayerFilter>({
+    position: golfPosition,
+    team: golfTeam,
+    league: golfLeague,
   });
   const [page, setPage] = useState<number>(0);
   const [paginationData, setPaginationData] = useState({
     start: 0,
     end: 0,
   });
-  const [pagePlayers, setPagePlayers] = useState<TennisPlayer[]>([]);
+  const [pagePlayers, setPagePlayers] = useState<GolfPlayer[]>([]);
   const playersPerPage = 10;
-  const { isFetching, isLoading, data } = useGetTennis(query, searchType);
+  const { isFetching, isLoading, data } = useGetGolf(query, searchType);
   const leagueFilters = useMemo(() => {
     const leagues: string[] = [];
 
@@ -52,38 +52,39 @@ const Tennis = () => {
   }, [data]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
+    const positionFilter = filter.position;
     const leagueFilter = filter.league;
 
-    return tennisItems.filter((player) => {
-      const team =
-        searchType === "player"
-          ? {
-              name: player.team.fullName?.toLowerCase(),
-              abbreviation: player.team.abbreviation?.toLowerCase(),
-              city: player.team.city?.toLowerCase(),
-              shortName: player.team.shortName?.toLowerCase(),
-            }
-          : {
-              name: player.fullName?.toLowerCase(),
-              abbreviation: player.firstName?.toLowerCase(),
-              city: player.lastName?.toLowerCase(),
-              shortName: player.firstName?.toLowerCase(),
-            };
-      const hasTeamName =
-        team.name?.includes(teamFilter) ||
-        team.abbreviation?.includes(teamFilter) ||
-        team.city?.includes(teamFilter) ||
-        team.shortName?.includes(teamFilter);
+    return golfItems.filter((player) => {
+      const team = player.position?.toLowerCase();
+      const hasTeamName = team.includes(teamFilter);
+      const hasPosition =
+        positionFilter === "all"
+          ? true
+          : positionFilter === "active"
+          ? positionFilter === "active" && player?.number >= 1
+            ? true
+            : false
+          : positionFilter === "inactive" && player?.number === 0
+          ? true
+          : false;
       const hasLeague =
         player.team?.fullName?.toLowerCase() === leagueFilter.toLowerCase();
 
+      if (teamFilter !== "" && positionFilter !== "" && leagueFilter !== "")
+        return hasTeamName && hasPosition && hasLeague;
+      if (teamFilter !== "" && positionFilter !== "")
+        return hasTeamName && hasPosition;
       if (teamFilter !== "" && leagueFilter !== "")
         return hasTeamName && hasLeague;
+      if (positionFilter !== "" && leagueFilter !== "")
+        return hasPosition && hasLeague;
       if (teamFilter !== "") return hasTeamName;
+      if (positionFilter !== "") return hasPosition;
       if (leagueFilter !== "") return hasLeague;
       return true;
     });
-  }, [filter.league, filter.team, searchType, tennisItems]);
+  }, [filter.team, filter.position, filter.league, golfItems, searchType]);
   const pages = useMemo(
     () => Math.ceil(filteredResults.length / playersPerPage),
     [filteredResults.length]
@@ -99,36 +100,36 @@ const Tennis = () => {
 
   useEffect(() => {
     if (filter.team) {
-      setTennisTeam(filter.team);
+      setGolfTeam(filter.team);
     } else {
-      setTennisTeam("");
+      setGolfTeam("");
     }
-  }, [filter.team, setTennisTeam]);
+  }, [filter.team, setGolfTeam]);
 
   useEffect(() => {
     if (filter.position) {
-      setTennisPosition(filter.position);
+      setGolfPosition(filter.position);
     } else {
-      setTennisPosition("");
+      setGolfPosition("");
     }
-  }, [filter.position, setTennisPosition]);
+  }, [filter.position, setGolfPosition]);
 
   useEffect(() => {
     if (filter.league) {
-      setTennisLeague(filter.league);
+      setGolfLeague(filter.league);
     } else {
-      setTennisLeague("");
+      setGolfLeague("");
     }
-  }, [filter.league, setTennisLeague]);
+  }, [filter.league, setGolfLeague]);
 
   useEffect(() => {
-    if (data && data !== tennisItems) {
-      setTennisItems(data);
+    if (data && data !== golfItems) {
+      setGolfItems(data);
       if (leagueFilters.length > 0 && leagueFilters.indexOf(filter.league) < 0)
         setFilter((state) => ({ ...state, league: "" }));
       setPage(0);
     }
-  }, [data, tennisItems, filter.league, leagueFilters, setTennisItems]);
+  }, [data, golfItems, filter.league, leagueFilters, setGolfItems]);
 
   useEffect(() => {
     if (filteredResults.length > 0) {
@@ -153,7 +154,7 @@ const Tennis = () => {
     return (
       <div className="items-center justify-center py-2">
         <div className="mt-4 w-full">
-          <h1 className="text-6xl font-bold">Tennis</h1>
+          <h1 className="text-6xl font-bold">Golf</h1>
         </div>
         <div className="mt-4 w-full">
           <h1 className="mt-4 text-2xl">{`Enter a ${searchType} name to search...`}</h1>
@@ -165,7 +166,7 @@ const Tennis = () => {
     return (
       <div className="items-center justify-center py-2">
         <div className="mt-4 w-full">
-          <h1 className="text-6xl font-bold">Tennis</h1>
+          <h1 className="text-6xl font-bold">Golf</h1>
         </div>
         <div className="mt-4 w-full">
           <h1 className="mt-4 text-2xl">Loading...</h1>
@@ -176,30 +177,53 @@ const Tennis = () => {
   return (
     <div className="items-center justify-center py-2">
       <div className="mt-4 w-full">
-        <h1 className="text-6xl font-bold">Tennis</h1>
+        <h1 className="text-6xl font-bold">Golf</h1>
 
+        <h1 className="text-lg font-bold">Filters</h1>
+        <div className="mt-4 flex w-full">
+          <select
+            className="mx-2 w-1/2 justify-center  rounded border border-gray-500 bg-gray-700 p-2 text-center text-lg text-gray-200"
+            value={filter.position}
+            onChange={(e) =>
+              setFilter({
+                ...filter,
+                position: e.target.value,
+              })
+            }
+            disabled={data?.length === 0}
+          >
+            <option value="">All</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <input
+            className="mx-2 h-10 w-1/2 flex-grow rounded border-gray-500 bg-gray-700 px-5 text-gray-200 outline-double outline-1 outline-gray-500 focus:outline-none focus:ring"
+            type="text"
+            value={filter.team}
+            onChange={(e) => setFilter({ ...filter, team: e.target.value })}
+            placeholder={"Country"}
+            disabled={data?.length === 0}
+          />
+        </div>
         {searchType === "player" && (
-          <>
-            <h1 className="text-lg font-bold">Filters</h1>
-            <div className="mt-4 flex w-full">
-              <select
-                className="mx-2 w-full justify-center  rounded border border-gray-500 bg-gray-700 p-2 text-center text-lg text-gray-200"
-                value={filter.league}
-                onChange={(e) =>
-                  setFilter({ ...filter, league: e.target.value as string })
-                }
-                title="League Filter"
-                disabled={data?.length === 0}
-              >
-                <option value="">All Leagues</option>
-                {leagueFilters.map((league) => (
-                  <option key={`leagueFilter-${league}`} value={league}>
-                    {league}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </>
+          <div className="mt-4 flex w-full">
+            <select
+              className="mx-2 w-full justify-center  rounded border border-gray-500 bg-gray-700 p-2 text-center text-lg text-gray-200"
+              value={filter.league}
+              onChange={(e) =>
+                setFilter({ ...filter, league: e.target.value as string })
+              }
+              title="League Filter"
+              disabled={data?.length === 0}
+            >
+              <option value="">All Leagues</option>
+              {leagueFilters.map((league) => (
+                <option key={`leagueFilter-${league}`} value={league}>
+                  {league}
+                </option>
+              ))}
+            </select>
+          </div>
         )}
       </div>
 
@@ -218,7 +242,7 @@ const Tennis = () => {
         />
         {pagePlayers.length > 0 ? (
           <ul className="mt-4 flex w-full flex-col items-center justify-center">
-            {pagePlayers.map((player: TennisPlayer, index: number) => (
+            {pagePlayers.map((player: GolfPlayer, index: number) => (
               <li
                 key={`${player.id}-${player.fullName.replaceAll(
                   " ",
@@ -253,15 +277,15 @@ const Tennis = () => {
                   className="w-fill m-1 flex items-center justify-center py-2 px-1"
                   title={player.position}
                 >
-                  <label className="px-1 font-bold">Rank: </label>
+                  <label className="px-1 font-bold">Country: </label>
                   {player?.position ?? "Unknown"}
                 </p>
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1"
                   title={player?.number.toString() ?? ""}
                 >
-                  <label className="x-1 mx-1 font-bold">Points: </label>
-                  {player?.number ?? "Unknown"}
+                  <label className="x-1 mx-1 font-bold">Active: </label>
+                  {player?.number ? "Yes" : "No"}
                 </p>
                 <a href={player.url} target="_blank" rel="noreferrer">
                   <div className="flex items-center justify-center">
@@ -292,4 +316,4 @@ const Tennis = () => {
   );
 };
 
-export default memo(Tennis);
+export default memo(Golf);

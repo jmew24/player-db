@@ -50,6 +50,7 @@ export default defineNextConfig({
       "www.formula1.com",
       "www.indycar.com",
       "digbza2f4g9qo.cloudfront.net",
+      "pga-tour-res.cloudinary.com",
     ],
   },
 });

@@ -16,6 +16,9 @@ const SearchFilter = () => {
     <div className="flex w-full min-w-full flex-1 flex-col items-center justify-center text-center">
       <div className="mt-4 flex w-full min-w-full">
         <nav className="flex w-full min-w-full flex-wrap items-center rounded border border-gray-500 bg-gray-800 p-3 text-gray-200">
+          <div className="inline-flex w-3/4 lg:hidden">
+            <h1 className="text-2xl font-bold uppercase">Filter: {filter}</h1>
+          </div>
           <button
             className="ml-auto inline-flex rounded p-3 text-white outline-none hover:cursor-pointer hover:bg-gray-700 hover:text-white lg:hidden"
             onClick={handleClick}
@@ -127,6 +130,16 @@ const SearchFilter = () => {
                   title="AutoRacing"
                 >
                   AutoRacing
+                </a>
+              </Link>
+              <Link href="/golf">
+                <a
+                  className={`${
+                    filter === "golf" ? "outline-double outline-gray-500" : ""
+                  } w-full items-center justify-center rounded px-3 py-2 text-xl font-bold text-white outline-1 filter transition-colors duration-150 hover:cursor-pointer hover:bg-gray-700 hover:text-white hover:outline-double hover:outline-gray-500 lg:inline-flex `}
+                  title="Golf"
+                >
+                  Golf
                 </a>
               </Link>
             </div>
