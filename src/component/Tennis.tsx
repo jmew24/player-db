@@ -189,7 +189,6 @@ const Tennis = () => {
                   setFilter({ ...filter, league: e.target.value as string })
                 }
                 title="League Filter"
-                disabled={data?.length === 0}
               >
                 <option value="">All Leagues</option>
                 {leagueFilters.map((league) => (
@@ -261,7 +260,7 @@ const Tennis = () => {
                   title={player?.number.toString() ?? ""}
                 >
                   <label className="x-1 mx-1 font-bold">Points: </label>
-                  {player?.number ?? "Unknown"}
+                  {player?.number.toLocaleString() ?? "Unknown"}
                 </p>
                 <a href={player.url} target="_blank" rel="noreferrer">
                   <div className="flex items-center justify-center">

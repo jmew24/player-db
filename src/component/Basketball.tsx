@@ -201,7 +201,6 @@ const Basketball = () => {
                 position: e.target.value as NBAPosition,
               })
             }
-            disabled={data?.length === 0}
           >
             <option value="">All Positions</option>
             <option value="C">Center</option>
@@ -217,7 +216,6 @@ const Basketball = () => {
             value={filter.team}
             onChange={(e) => setFilter({ ...filter, team: e.target.value })}
             placeholder={searchType === "player" ? "Team" : "Name"}
-            disabled={data?.length === 0}
           />
         </div>
         <div className="mt-4 flex w-full">
@@ -228,7 +226,6 @@ const Basketball = () => {
               setFilter({ ...filter, league: e.target.value as string })
             }
             title="League Filter"
-            disabled={data?.length === 0}
           >
             <option value="">All Leagues</option>
             {leagueFilters.map((league) => (

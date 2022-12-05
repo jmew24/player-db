@@ -190,7 +190,6 @@ const Golf = () => {
                 position: e.target.value,
               })
             }
-            disabled={data?.length === 0}
           >
             <option value="">All</option>
             <option value="active">Active</option>
@@ -202,7 +201,6 @@ const Golf = () => {
             value={filter.team}
             onChange={(e) => setFilter({ ...filter, team: e.target.value })}
             placeholder={"Country"}
-            disabled={data?.length === 0}
           />
         </div>
         {searchType === "player" && (
@@ -214,7 +212,6 @@ const Golf = () => {
                 setFilter({ ...filter, league: e.target.value as string })
               }
               title="League Filter"
-              disabled={data?.length === 0}
             >
               <option value="">All Leagues</option>
               {leagueFilters.map((league) => (
