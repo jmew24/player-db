@@ -47,7 +47,7 @@ const Search: FC<SearchProps> = ({ children }) => {
           </div>
           <div className="mt-6 mb-6 flex w-full min-w-full">
             <select
-              className="mx-2 w-1/6 justify-center  rounded border border-gray-500 bg-gray-700 p-2 text-center text-lg text-gray-200"
+              className="mx-2 w-1/6 justify-center rounded border border-gray-500 bg-gray-700 p-2 text-center text-lg text-gray-200"
               value={searchType}
               onChange={(e) => handleSearchType(e.target.value)}
               title="Search Type"

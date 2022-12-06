@@ -259,7 +259,7 @@ const Football = () => {
         <h1 className="text-lg font-bold">Filters</h1>
         <div className="mt-4 flex w-full">
           <select
-            className="mx-2 w-1/2 justify-center  rounded border border-gray-500 bg-gray-700 p-2 text-center text-lg text-gray-200"
+            className="mx-2 w-1/2 justify-center rounded border border-gray-500 bg-gray-700 p-2 text-center text-lg text-gray-200"
             value={filter.position}
             onChange={(e) =>
               setFilter({
@@ -297,7 +297,7 @@ const Football = () => {
         </div>
         <div className="mt-4 flex w-full">
           <select
-            className="mx-2 w-full justify-center  rounded border border-gray-500 bg-gray-700 p-2 text-center text-lg text-gray-200"
+            className="mx-2 w-full justify-center rounded border border-gray-500 bg-gray-700 p-2 text-center text-lg text-gray-200"
             value={filter.league}
             onChange={(e) =>
               setFilter({ ...filter, league: e.target.value as string })
