@@ -84,7 +84,7 @@ const Golf = () => {
       if (leagueFilter !== "") return hasLeague;
       return true;
     });
-  }, [filter.team, filter.position, filter.league, golfItems, searchType]);
+  }, [filter.team, filter.position, filter.league, golfItems]);
   const pages = useMemo(
     () => Math.ceil(filteredResults.length / playersPerPage),
     [filteredResults.length]
@@ -299,9 +299,9 @@ const Golf = () => {
                 {player.updatedAt && (
                   <span
                     className="flex justify-center rounded bg-gray-500 px-2 py-1 text-sm text-white"
-                    title={player.position}
+                    title="Last Checked"
                   >
-                    {`Updated At: ${GetLocal(player.updatedAt)}`}
+                    {`Last Checked: ${GetLocal(player.updatedAt)}`}
                   </span>
                 )}
               </li>
