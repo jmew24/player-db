@@ -44,58 +44,63 @@ const Golf = () => {
     const leagues: string[] = [];
 
     data?.forEach((player) => {
-      if (!leagues.includes(player.team.fullName))
-        leagues.push(player.team.fullName);
+      const league = player.team.fullName;
+      if (!leagues.includes(league)) leagues.push(league);
     });
 
     return leagues;
   }, [data]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
-    const positionFilter = filter.position;
-    const leagueFilter = filter.league;
+    const positionFilter = filter.position?.toLowerCase();
+    const leagueFilter = filter.league?.toLowerCase();
 
     return golfItems.filter((player) => {
       const team = player.position?.toLowerCase();
       const hasTeamName = team.includes(teamFilter);
       const hasPosition =
-        positionFilter === "all"
-          ? true
-          : positionFilter === "active"
-          ? positionFilter === "active" && player?.number >= 1
-            ? true
-            : false
-          : positionFilter === "inactive" && player?.number === 0
-          ? true
-          : false;
+        positionFilter === "all" ||
+        (positionFilter === "active" && player?.number >= 1) ||
+        (positionFilter === "inactive" && player?.number === 0);
       const hasLeague =
         player.team?.fullName?.toLowerCase() === leagueFilter.toLowerCase();
 
-      if (teamFilter !== "" && positionFilter !== "" && leagueFilter !== "")
-        return hasTeamName && hasPosition && hasLeague;
-      if (teamFilter !== "" && positionFilter !== "")
-        return hasTeamName && hasPosition;
-      if (teamFilter !== "" && leagueFilter !== "")
-        return hasTeamName && hasLeague;
-      if (positionFilter !== "" && leagueFilter !== "")
-        return hasPosition && hasLeague;
-      if (teamFilter !== "") return hasTeamName;
-      if (positionFilter !== "") return hasPosition;
-      if (leagueFilter !== "") return hasLeague;
-      return true;
+      return (
+        (teamFilter !== "" &&
+          positionFilter !== "" &&
+          leagueFilter !== "" &&
+          hasTeamName &&
+          hasPosition &&
+          hasLeague) ||
+        (teamFilter !== "" &&
+          positionFilter !== "" &&
+          hasTeamName &&
+          hasPosition) ||
+        (teamFilter !== "" &&
+          leagueFilter !== "" &&
+          hasTeamName &&
+          hasLeague) ||
+        (positionFilter !== "" &&
+          leagueFilter !== "" &&
+          hasPosition &&
+          hasLeague) ||
+        (teamFilter !== "" && hasTeamName) ||
+        (positionFilter !== "" && hasPosition) ||
+        (leagueFilter !== "" && hasLeague) ||
+        (teamFilter === "" && positionFilter === "" && leagueFilter === "")
+      );
     });
   }, [filter.team, filter.position, filter.league, golfItems]);
-  const pages = useMemo(
-    () => Math.ceil(filteredResults.length / playersPerPage),
-    [filteredResults.length]
-  );
-  const pagesArray = useMemo(() => Array.from(Array(pages).keys()), [pages]);
+  const pages = useMemo(() => {
+    return Math.ceil(filteredResults.length / playersPerPage);
+  }, [filteredResults.length]);
+  const pagesArray = useMemo(() => [...Array(pages).keys()], [pages]);
   const pagesDisplay = useMemo(() => {
     const selectedPage = page - 1;
-    const firstPage = selectedPage - 1 < 0 ? 0 : selectedPage - 1;
-    const lastPage = selectedPage + 4 >= pages ? pages : selectedPage + 4;
+    const firstPage = Math.max(selectedPage - 1, 0);
+    const lastPage = Math.min(selectedPage + 4, pages - 1);
 
-    return pagesArray.slice(firstPage, lastPage);
+    return pagesArray.slice(firstPage, lastPage + 1);
   }, [pages, pagesArray, page]);
 
   useEffect(() => {

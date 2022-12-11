@@ -16,6 +16,23 @@ import {
   autoRacingPositionAtom,
 } from "@shared/jotai";
 
+const getTeamName = (player: AutoRacingPlayer, searchType: string) => {
+  if (searchType === "player") {
+    return [
+      player.team.fullName?.toLowerCase(),
+      player.team.abbreviation?.toLowerCase(),
+      player.team.city?.toLowerCase(),
+      player.team.shortName?.toLowerCase(),
+    ];
+  }
+  return [
+    player.fullName?.toLowerCase(),
+    player.firstName?.toLowerCase(),
+    player.lastName?.toLowerCase(),
+    player.firstName?.toLowerCase(),
+  ];
+};
+
 const AutoRacing = () => {
   const query = useAtomValue(queryAtom);
   const searchType = useAtomValue(searchTypeAtom);
@@ -44,44 +61,26 @@ const AutoRacing = () => {
     const leagues: string[] = [];
 
     data?.forEach((player) => {
-      if (!leagues.includes(player.team.fullName))
-        leagues.push(player.team.fullName);
+      const league = player.team.fullName;
+      if (!leagues.includes(league)) leagues.push(league);
     });
 
     return leagues;
   }, [data]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
-    const leagueFilter = filter.league;
+    const leagueFilter = filter.league?.toLowerCase();
 
     return autoRacingItems.filter((player) => {
-      const team =
-        searchType === "player"
-          ? {
-              name: player.team.fullName?.toLowerCase(),
-              abbreviation: player.team.abbreviation?.toLowerCase(),
-              city: player.team.city?.toLowerCase(),
-              shortName: player.team.shortName?.toLowerCase(),
-            }
-          : {
-              name: player.fullName?.toLowerCase(),
-              abbreviation: player.firstName?.toLowerCase(),
-              city: player.lastName?.toLowerCase(),
-              shortName: player.firstName?.toLowerCase(),
-            };
-      const hasTeamName =
-        team.name?.includes(teamFilter) ||
-        team.abbreviation?.includes(teamFilter) ||
-        team.city?.includes(teamFilter) ||
-        team.shortName?.includes(teamFilter);
+      const hasTeamName = getTeamName(player, searchType).some((name) =>
+        name.toLowerCase().includes(teamFilter)
+      );
       const hasLeague =
         player.team?.fullName?.toLowerCase() === leagueFilter.toLowerCase();
 
-      if (teamFilter !== "" && leagueFilter !== "")
-        return hasTeamName && hasLeague;
-      if (teamFilter !== "") return hasTeamName;
-      if (leagueFilter !== "") return hasLeague;
-      return true;
+      return (
+        (teamFilter === "" || hasTeamName) && (leagueFilter === "" || hasLeague)
+      );
     });
   }, [filter.league, filter.team, searchType, autoRacingItems]);
   const pages = useMemo(

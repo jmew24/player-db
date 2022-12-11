@@ -16,6 +16,23 @@ import {
   basketballPositionAtom,
 } from "@shared/jotai";
 
+const getTeamName = (player: BasketballPlayer, searchType: string) => {
+  if (searchType === "player") {
+    return [
+      player.team.fullName?.toLowerCase(),
+      player.team.abbreviation?.toLowerCase(),
+      player.team.city?.toLowerCase(),
+      player.team.shortName?.toLowerCase(),
+    ];
+  }
+  return [
+    player.fullName?.toLowerCase(),
+    player.firstName?.toLowerCase(),
+    player.lastName?.toLowerCase(),
+    player.firstName?.toLowerCase(),
+  ];
+};
+
 const Basketball = () => {
   const query = useAtomValue(queryAtom);
   const searchType = useAtomValue(searchTypeAtom);
@@ -44,54 +61,33 @@ const Basketball = () => {
     const leagues: string[] = [];
 
     data?.forEach((player) => {
-      if (!leagues.includes(player.team.league))
-        leagues.push(player.team.league);
+      const league = player.team.league;
+      if (!leagues.includes(league)) leagues.push(league);
     });
 
     return leagues;
   }, [data]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
-    const positionFilter = filter.position;
-    const leagueFilter = filter.league;
+    const positionFilter = filter.position?.toLowerCase();
+    const leagueFilter = filter.league?.toLowerCase();
 
     return basketballItems.filter((player) => {
-      const team =
-        searchType === "player"
-          ? {
-              name: player.team.fullName?.toLowerCase(),
-              abbreviation: player.team.abbreviation?.toLowerCase(),
-              city: player.team.city?.toLowerCase(),
-              shortName: player.team.shortName?.toLowerCase(),
-            }
-          : {
-              name: player.fullName?.toLowerCase(),
-              abbreviation: player.firstName?.toLowerCase(),
-              city: player.lastName?.toLowerCase(),
-              shortName: player.firstName?.toLowerCase(),
-            };
-      const hasTeamName =
-        team.name?.includes(teamFilter) ||
-        team.abbreviation?.includes(teamFilter) ||
-        team.city?.includes(teamFilter) ||
-        team.shortName?.includes(teamFilter);
-      const hasPosition =
-        player.position?.toLowerCase() === positionFilter.toLowerCase();
-      const hasLeague =
-        player.team?.league?.toLowerCase() === leagueFilter.toLowerCase();
+      const hasTeamName = getTeamName(player, searchType).some((name) =>
+        name.toLowerCase().includes(teamFilter)
+      );
+      const hasPosition = player.position?.toLowerCase() === positionFilter;
+      const hasLeague = player.team?.league?.toLowerCase() === leagueFilter;
 
-      if (teamFilter !== "" && positionFilter !== "" && leagueFilter !== "")
-        return hasTeamName && hasPosition && hasLeague;
-      if (teamFilter !== "" && positionFilter !== "")
-        return hasTeamName && hasPosition;
-      if (teamFilter !== "" && leagueFilter !== "")
-        return hasTeamName && hasLeague;
-      if (positionFilter !== "" && leagueFilter !== "")
-        return hasPosition && hasLeague;
-      if (teamFilter !== "") return hasTeamName;
-      if (positionFilter !== "") return hasPosition;
-      if (leagueFilter !== "") return hasLeague;
-      return true;
+      if (teamFilter === "" && positionFilter === "" && leagueFilter === "") {
+        return true;
+      }
+
+      const teamCondition = teamFilter === "" || hasTeamName;
+      const positionCondition = positionFilter === "" || hasPosition;
+      const leagueCondition = leagueFilter === "" || hasLeague;
+
+      return teamCondition && positionCondition && leagueCondition;
     });
   }, [
     filter.team,
@@ -100,17 +96,16 @@ const Basketball = () => {
     basketballItems,
     searchType,
   ]);
-  const pages = useMemo(
-    () => Math.ceil(filteredResults.length / playersPerPage),
-    [filteredResults.length]
-  );
-  const pagesArray = useMemo(() => Array.from(Array(pages).keys()), [pages]);
+  const pages = useMemo(() => {
+    return Math.ceil(filteredResults.length / playersPerPage);
+  }, [filteredResults.length]);
+  const pagesArray = useMemo(() => [...Array(pages).keys()], [pages]);
   const pagesDisplay = useMemo(() => {
     const selectedPage = page - 1;
-    const firstPage = selectedPage - 1 < 0 ? 0 : selectedPage - 1;
-    const lastPage = selectedPage + 4 >= pages ? pages : selectedPage + 4;
+    const firstPage = Math.max(selectedPage - 1, 0);
+    const lastPage = Math.min(selectedPage + 4, pages - 1);
 
-    return pagesArray.slice(firstPage, lastPage);
+    return pagesArray.slice(firstPage, lastPage + 1);
   }, [pages, pagesArray, page]);
 
   useEffect(() => {

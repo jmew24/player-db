@@ -16,6 +16,23 @@ import {
   footballLeagueAtom,
 } from "@shared/jotai";
 
+const getTeamName = (player: FootballPlayer, searchType: string) => {
+  if (searchType === "player") {
+    return [
+      player.team.fullName?.toLowerCase(),
+      player.team.abbreviation?.toLowerCase(),
+      player.team.city?.toLowerCase(),
+      player.team.shortName?.toLowerCase(),
+    ];
+  }
+  return [
+    player.fullName?.toLowerCase(),
+    player.firstName?.toLowerCase(),
+    player.lastName?.toLowerCase(),
+    player.firstName?.toLowerCase(),
+  ];
+};
+
 const Football = () => {
   const query = useAtomValue(queryAtom);
   const searchType = useAtomValue(searchTypeAtom);
@@ -44,139 +61,95 @@ const Football = () => {
     const leagues: string[] = [];
 
     data?.forEach((player) => {
-      if (!leagues.includes(player.team.league))
-        leagues.push(player.team.league);
+      const league = player.team.league;
+      if (!leagues.includes(league)) leagues.push(league);
     });
 
     return leagues;
   }, [data]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
-    const positionFilter = filter.position;
-    const leagueFilter = filter.league;
+    const positionFilter = filter.position?.toLowerCase();
+    const leagueFilter = filter.league?.toLowerCase();
 
     return footballItems.filter((player) => {
-      const team =
-        searchType === "player"
-          ? {
-              name: player.team.fullName?.toLowerCase(),
-              abbreviation: player.team.abbreviation?.toLowerCase(),
-              city: player.team.city?.toLowerCase(),
-              shortName: player.team.shortName?.toLowerCase(),
-            }
-          : {
-              name: player.fullName?.toLowerCase(),
-              abbreviation: player.firstName?.toLowerCase(),
-              city: player.lastName?.toLowerCase(),
-              shortName: player.firstName?.toLowerCase(),
-            };
-      const hasTeamName =
-        team.name?.includes(teamFilter) ||
-        team.abbreviation?.includes(teamFilter) ||
-        team.city?.includes(teamFilter) ||
-        team.shortName?.includes(teamFilter);
-      let position = player.position ?? "";
-      switch (player.position) {
-        case "Quarterback":
-          position = "QB";
-          break;
-        case "Center":
-          position = "C";
-          break;
-        case "Offensive Guard":
-          position = "OG";
-          break;
-        case "Full Back":
-          position = "FB";
-          break;
-        case "Half Back":
-          position = "HB";
-          break;
-        case "Wide Receiver":
-          position = "WR";
-          break;
-        case "Tight End":
-          position = "TE";
-          break;
-        case "Left Tackle":
-          position = "LT";
-          break;
-        case "Right Tackle":
-          position = "RT";
-          break;
-        case "Defensive End":
-          position = "DE";
-          break;
-        case "Offensive Tackle":
-          position = "OT";
-          break;
-        case "Defensive Tackle":
-          position = "DT";
-          break;
-        case "Middle Linebacker":
-          position = "LB";
-          break;
-        case "Right Outside Linebacker":
-          position = "LB";
-          break;
-        case "Outside Linebacker":
-          position = "LB";
-          break;
-        case "Left Outside Linebacker":
-          position = "LB";
-          break;
-        case "Cornerback":
-          position = "CB";
-          break;
-        case "Safety":
-          position = "S";
-          break;
-        case "Strong Safety":
-          position = "S";
-          break;
-        case "Free Safety":
-          position = "S";
-          break;
-        case "Kicker":
-          position = "K";
-          break;
-        case "Punter":
-          position = "P";
-          break;
-        default:
-          position = player.position ?? "";
-          break;
-      }
+      const hasTeamName = getTeamName(player, searchType).some((name) =>
+        name.toLowerCase().includes(teamFilter)
+      );
+      const hasLeague = player.team?.league?.toLowerCase() === leagueFilter;
+      const positions: {
+        [key: string]: string;
+      } = {
+        Quarterback: "QB",
+        Center: "C",
+        "Offensive Guard": "OG",
+        "Full Back": "FB",
+        "Half Back": "HB",
+        "Wide Receiver": "WR",
+        "Tight End": "TE",
+        "Left Tackle": "LT",
+        "Right Tackle": "RT",
+        "Defensive End": "DE",
+        "Offensive Tackle": "OT",
+        "Defensive Tackle": "DT",
+        "Middle Linebacker": "LB",
+        "Right Outside Linebacker": "LB",
+        "Outside Linebacker": "LB",
+        "Left Outside Linebacker": "LB",
+        "Right Inside Linebacker": "LB",
+        "Inside Linebacker": "LB",
+        "Left Inside Linebacker": "LB",
+        "Right Defensive End": "DE",
+        "Left Defensive End": "DE",
+        "Right Defensive Tackle": "DT",
+        "Left Defensive Tackle": "DT",
+        "Right Cornerback": "CB",
+        "Left Cornerback": "CB",
+        Cornerback: "CB",
+        Safety: "S",
+        "Strong Safety": "S",
+        "Free Safety": "S",
+        Kicker: "K",
+        Punter: "P",
+        "Long Snapper": "LS",
+        "Place Kicker": "PK",
+        "Kick Returner": "KR",
+        "Punt Returner": "PR",
+        "Kickoff Returner": "KR",
+        "Kick Return Specialist": "KR",
+        "Punt Return Specialist": "PR",
+        "Kickoff Return Specialist": "KR",
+        "Kick Return": "KR",
+        "Punt Return": "PR",
+        "Kickoff Return": "KR",
+      };
+      const position = player.position ?? "";
+      const abbreviation = positions[position] ?? "";
       const hasPosition =
-        position.toLowerCase() === positionFilter.toLowerCase();
-      const hasLeague =
-        player.team?.league?.toLowerCase() === leagueFilter.toLowerCase();
+        position.toLowerCase() === positionFilter.toLowerCase() ||
+        abbreviation.toLowerCase() === positionFilter.toLowerCase();
 
-      if (teamFilter !== "" && positionFilter !== "" && leagueFilter !== "")
-        return hasTeamName && hasPosition && hasLeague;
-      if (teamFilter !== "" && positionFilter !== "")
-        return hasTeamName && hasPosition;
-      if (teamFilter !== "" && leagueFilter !== "")
-        return hasTeamName && hasLeague;
-      if (positionFilter !== "" && leagueFilter !== "")
-        return hasPosition && hasLeague;
-      if (teamFilter !== "") return hasTeamName;
-      if (positionFilter !== "") return hasPosition;
-      if (leagueFilter !== "") return hasLeague;
-      return true;
+      if (teamFilter === "" && positionFilter === "" && leagueFilter === "") {
+        return true;
+      }
+
+      const teamCondition = teamFilter === "" || hasTeamName;
+      const positionCondition = positionFilter === "" || hasPosition;
+      const leagueCondition = leagueFilter === "" || hasLeague;
+
+      return teamCondition && positionCondition && leagueCondition;
     });
   }, [filter.team, filter.position, filter.league, footballItems, searchType]);
-  const pages = useMemo(
-    () => Math.ceil(filteredResults.length / playersPerPage),
-    [filteredResults.length]
-  );
-  const pagesArray = useMemo(() => Array.from(Array(pages).keys()), [pages]);
+  const pages = useMemo(() => {
+    return Math.ceil(filteredResults.length / playersPerPage);
+  }, [filteredResults.length]);
+  const pagesArray = useMemo(() => [...Array(pages).keys()], [pages]);
   const pagesDisplay = useMemo(() => {
     const selectedPage = page - 1;
-    const firstPage = selectedPage - 1 < 0 ? 0 : selectedPage - 1;
-    const lastPage = selectedPage + 4 >= pages ? pages : selectedPage + 4;
+    const firstPage = Math.max(selectedPage - 1, 0);
+    const lastPage = Math.min(selectedPage + 4, pages - 1);
 
-    return pagesArray.slice(firstPage, lastPage);
+    return pagesArray.slice(firstPage, lastPage + 1);
   }, [pages, pagesArray, page]);
 
   useEffect(() => {

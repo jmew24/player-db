@@ -44,8 +44,8 @@ const Tennis = () => {
     const leagues: string[] = [];
 
     data?.forEach((player) => {
-      if (!leagues.includes(player.team.fullName))
-        leagues.push(player.team.fullName);
+      const league = player.team.fullName;
+      if (!leagues.includes(league)) leagues.push(league);
     });
 
     return leagues;
@@ -84,17 +84,16 @@ const Tennis = () => {
       return true;
     });
   }, [filter.league, filter.team, searchType, tennisItems]);
-  const pages = useMemo(
-    () => Math.ceil(filteredResults.length / playersPerPage),
-    [filteredResults.length]
-  );
-  const pagesArray = useMemo(() => Array.from(Array(pages).keys()), [pages]);
+  const pages = useMemo(() => {
+    return Math.ceil(filteredResults.length / playersPerPage);
+  }, [filteredResults.length]);
+  const pagesArray = useMemo(() => [...Array(pages).keys()], [pages]);
   const pagesDisplay = useMemo(() => {
     const selectedPage = page - 1;
-    const firstPage = selectedPage - 1 < 0 ? 0 : selectedPage - 1;
-    const lastPage = selectedPage + 4 >= pages ? pages : selectedPage + 4;
+    const firstPage = Math.max(selectedPage - 1, 0);
+    const lastPage = Math.min(selectedPage + 4, pages - 1);
 
-    return pagesArray.slice(firstPage, lastPage);
+    return pagesArray.slice(firstPage, lastPage + 1);
   }, [pages, pagesArray, page]);
 
   useEffect(() => {
