@@ -51,6 +51,7 @@ export default defineNextConfig({
       "www.indycar.com",
       "digbza2f4g9qo.cloudfront.net",
       "pga-tour-res.cloudinary.com",
+      "www.nascar.com",
     ],
   },
 });
