@@ -3,7 +3,7 @@ import { useSetAtom, useAtomValue } from "jotai";
 
 import { queryAtom, searchTypeAtom } from "@shared/jotai";
 
-import SearchFilter from "@component/SearchFilter";
+import NavBar from "@component/NavBar";
 
 type SearchProps = {
   children?: JSX.Element | JSX.Element[] | string | string[];
@@ -43,7 +43,7 @@ const Search: FC<SearchProps> = ({ children }) => {
           className="flex w-full flex-col items-center justify-center"
         >
           <div className="mt-4 flex w-full min-w-full">
-            <SearchFilter />
+            <NavBar />
           </div>
           <div className="mt-6 mb-6 flex w-full min-w-full">
             <select
