@@ -234,7 +234,7 @@ const AutoRacing = () => {
                 </p>
                 <ImageWithFallback
                   className="justify-start rounded px-2 py-1 text-sm text-white"
-                  alt={`${player.id}`}
+                  alt={`${player.fullName} image`}
                   width={67}
                   height={67}
                   src={player.image}
