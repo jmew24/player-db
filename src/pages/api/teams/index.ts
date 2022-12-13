@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Sport } from "@prisma/client";
 
 import prisma from "@lib/prisma";
-import redis from "@lib/redis";
+import redisClient from "@lib/redis";
 
 // GET /api/teams?sport=:sport
 // GET /api/teams?sport=:sport&query=:query
@@ -14,7 +14,7 @@ export default async function handle(
 
   const sportQuery = (req.query.sport as string).trim();
   const sportCacheStr =
-    (await redis.get(`sportCache:${sportQuery.toLowerCase()}`)) ?? "{}";
+    (await redisClient.get(`sportCache:${sportQuery.toLowerCase()}`)) ?? "{}";
   const sportCache = JSON.parse(sportCacheStr);
   let sport: Sport | null = null;
 
@@ -45,18 +45,16 @@ export default async function handle(
       },
     });
     if (sport)
-      redis.set(
+      redisClient.set(
         `sportCache:${sportQuery.toLowerCase()}`,
-        JSON.stringify({ ...sportCache, ...sport }),
-        "EX",
-        60
+        JSON.stringify({ ...sportCache, ...sport })
       );
   }
 
   if (!sport) return res.json([]);
 
   const resultCacheStr =
-    (await redis.get(`teamCache:${sportQuery.toLowerCase()}`)) ?? "{}";
+    (await redisClient.get(`teamCache:${sportQuery.toLowerCase()}`)) ?? "{}";
   const teamCache = JSON.parse(resultCacheStr);
   let results = [];
 
@@ -147,11 +145,9 @@ export default async function handle(
         },
       });
       if (results.length > 0)
-        redis.set(
+        redisClient.set(
           `teamCache:${sportQuery.toLowerCase()}`,
-          JSON.stringify({ ...teamCache, ...results }),
-          "EX",
-          60
+          JSON.stringify({ ...teamCache, ...results })
         );
     }
   } else {
@@ -190,11 +186,9 @@ export default async function handle(
         },
       });
       if (results.length > 0)
-        redis.set(
+        redisClient.set(
           `teamCache:${sportQuery.toLowerCase()}`,
-          JSON.stringify({ ...teamCache, ...results }),
-          "EX",
-          60
+          JSON.stringify({ ...teamCache, ...results })
         );
     }
   }

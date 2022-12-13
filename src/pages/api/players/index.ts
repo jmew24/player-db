@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { Sport } from "@prisma/client";
 
 import prisma from "@lib/prisma";
-import redis from "@lib/redis";
+import redisClient from "@lib/redis";
 
 // GET /api/players?sport=:sport
 // GET /api/players?sport=:sport&query=:query
@@ -15,7 +15,7 @@ export default async function handle(
 
   const sportQuery = (req.query.sport as string).trim();
   const sportCacheStr =
-    (await redis.get(`sportCache:${sportQuery.toLowerCase()}`)) ?? "{}";
+    (await redisClient.get(`sportCache:${sportQuery.toLowerCase()}`)) ?? "{}";
   const sportCache = JSON.parse(sportCacheStr);
   let sport: Sport | null = null;
 
@@ -46,18 +46,16 @@ export default async function handle(
       },
     });
     if (sport)
-      redis.set(
+      redisClient.set(
         `sportCache:${sportQuery.toLowerCase()}`,
-        JSON.stringify({ ...sportCache, ...sport }),
-        "EX",
-        60
+        JSON.stringify({ ...sportCache, ...sport })
       );
   }
 
   if (!sport) return res.json([]);
 
   const resultCacheStr =
-    (await redis.get(`playerCache:${sportQuery.toLowerCase()}`)) ?? "{}";
+    (await redisClient.get(`playerCache:${sportQuery.toLowerCase()}`)) ?? "{}";
   const playerCache = JSON.parse(resultCacheStr);
   let results = [];
 
@@ -147,11 +145,9 @@ export default async function handle(
         },
       });
       if (results.length > 0)
-        redis.set(
+        redisClient.set(
           `playerCache:${sportQuery.toLowerCase()}`,
-          JSON.stringify({ ...playerCache, ...results }),
-          "EX",
-          60
+          JSON.stringify({ ...playerCache, ...results })
         );
     }
   } else if (req.query.team) {
@@ -248,11 +244,9 @@ export default async function handle(
         },
       });
       if (results.length > 0)
-        redis.set(
+        redisClient.set(
           `playerCache:${sportQuery.toLowerCase()}`,
-          JSON.stringify({ ...playerCache, ...results }),
-          "EX",
-          60
+          JSON.stringify({ ...playerCache, ...results })
         );
     }
   } else {
@@ -303,11 +297,9 @@ export default async function handle(
         },
       });
       if (results.length > 0)
-        redis.set(
+        redisClient.set(
           `playerCache:${sportQuery.toLowerCase()}`,
-          JSON.stringify({ ...playerCache, ...results }),
-          "EX",
-          60
+          JSON.stringify({ ...playerCache, ...results })
         );
     }
   }
