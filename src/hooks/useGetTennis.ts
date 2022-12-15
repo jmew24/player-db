@@ -3,7 +3,7 @@ import { Team } from "@prisma/client";
 import { TennisResponse, TennisPlayer, TennisRoster } from "tennis";
 
 import { fetchRequest } from "@factory/fetchRequest";
-import { tennisTeamCache, tennisCache } from "@factory/cache";
+import cache from "@factory/cache";
 
 const blankTeam: Team = {
   id: "-1",
@@ -21,8 +21,8 @@ const blankTeam: Team = {
 
 const searchTennis = async (query: string) => {
   const q = query.trim();
-  const teams = tennisTeamCache.get();
-  const players = tennisCache.get(q);
+  const teams = cache.get("tennis:t") as Team[];
+  const players = cache.get(`tennis:p:${q}`) as TennisPlayer[];
   if (players.length > 0) return players;
 
   if (teams.length <= 0) {
@@ -32,9 +32,9 @@ const searchTennis = async (query: string) => {
 
     for (const team of teamResponse) {
       teams.push(team);
-      tennisTeamCache.add(team);
     }
   }
+  cache.set("tennis:t", teams);
 
   const response = (await fetchRequest(
     `/api/players?sport=tennis&query=${q}`
@@ -63,12 +63,12 @@ const searchTennis = async (query: string) => {
     } as TennisPlayer);
   }
 
-  return tennisCache.set(q, players);
+  return cache.set(`tennis:p:${q}`, players);
 };
 
 const searchTennisTeam = async (query: string) => {
   const q = query.trim();
-  const players = tennisCache.get(`team:${q}`);
+  const players = cache.get(`tennis:tp:${q}`) as TennisPlayer[];
   if (players.length > 0) return players;
 
   const results = (await fetchRequest(`/api/teams?sport=tennis&query=${q}`, {
@@ -108,7 +108,7 @@ const searchTennisTeam = async (query: string) => {
     }
   }
 
-  return tennisCache.set(`team:${q}`, players);
+  return cache.set(`tennis:tp:${q}`, players);
 };
 
 export default function useGetTennis(

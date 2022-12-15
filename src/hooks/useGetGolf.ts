@@ -3,7 +3,7 @@ import { Team } from "@prisma/client";
 import { GolfResponse, GolfPlayer, GolfRoster } from "golf";
 
 import { fetchRequest } from "@factory/fetchRequest";
-import { golfTeamCache, golfCache } from "@factory/cache";
+import cache from "@factory/cache";
 
 const blankTeam: Team = {
   id: "-1",
@@ -21,8 +21,8 @@ const blankTeam: Team = {
 
 const searchGolf = async (query: string) => {
   const q = query.trim();
-  const teams = golfTeamCache.get();
-  const players = golfCache.get(q);
+  const teams = cache.get("golf:t") as Team[];
+  const players = cache.get(`golf:p:${q}`) as GolfPlayer[];
   if (players.length > 0) return players;
 
   if (teams.length <= 0) {
@@ -32,9 +32,9 @@ const searchGolf = async (query: string) => {
 
     for (const team of teamResponse) {
       teams.push(team);
-      golfTeamCache.add(team);
     }
   }
+  cache.set("golf:t", teams);
 
   const response = (await fetchRequest(
     `/api/players?sport=golf&query=${q}`
@@ -63,12 +63,12 @@ const searchGolf = async (query: string) => {
     } as GolfPlayer);
   }
 
-  return golfCache.set(q, players);
+  return cache.set(`golf:p:${q}`, players);
 };
 
 const searchGolfTeam = async (query: string) => {
   const q = query.trim();
-  const players = golfCache.get(`team:${q}`);
+  const players = cache.get(`golf:tp:${q}`) as GolfPlayer[];
   if (players.length > 0) return players;
 
   const results = (await fetchRequest(`/api/teams?sport=golf&query=${q}`, {
@@ -108,7 +108,7 @@ const searchGolfTeam = async (query: string) => {
     }
   }
 
-  return golfCache.set(`team:${q}`, players);
+  return cache.set(`golf:tp:${q}`, players);
 };
 
 export default function useGetGolf(

@@ -9,7 +9,7 @@ import {
 
 import { fetchRequest } from "@factory/fetchRequest";
 import { proxy } from "@factory/proxy";
-import { hockeyTeamCache, hockeyCache } from "@factory/cache";
+import cache from "@factory/cache";
 
 const blankTeam: Team = {
   id: "-1",
@@ -27,8 +27,8 @@ const blankTeam: Team = {
 
 const searchHockey = async (query: string) => {
   const q = query.trim();
-  const teams = hockeyTeamCache.get();
-  const players = hockeyCache.get(q);
+  const teams = cache.get("hockey:t") as Team[];
+  const players = cache.get(`hockey:p:${q}`) as HockeyPlayer[];
   if (players.length > 0) return players;
 
   if (teams.length <= 0) {
@@ -38,9 +38,9 @@ const searchHockey = async (query: string) => {
 
     for (const team of teamResponse) {
       teams.push(team);
-      hockeyTeamCache.add(team);
     }
   }
+  cache.set("hockey:t", teams);
 
   const response = (await fetchRequest(
     `/api/players?sport=hockey&query=${q}`
@@ -135,12 +135,12 @@ const searchHockey = async (query: string) => {
     } as HockeyPlayer);
   }
 
-  return hockeyCache.set(q, players);
+  return cache.set(`hockey:p:${q}`, players);
 };
 
 const searchHockeyTeam = async (query: string) => {
   const q = query.trim();
-  const players = hockeyCache.get(`team:${q}`);
+  const players = cache.get(`hockey:tp:${q}`) as HockeyPlayer[];
   if (players.length > 0) return players;
 
   const results = (await fetchRequest(`/api/teams?sport=hockey&query=${q}`, {
@@ -180,7 +180,7 @@ const searchHockeyTeam = async (query: string) => {
     }
   }
 
-  return hockeyCache.set(`team:${q}`, players);
+  return cache.set(`hockey:tp:${q}`, players);
 };
 
 export default function useGetHockey(

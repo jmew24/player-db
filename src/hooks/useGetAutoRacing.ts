@@ -7,7 +7,7 @@ import {
 } from "autoRacing";
 
 import { fetchRequest } from "@factory/fetchRequest";
-import { autoRacingTeamCache, autoRacingCache } from "@factory/cache";
+import cache from "@factory/cache";
 
 const blankTeam: Team = {
   id: "-1",
@@ -25,8 +25,8 @@ const blankTeam: Team = {
 
 const searchAutoRacing = async (query: string) => {
   const q = query.trim();
-  const teams = autoRacingTeamCache.get();
-  const players = autoRacingCache.get(q);
+  const teams = cache.get("autoRacing:t") as Team[];
+  const players = cache.get(`autoRacing:p:${q}`) as AutoRacingPlayer[];
   if (players.length > 0) return players;
 
   if (teams.length <= 0) {
@@ -36,9 +36,9 @@ const searchAutoRacing = async (query: string) => {
 
     for (const team of teamResponse) {
       teams.push(team);
-      autoRacingTeamCache.add(team);
     }
   }
+  cache.set("autoRacing:t", teams);
 
   const response = (await fetchRequest(
     `/api/players?sport=autoRacing&query=${q}`
@@ -67,12 +67,12 @@ const searchAutoRacing = async (query: string) => {
     } as AutoRacingPlayer);
   }
 
-  return autoRacingCache.set(q, players);
+  return cache.set(`autoRacing:p:${q}`, players);
 };
 
 const searchAutoRacingTeam = async (query: string) => {
   const q = query.trim();
-  const players = autoRacingCache.get(`team:${q}`);
+  const players = cache.get(`autoRacing:tp:${q}`) as AutoRacingPlayer[];
   if (players.length > 0) return players;
 
   const results = (await fetchRequest(
@@ -115,7 +115,7 @@ const searchAutoRacingTeam = async (query: string) => {
     }
   }
 
-  return autoRacingCache.set(`team:${q}`, players);
+  return cache.set(`autoRacing:tp:${q}`, players);
 };
 
 export default function useGetAutoRacing(

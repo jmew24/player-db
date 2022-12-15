@@ -9,7 +9,7 @@ import {
 
 import { fetchRequest } from "@factory/fetchRequest";
 import { proxy } from "@factory/proxy";
-import { baseballTeamCache, baseballCache } from "@factory/cache";
+import cache from "@factory/cache";
 
 const blankTeam: Team = {
   id: "-1",
@@ -27,8 +27,8 @@ const blankTeam: Team = {
 
 const searchBaseball = async (query: string) => {
   const q = query.trim();
-  const teams = baseballTeamCache.get();
-  const players = baseballCache.get(q);
+  const teams = cache.get("baseball:t") as Team[];
+  const players = cache.get(`baseball:p:${q}`) as BaseballPlayer[];
   if (players.length > 0) return players;
 
   if (teams.length <= 0) {
@@ -38,9 +38,9 @@ const searchBaseball = async (query: string) => {
 
     for (const team of teamResponse) {
       teams.push(team);
-      baseballTeamCache.add(team);
     }
   }
+  cache.set("baseball:t", teams);
 
   const response = (await fetchRequest(
     `/api/players?sport=baseball&query=${q}`
@@ -131,12 +131,12 @@ const searchBaseball = async (query: string) => {
     } as BaseballPlayer);
   }
 
-  return baseballCache.set(q, players);
+  return cache.set(`baseball:p:${q}`, players);
 };
 
 const searchBaseballTeam = async (query: string) => {
   const q = query.trim();
-  const players = baseballCache.get(`team:${q}`);
+  const players = cache.get(`baseball:tp:${q}`) as BaseballPlayer[];
   if (players.length > 0) return players;
 
   const results = (await fetchRequest(`/api/teams?sport=baseball&query=${q}`, {
@@ -176,7 +176,7 @@ const searchBaseballTeam = async (query: string) => {
     }
   }
 
-  return baseballCache.set(`team:${q}`, players);
+  return cache.set(`baseball:tp:${q}`, players);
 };
 
 export default function useGetBaseball(
