@@ -3,7 +3,6 @@ import { Player, Sport, Team } from "@prisma/client";
 declare type HockeyResponse = Player & { team: Team; sport: Sport };
 declare type HockeyPlayer = NHLPlayer & { team: Team; sport: Sport };
 declare type HockeyRoster = Team & { sport: Sport; players: Player[] };
-declare type HockeyCache = { [key: string]: HockeyPlayer[] };
 
 declare interface HockeyProps {
   query: string;

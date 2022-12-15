@@ -3,7 +3,6 @@ import { Player, Sport, Team } from "@prisma/client";
 declare type AutoRacingResponse = Player & { team: Team; sport: Sport };
 declare type AutoRacingPlayer = RacingPlayer & { team: Team; sport: Sport };
 declare type AutoRacingRoster = Team & { sport: Sport; players: Player[] };
-declare type AutoRacingCache = { [key: string]: AutoRacingPlayer[] };
 
 declare interface AutoRacingProps {
   query: string;

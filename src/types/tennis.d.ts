@@ -3,7 +3,6 @@ import { Player, Sport, Team } from "@prisma/client";
 declare type TennisResponse = Player & { team: Team; sport: Sport };
 declare type TennisPlayer = ATPPlayer & { team: Team; sport: Sport };
 declare type TennisRoster = Team & { sport: Sport; players: Player[] };
-declare type TennisCache = { [key: string]: TennisPlayer[] };
 
 declare interface TennisProps {
   query: string;
