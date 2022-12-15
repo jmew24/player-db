@@ -9,7 +9,7 @@ import {
 
 import { fetchRequest } from "@factory/fetchRequest";
 import { proxy } from "@factory/proxy";
-import cache from "@factory/cache";
+import { teamCache, playerCache } from "@factory/cache";
 
 const blankTeam: Team = {
   id: "-1",
@@ -27,8 +27,8 @@ const blankTeam: Team = {
 
 const searchFootball = async (query: string) => {
   const q = query.trim();
-  const teams = cache.get("football:t") as Team[];
-  const players = cache.get(`football:p:${q}`) as FootballPlayer[];
+  const teams = teamCache.get("football") as Team[];
+  const players = playerCache.get(`football:p:${q}`) as FootballPlayer[];
   if (players.length > 0) return players;
 
   if (teams.length <= 0) {
@@ -40,7 +40,7 @@ const searchFootball = async (query: string) => {
       teams.push(team);
     }
   }
-  cache.set("football:t", teams);
+  teamCache.set("football", teams);
 
   const response = (await fetchRequest(
     `/api/players?sport=football&query=${q}`
@@ -122,12 +122,12 @@ const searchFootball = async (query: string) => {
     } as FootballPlayer);
   }
 
-  return cache.set(`football:p:${q}`, players);
+  return playerCache.set(`football:p:${q}`, players) as FootballPlayer[];
 };
 
 const searchFootballTeam = async (query: string) => {
   const q = query.trim();
-  const players = cache.get(`football:tp:${q}`) as FootballPlayer[];
+  const players = playerCache.get(`football:t:${q}`) as FootballPlayer[];
   if (players.length > 0) return players;
 
   const results = (await fetchRequest(`/api/teams?sport=football&query=${q}`, {
@@ -167,7 +167,7 @@ const searchFootballTeam = async (query: string) => {
     }
   }
 
-  return cache.set(`football:tp:${q}`, players);
+  return playerCache.set(`football:t:${q}`, players) as FootballPlayer[];
 };
 
 export default function useGetFootball(

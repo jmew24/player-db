@@ -1,7 +1,7 @@
 import { memo, useState, useEffect, useMemo } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { GoLinkExternal } from "react-icons/go";
-import { BaseballPlayer, MLBPlayerFilter, MLBPosition } from "baseball";
+import type { BaseballPlayer, MLBPlayerFilter, MLBPosition } from "baseball";
 
 import useGetBaseball from "@hook/useGetBaseball";
 import ImageWithFallback from "@component/ImageWithFallback";

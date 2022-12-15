@@ -1,7 +1,7 @@
 import { memo, useState, useEffect, useMemo } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { GoLinkExternal } from "react-icons/go";
-import { GolfPlayer, GolfPlayerFilter } from "golf";
+import type { GolfPlayer, GolfPlayerFilter } from "golf";
 
 import useGetGolf from "@hook/useGetGolf";
 import ImageWithFallback from "@component/ImageWithFallback";
