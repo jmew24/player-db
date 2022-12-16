@@ -7,7 +7,7 @@ class Cache<CacheValue> {
 
   // Create a method to get a value from the cache
   get(key: string) {
-    return this.cache.get(key) || [];
+    return this.cache.get(key) || ([] as CacheValue);
   }
 
   // Create a method to set a value in the cache and return the array
