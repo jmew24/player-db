@@ -41,21 +41,25 @@ const Golf = () => {
   const playersPerPage = 10;
   const { isFetching, isLoading, data } = useGetGolf(query, searchType);
   const leagueFilters = useMemo(() => {
-    const leagues: string[] = [];
+    const compare = (a: string, b: string) => {
+      if (a === "PGA Tour") return -1;
+      if (b === "PGA Tour") return 1;
+      if (a === "Unknown") return 1;
+      if (b === "Unknown") return -1;
+      return a.localeCompare(b);
+    };
+    const leagues = new Set<string>();
 
-    data?.forEach((player) => {
-      const league = player.team.fullName;
-      if (!leagues.includes(league)) leagues.push(league);
-    });
+    data?.forEach((player) => leagues.add(player.team.fullName));
 
-    return leagues;
+    return Array.from(leagues).sort(compare);
   }, [data]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
     const positionFilter = filter.position?.toLowerCase();
     const leagueFilter = filter.league?.toLowerCase();
 
-    return golfItems.filter((player) => {
+    const players = golfItems.filter((player) => {
       const team = player.position?.toLowerCase();
       const hasTeamName = team.includes(teamFilter);
       const hasPosition =
@@ -89,6 +93,25 @@ const Golf = () => {
         (leagueFilter !== "" && hasLeague) ||
         (teamFilter === "" && positionFilter === "" && leagueFilter === "")
       );
+    });
+
+    return players.sort((a: GolfPlayer, b: GolfPlayer) => {
+      if (a.team?.fullName === "PGA Tour" && b.team?.fullName !== "PGA Tour")
+        return -1;
+      if (a.team?.fullName !== "PGA Tour" && b.team?.fullName === "PGA Tour")
+        return 1;
+      if (a.source === "PGATour.com" && b.source !== "PGATour.com") return -1;
+      if (a.source !== "PGATour.com" && b.source === "PGATour.com") return 1;
+      // If both players are from the same team, compare their active status with active showing first (0 = inactive, 1 = active)
+      if (a.team?.fullName === b.team?.fullName) {
+        return b.number < a.number ? -1 : b.number > a.number ? 1 : 0;
+      }
+      if (a.team?.fullName === "Unknown" && b.team?.fullName !== "Unknown")
+        return 1;
+      if (a.team?.fullName !== "Unknown" && b.team?.fullName === "Unknown")
+        return -1;
+      // If both players are from the same source and league, sort by full name
+      return a.fullName.localeCompare(b.fullName);
     });
   }, [filter.team, filter.position, filter.league, golfItems]);
   const pages = useMemo(() => {
@@ -141,11 +164,7 @@ const Golf = () => {
       const start = page * playersPerPage;
       const end = start + playersPerPage;
       setPaginationData({ start, end });
-      setPagePlayers(
-        filteredResults
-          .sort((a, b) => parseInt(a.position) - parseInt(b.position))
-          .slice(start, end)
-      );
+      setPagePlayers(filteredResults.slice(start, end));
     } else {
       setPagePlayers([]);
     }

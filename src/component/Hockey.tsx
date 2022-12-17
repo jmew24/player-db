@@ -58,21 +58,25 @@ const Hockey = () => {
   const playersPerPage = 10;
   const { isFetching, isLoading, data } = useGetHockey(query, searchType);
   const leagueFilters = useMemo(() => {
-    const leagues: string[] = [];
+    const compare = (a: string, b: string) => {
+      if (a === "National Hockey League") return -1;
+      if (b === "National Hockey League") return 1;
+      if (a === "Unknown") return 1;
+      if (b === "Unknown") return -1;
+      return a.localeCompare(b);
+    };
+    const leagues = new Set<string>();
 
-    data?.forEach((player) => {
-      const league = player.team.league;
-      if (!leagues.includes(league)) leagues.push(league);
-    });
+    data?.forEach((player) => leagues.add(player.team.league));
 
-    return leagues;
+    return Array.from(leagues).sort(compare);
   }, [data]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
     const positionFilter = filter.position?.toLowerCase();
     const leagueFilter = filter.league?.toLowerCase();
 
-    return hockeyItems.filter((player) => {
+    const players = hockeyItems.filter((player) => {
       const hasTeamName = getTeamName(player, searchType).some((name) =>
         name.toLowerCase().includes(teamFilter)
       );
@@ -91,6 +95,26 @@ const Hockey = () => {
       const leagueCondition = leagueFilter === "" || hasLeague;
 
       return teamCondition && positionCondition && leagueCondition;
+    });
+
+    return players.sort((a: HockeyPlayer, b: HockeyPlayer) => {
+      if (
+        a.team?.league === "National Hockey League" &&
+        b.team?.league !== "National Hockey League"
+      )
+        return -1;
+      if (
+        a.team?.league !== "National Hockey League" &&
+        b.team?.league === "National Hockey League"
+      )
+        return 1;
+      if (a.source === "NHL.com" && b.source !== "NHL.com") return -1;
+      if (a.source !== "NHL.com" && b.source === "NHL.com") return 1;
+      if (a.team?.league === "Unknown" && b.team?.league !== "Unknown")
+        return 1;
+      if (a.team?.league !== "Unknown" && b.team?.league === "Unknown")
+        return -1;
+      return a.fullName.localeCompare(b.fullName);
     });
   }, [filter.team, filter.position, filter.league, hockeyItems, searchType]);
   const pages = useMemo(() => {

@@ -62,21 +62,25 @@ const Basketball = () => {
   const playersPerPage = 10;
   const { isFetching, isLoading, data } = useGetBasketball(query, searchType);
   const leagueFilters = useMemo(() => {
-    const leagues: string[] = [];
+    const compare = (a: string, b: string) => {
+      if (a === "National Basketball Association") return -1;
+      if (b === "National Basketball Association") return 1;
+      if (a === "Unknown") return 1;
+      if (b === "Unknown") return -1;
+      return a.localeCompare(b);
+    };
+    const leagues = new Set<string>();
 
-    data?.forEach((player) => {
-      const league = player.team.league;
-      if (!leagues.includes(league)) leagues.push(league);
-    });
+    data?.forEach((player) => leagues.add(player.team.league));
 
-    return leagues;
+    return Array.from(leagues).sort(compare);
   }, [data]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
     const positionFilter = filter.position?.toLowerCase();
     const leagueFilter = filter.league?.toLowerCase();
 
-    return basketballItems.filter((player) => {
+    const players = basketballItems.filter((player) => {
       const hasTeamName = getTeamName(player, searchType).some((name) =>
         name.toLowerCase().includes(teamFilter)
       );
@@ -92,6 +96,26 @@ const Basketball = () => {
       const leagueCondition = leagueFilter === "" || hasLeague;
 
       return teamCondition && positionCondition && leagueCondition;
+    });
+
+    return players.sort((a: BasketballPlayer, b: BasketballPlayer) => {
+      if (
+        a.team?.league === "National Basketball Association" &&
+        b.team?.league !== "National Basketball Association"
+      )
+        return -1;
+      if (
+        a.team?.league !== "National Basketball Association" &&
+        b.team?.league === "National Basketball Association"
+      )
+        return 1;
+      if (a.source === "NBA.com" && b.source !== "NBA.com") return -1;
+      if (a.source !== "NBA.com" && b.source === "NBA.com") return 1;
+      if (a.team?.league === "Unknown" && b.team?.league !== "Unknown")
+        return 1;
+      if (a.team?.league !== "Unknown" && b.team?.league === "Unknown")
+        return -1;
+      return a.fullName.localeCompare(b.fullName);
     });
   }, [
     filter.team,

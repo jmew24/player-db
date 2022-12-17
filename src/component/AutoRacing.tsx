@@ -58,20 +58,24 @@ const AutoRacing = () => {
   const playersPerPage = 10;
   const { isFetching, isLoading, data } = useGetAutoRacing(query, searchType);
   const leagueFilters = useMemo(() => {
-    const leagues: string[] = [];
+    const compare = (a: string, b: string) => {
+      if (a === "Formula1") return -1;
+      if (b === "Formula1") return 1;
+      if (a === "Unknown") return 1;
+      if (b === "Unknown") return -1;
+      return a.localeCompare(b);
+    };
+    const leagues = new Set<string>();
 
-    data?.forEach((player) => {
-      const league = player.team.fullName;
-      if (!leagues.includes(league)) leagues.push(league);
-    });
+    data?.forEach((player) => leagues.add(player.team.fullName));
 
-    return leagues;
+    return Array.from(leagues).sort(compare);
   }, [data]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
     const leagueFilter = filter.league?.toLowerCase();
 
-    return autoRacingItems.filter((player) => {
+    const players = autoRacingItems.filter((player) => {
       const hasTeamName = getTeamName(player, searchType).some((name) =>
         name.toLowerCase().includes(teamFilter)
       );
@@ -81,6 +85,34 @@ const AutoRacing = () => {
       return (
         (teamFilter === "" || hasTeamName) && (leagueFilter === "" || hasLeague)
       );
+    });
+
+    return players.sort((a: AutoRacingPlayer, b: AutoRacingPlayer) => {
+      if (a.team?.fullName === "Formula1" && b.team?.fullName !== "Formula1")
+        return -1;
+      if (a.team?.fullName !== "Formula1" && b.team?.fullName === "Formula1")
+        return 1;
+      if (a.source === "formula1.com" && b.source !== "formula1.com") return -1;
+      if (a.source !== "formula1.com" && b.source === "formula1.com") return 1;
+      // If both players are from the same source, compare their teams
+      if (a.source === b.source) {
+        // If both players are from the same team, compare their positions
+        if (a.team?.fullName === b.team?.fullName) {
+          const aPos = parseInt(a.position, 10);
+          const bPos = parseInt(b.position, 10);
+          return aPos < bPos ? -1 : aPos > bPos ? 1 : 0;
+        }
+        return a.team?.fullName.localeCompare(b.team?.fullName);
+      }
+      if (a.team?.fullName === "Unknown" && b.team?.fullName !== "Unknown")
+        return 1;
+      if (a.team?.fullName !== "Unknown" && b.team?.fullName === "Unknown")
+        return -1;
+      // If both players are from different sources, compare their sources
+      if (a.team?.fullName !== b.team?.fullName)
+        return a.team?.fullName.localeCompare(b.team?.fullName);
+      // If both players are from the same source and league, sort by full name
+      return a.fullName.localeCompare(b.fullName);
     });
   }, [filter.league, filter.team, searchType, autoRacingItems]);
   const pages = useMemo(
@@ -134,11 +166,7 @@ const AutoRacing = () => {
       const start = page * playersPerPage;
       const end = start + playersPerPage;
       setPaginationData({ start, end });
-      setPagePlayers(
-        filteredResults
-          .sort((a, b) => parseInt(a.position) - parseInt(b.position))
-          .slice(start, end)
-      );
+      setPagePlayers(filteredResults.slice(start, end));
     } else {
       setPagePlayers([]);
     }

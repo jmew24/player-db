@@ -41,20 +41,24 @@ const Tennis = () => {
   const playersPerPage = 10;
   const { isFetching, isLoading, data } = useGetTennis(query, searchType);
   const leagueFilters = useMemo(() => {
-    const leagues: string[] = [];
+    const compare = (a: string, b: string) => {
+      if (a === "ATP Tour") return -1;
+      if (b === "ATP Tour") return 1;
+      if (a === "Unknown") return 1;
+      if (b === "Unknown") return -1;
+      return a.localeCompare(b);
+    };
+    const leagues = new Set<string>();
 
-    data?.forEach((player) => {
-      const league = player.team.fullName;
-      if (!leagues.includes(league)) leagues.push(league);
-    });
+    data?.forEach((player) => leagues.add(player.team.fullName));
 
-    return leagues;
+    return Array.from(leagues).sort(compare);
   }, [data]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
     const leagueFilter = filter.league;
 
-    return tennisItems.filter((player) => {
+    const players = tennisItems.filter((player) => {
       const team =
         searchType === "player"
           ? {
@@ -82,6 +86,31 @@ const Tennis = () => {
       if (teamFilter !== "") return hasTeamName;
       if (leagueFilter !== "") return hasLeague;
       return true;
+    });
+
+    return players.sort((a: TennisPlayer, b: TennisPlayer) => {
+      if (a.team?.fullName === "ATP Tour" && b.team?.fullName !== "ATP Tour")
+        return -1;
+      if (a.team?.fullName !== "ATP Tour" && b.team?.fullName === "ATP Tour")
+        return 1;
+      if (a.source === "ATPtour.com" && b.source !== "ATPtour.com") return -1;
+      if (a.source !== "ATPtour.com" && b.source === "ATPtour.com") return 1;
+      // If both players are from the same source, compare their teams
+      if (a.source === b.source) {
+        // If both players are from the same team, compare their positions
+        if (a.team?.fullName === b.team?.fullName) {
+          const aPos = parseInt(a.position, 10);
+          const bPos = parseInt(b.position, 10);
+          return aPos < bPos ? -1 : aPos > bPos ? 1 : 0;
+        }
+        return a.team?.fullName.localeCompare(b.team?.fullName);
+      }
+      if (a.team?.league === "Unknown" && b.team?.league !== "Unknown")
+        return 1;
+      if (a.team?.league !== "Unknown" && b.team?.league === "Unknown")
+        return -1;
+      // If both players are from the same source and league, sort by full name
+      return a.fullName.localeCompare(b.fullName);
     });
   }, [filter.league, filter.team, searchType, tennisItems]);
   const pages = useMemo(() => {
@@ -134,11 +163,7 @@ const Tennis = () => {
       const start = page * playersPerPage;
       const end = start + playersPerPage;
       setPaginationData({ start, end });
-      setPagePlayers(
-        filteredResults
-          .sort((a, b) => parseInt(a.position) - parseInt(b.position))
-          .slice(start, end)
-      );
+      setPagePlayers(filteredResults.slice(start, end));
     } else {
       setPagePlayers([]);
     }

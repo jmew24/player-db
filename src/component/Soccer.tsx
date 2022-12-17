@@ -58,21 +58,25 @@ const Soccer = () => {
   const playersPerPage = 10;
   const { isFetching, isLoading, data } = useGetSoccer(query, searchType);
   const leagueFilters = useMemo(() => {
-    const leagues: string[] = [];
+    const compare = (a: string, b: string) => {
+      if (a === "English Premier League") return -1;
+      if (b === "English Premier League") return 1;
+      if (a === "Unknown") return 1;
+      if (b === "Unknown") return -1;
+      return a.localeCompare(b);
+    };
+    const leagues = new Set<string>();
 
-    data?.forEach((player) => {
-      const league = player.team.league;
-      if (!leagues.includes(league)) leagues.push(league);
-    });
+    data?.forEach((player) => leagues.add(player.team.league));
 
-    return leagues;
+    return Array.from(leagues).sort(compare);
   }, [data]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
     const positionFilter = filter.position?.toLowerCase();
     const leagueFilter = filter.league?.toLowerCase();
 
-    return soccerItems.filter((player) => {
+    const players = soccerItems.filter((player) => {
       const hasTeamName = getTeamName(player, searchType).some((name) =>
         name.toLowerCase().includes(teamFilter)
       );
@@ -88,6 +92,26 @@ const Soccer = () => {
       const leagueCondition = leagueFilter === "" || hasLeague;
 
       return teamCondition && positionCondition && leagueCondition;
+    });
+
+    return players.sort((a: SoccerPlayer, b: SoccerPlayer) => {
+      if (
+        a.team?.league === "English Premier League" &&
+        b.team?.league !== "English Premier League"
+      )
+        return -1;
+      if (
+        a.team?.league !== "English Premier League" &&
+        b.team?.league === "English Premier League"
+      )
+        return 1;
+      if (a.source === "ESPN.com" && b.source !== "ESPN.com") return -1;
+      if (a.source !== "ESPN.com" && b.source === "ESPN.com") return 1;
+      if (a.team?.league === "Unknown" && b.team?.league !== "Unknown")
+        return 1;
+      if (a.team?.league !== "Unknown" && b.team?.league === "Unknown")
+        return -1;
+      return a.fullName.localeCompare(b.fullName);
     });
   }, [filter.team, filter.position, filter.league, soccerItems, searchType]);
   const pages = useMemo(() => {
