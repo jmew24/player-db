@@ -120,9 +120,10 @@ const Baseball = () => {
   );
   const pagesArray = useMemo(() => Array.from(Array(pages).keys()), [pages]);
   const pagesDisplay = useMemo(() => {
-    const selectedPage = page - 1;
-    const firstPage = selectedPage - 1 < 0 ? 0 : selectedPage - 1;
-    const lastPage = selectedPage + 4 >= pages ? pages : selectedPage + 4;
+    const NUM_PAGES_TO_DISPLAY = 4;
+    const currentPage = page - 1;
+    const firstPage = Math.max(0, currentPage - 1);
+    const lastPage = Math.min(pages, currentPage + NUM_PAGES_TO_DISPLAY);
 
     return pagesArray.slice(firstPage, lastPage);
   }, [pages, pagesArray, page]);

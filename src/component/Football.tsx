@@ -169,11 +169,12 @@ const Football = () => {
   }, [filteredResults.length]);
   const pagesArray = useMemo(() => [...Array(pages).keys()], [pages]);
   const pagesDisplay = useMemo(() => {
-    const selectedPage = page - 1;
-    const firstPage = Math.max(selectedPage - 1, 0);
-    const lastPage = Math.min(selectedPage + 4, pages - 1);
+    const NUM_PAGES_TO_DISPLAY = 4;
+    const currentPage = page - 1;
+    const firstPage = Math.max(0, currentPage - 1);
+    const lastPage = Math.min(pages, currentPage + NUM_PAGES_TO_DISPLAY);
 
-    return pagesArray.slice(firstPage, lastPage + 1);
+    return pagesArray.slice(firstPage, lastPage);
   }, [pages, pagesArray, page]);
 
   useEffect(() => {
