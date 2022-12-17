@@ -82,9 +82,14 @@ const AutoRacing = () => {
       const hasLeague =
         player.team?.fullName?.toLowerCase() === leagueFilter.toLowerCase();
 
-      return (
-        (teamFilter === "" || hasTeamName) && (leagueFilter === "" || hasLeague)
-      );
+      if (teamFilter === "" && leagueFilter === "") {
+        return true;
+      }
+
+      const teamCondition = teamFilter === "" || hasTeamName;
+      const leagueCondition = leagueFilter === "" || hasLeague;
+
+      return teamCondition && leagueCondition;
     });
 
     return players.sort((a: AutoRacingPlayer, b: AutoRacingPlayer) => {

@@ -16,6 +16,23 @@ import {
   tennisPositionAtom,
 } from "@shared/jotai";
 
+const getTeamName = (player: TennisPlayer, searchType: string) => {
+  if (searchType === "player") {
+    return [
+      player.team.fullName?.toLowerCase(),
+      player.team.abbreviation?.toLowerCase(),
+      player.team.city?.toLowerCase(),
+      player.team.shortName?.toLowerCase(),
+    ];
+  }
+  return [
+    player.fullName?.toLowerCase(),
+    player.firstName?.toLowerCase(),
+    player.lastName?.toLowerCase(),
+    player.firstName?.toLowerCase(),
+  ];
+};
+
 const Tennis = () => {
   const query = useAtomValue(queryAtom);
   const searchType = useAtomValue(searchTypeAtom);
@@ -56,36 +73,22 @@ const Tennis = () => {
   }, [data]);
   const filteredResults = useMemo(() => {
     const teamFilter = filter.team?.toLowerCase();
-    const leagueFilter = filter.league;
+    const leagueFilter = filter.league?.toLowerCase();
 
     const players = tennisItems.filter((player) => {
-      const team =
-        searchType === "player"
-          ? {
-              name: player.team.fullName?.toLowerCase(),
-              abbreviation: player.team.abbreviation?.toLowerCase(),
-              city: player.team.city?.toLowerCase(),
-              shortName: player.team.shortName?.toLowerCase(),
-            }
-          : {
-              name: player.fullName?.toLowerCase(),
-              abbreviation: player.firstName?.toLowerCase(),
-              city: player.lastName?.toLowerCase(),
-              shortName: player.firstName?.toLowerCase(),
-            };
-      const hasTeamName =
-        team.name?.includes(teamFilter) ||
-        team.abbreviation?.includes(teamFilter) ||
-        team.city?.includes(teamFilter) ||
-        team.shortName?.includes(teamFilter);
-      const hasLeague =
-        player.team?.fullName?.toLowerCase() === leagueFilter.toLowerCase();
+      const hasTeamName = getTeamName(player, searchType).some((name) =>
+        name.toLowerCase().includes(teamFilter)
+      );
+      const hasLeague = player.team?.fullName?.toLowerCase() === leagueFilter;
 
-      if (teamFilter !== "" && leagueFilter !== "")
-        return hasTeamName && hasLeague;
-      if (teamFilter !== "") return hasTeamName;
-      if (leagueFilter !== "") return hasLeague;
-      return true;
+      if (teamFilter === "" && leagueFilter === "") {
+        return true;
+      }
+
+      const teamCondition = teamFilter === "" || hasTeamName;
+      const leagueCondition = leagueFilter === "" || hasLeague;
+
+      return teamCondition && leagueCondition;
     });
 
     return players.sort((a: TennisPlayer, b: TennisPlayer) => {
@@ -263,7 +266,11 @@ const Tennis = () => {
                   width={67}
                   height={67}
                   src={player.image}
-                  fallbackSrc="https://pga-tour-res.cloudinary.com/image/upload/c_fill,d_headshots_default.png,dpr_2.0,f_auto,g_face:center,h_64,q_auto,w_64/headshots_1.png"
+                  fallbackSrc={
+                    player.team.fullName == "WTA Tour"
+                      ? "https://www.wtatennis.com/resources/v3.53.0/i/elements/player-placeholder.svg"
+                      : "https://www.atptour.com/-/media/tennis/players/head-shot/2022/07/21/13/40/ghost-headshot.png"
+                  }
                 />
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1"

@@ -61,38 +61,22 @@ const Golf = () => {
 
     const players = golfItems.filter((player) => {
       const team = player.position?.toLowerCase();
-      const hasTeamName = team.includes(teamFilter);
+      const hasTeamName = teamFilter !== "" && team.includes(teamFilter);
       const hasPosition =
         positionFilter === "all" ||
         (positionFilter === "active" && player?.number >= 1) ||
         (positionFilter === "inactive" && player?.number === 0);
-      const hasLeague =
-        player.team?.fullName?.toLowerCase() === leagueFilter.toLowerCase();
+      const hasLeague = player.team?.fullName?.toLowerCase() === leagueFilter;
 
-      return (
-        (teamFilter !== "" &&
-          positionFilter !== "" &&
-          leagueFilter !== "" &&
-          hasTeamName &&
-          hasPosition &&
-          hasLeague) ||
-        (teamFilter !== "" &&
-          positionFilter !== "" &&
-          hasTeamName &&
-          hasPosition) ||
-        (teamFilter !== "" &&
-          leagueFilter !== "" &&
-          hasTeamName &&
-          hasLeague) ||
-        (positionFilter !== "" &&
-          leagueFilter !== "" &&
-          hasPosition &&
-          hasLeague) ||
-        (teamFilter !== "" && hasTeamName) ||
-        (positionFilter !== "" && hasPosition) ||
-        (leagueFilter !== "" && hasLeague) ||
-        (teamFilter === "" && positionFilter === "" && leagueFilter === "")
-      );
+      if (teamFilter === "" && positionFilter === "" && leagueFilter === "") {
+        return true;
+      }
+
+      const teamCondition = teamFilter === "" || hasTeamName;
+      const positionCondition = positionFilter === "" || hasPosition;
+      const leagueCondition = leagueFilter === "" || hasLeague;
+
+      return teamCondition && positionCondition && leagueCondition;
     });
 
     return players.sort((a: GolfPlayer, b: GolfPlayer) => {
@@ -285,7 +269,11 @@ const Golf = () => {
                   width={67}
                   height={67}
                   src={player.image}
-                  fallbackSrc="https://pga-tour-res.cloudinary.com/image/upload/c_fill,d_headshots_default.png,dpr_2.0,f_auto,g_face:center,h_64,q_auto,w_64/headshots_1.png"
+                  fallbackSrc={
+                    player.team.fullName == "LPGA Tour"
+                      ? "https://www.wtatennis.com/resources/v3.53.0/i/elements/player-placeholder.svg"
+                      : "https://pga-tour-res.cloudinary.com/image/upload/c_fill,d_headshots_default.png,dpr_2.0,f_auto,g_face:center,h_64,q_auto,w_64/headshots_1.pn"
+                  }
                 />
                 <p
                   className="w-fill m-1 flex items-center justify-center py-2 px-1"

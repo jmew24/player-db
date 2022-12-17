@@ -155,8 +155,8 @@ const Football = () => {
         b.team?.league === "National Football League"
       )
         return 1;
-      if (a.source === "NFL.com" && b.source !== "NFL.com") return -1;
-      if (a.source !== "NFL.com" && b.source === "NFL.com") return 1;
+      if (a.source === "ESPN.com" && b.source !== "ESPN.com") return -1;
+      if (a.source !== "ESPN.com" && b.source === "ESPN.com") return 1;
       if (a.team?.league === "Unknown" && b.team?.league !== "Unknown")
         return 1;
       if (a.team?.league !== "Unknown" && b.team?.league === "Unknown")
