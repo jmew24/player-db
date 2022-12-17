@@ -16,6 +16,20 @@ class Cache<CacheValue> {
     return value;
   }
 
+  // Create a method to add a value into a cache and return the array
+  add(key: string, value: unknown) {
+    const current = this.get(key) as CacheValue[];
+
+    if (Array.isArray(value)) {
+      current.push(...(value as CacheValue[]));
+    } else {
+      current.push(value as CacheValue);
+    }
+
+    // Set the value in the cache and return the array
+    return this.set(key, current as CacheValue);
+  }
+
   // Create a method to clear a value from the cache
   remove(key: string) {
     this.cache.delete(key);

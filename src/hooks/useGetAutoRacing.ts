@@ -25,20 +25,19 @@ const blankTeam: Team = {
 
 const searchAutoRacing = async (query: string) => {
   const q = query.trim();
-  const teams = teamCache.get("autoRacing") as Team[];
   const players = playerCache.get(`autoRacing:p:${q}`) as AutoRacingPlayer[];
   if (players.length > 0) return players;
 
+  let teams = teamCache.get("autoRacing") as Team[];
   if (teams.length <= 0) {
     const teamResponse = (await fetchRequest(
       "/api/teams?sport=autoRacing"
     )) as Team[];
 
     for (const team of teamResponse) {
-      teams.push(team);
+      teams = teamCache.add("autoRacing", team);
     }
   }
-  teamCache.set("autoRacing", teams);
 
   const response = (await fetchRequest(
     `/api/players?sport=autoRacing&query=${q}`

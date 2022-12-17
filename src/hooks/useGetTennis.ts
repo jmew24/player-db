@@ -21,20 +21,19 @@ const blankTeam: Team = {
 
 const searchTennis = async (query: string) => {
   const q = query.trim();
-  const teams = teamCache.get("tennis") as Team[];
   const players = playerCache.get(`tennis:p:${q}`) as TennisPlayer[];
   if (players.length > 0) return players;
 
+  let teams = teamCache.get("tennis") as Team[];
   if (teams.length <= 0) {
     const teamResponse = (await fetchRequest(
       "/api/teams?sport=tennis"
     )) as Team[];
 
     for (const team of teamResponse) {
-      teams.push(team);
+      teams = teamCache.add("tennis", team);
     }
   }
-  teamCache.set("tennis", teams);
 
   const response = (await fetchRequest(
     `/api/players?sport=tennis&query=${q}`
